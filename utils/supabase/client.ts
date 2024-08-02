@@ -1,5 +1,7 @@
 import { createBrowserClient } from "@supabase/ssr";
 
+// DO NOT TOUCH, ALREADY UP TO DATE
+
 export const createClient = () =>
   createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

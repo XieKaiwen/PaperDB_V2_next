@@ -1,5 +1,18 @@
-import { GeistSans } from "geist/font/sans";
+import {Merriweather, Open_Sans} from "next/font/google"
 import "./globals.css";
+export const dynamic = 'force-dynamic'
+
+const merriweather = Merriweather({
+  subsets: ['latin'],   // Specifies the character subset to load, useful for performance optimization.
+  weight: ['400', '700'],  // Includes 'normal' and 'bold' weights for diverse typographical emphasis.
+  variable: '--font-merriweather'  // Custom CSS variable for easier referencing in your CSS.
+});
+
+const openSans = Open_Sans({
+  subsets: ['latin'],   // Specifies the 'latin' character subset to load.
+  variable: '--font-open-sans'  // Custom CSS variable for easier referencing in your CSS.
+});
+
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -7,8 +20,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "PaperDB",
+  description: "Access countless Top School Papers and get the best mugging experience here!",
 };
 
 export default function RootLayout({
@@ -17,11 +30,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={GeistSans.className}>
-      <body className="bg-background text-foreground">
-        <main className="min-h-screen flex flex-col items-center">
+    <html lang="en">
+      <body className={`min-h-screen bg-background antialiased w-full ${merriweather.variable} ${openSans.variable}`}>
           {children}
-        </main>
       </body>
     </html>
   );
