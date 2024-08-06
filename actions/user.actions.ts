@@ -3,19 +3,23 @@ import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export async function login({ email, password, redirectedFrom="" }: LoginProps) {
+export async function login({
+  email,
+  password
+}: LoginProps) {
   const supabase = createClient();
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const userEmail = data?.user?.email
   if (error) {
-    console.error(error);    
+    console.error(error);
     throw new Error(error.message);
   }
-  redirect(`/${redirectedFrom || "home"}`)
+  // Instead of redirect, we should pass the user to the client
+  // TODO: retrieve user, and also refactor into a try catch block instead
 }
 
 export async function signUp({
@@ -24,22 +28,22 @@ export async function signUp({
   phoneNumber,
   username,
   educationLevel,
-  redirectedFrom=""
+  redirectedFrom = "",
 }: SignUpProps) {
-    const headersList = headers()
-    const host = headersList.get('host')
-    const protocol = headersList.get('x-forwarded-proto') || 'http'
-    
-    const origin = `${protocol}://${host}`
-    
-    // Use the origin as needed
-    console.log('Request origin:', origin)
+  const headersList = headers();
+  const host = headersList.get("host");
+  const protocol = headersList.get("x-forwarded-proto") || "http";
+
+  const origin = `${protocol}://${host}`;
+
+  // Use the origin as needed
+  console.log("Request origin:", origin);
   const supabase = createClient();
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
 
-  const { data, error } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -48,14 +52,12 @@ export async function signUp({
         username: username,
         educationLevel: educationLevel,
       },
-      emailRedirectTo: `${origin}/auth/?redirectedFrom=${redirectedFrom}`
+      emailRedirectTo: `${origin}/auth/callback?${redirectedFrom ? `redirectedFrom=${redirectedFrom}` : 'redirectedFrom'}`,
     },
   });
 
   if (error) {
     console.error(error);
-    throw new Error("Something wrong happened");
+    throw new Error(error.message);
   }
-
-  redirect("/home");
 }
