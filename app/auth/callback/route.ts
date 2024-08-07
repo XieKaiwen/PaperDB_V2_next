@@ -6,8 +6,6 @@ import { getBaseUrl } from "@/lib/utils";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-// TODO Create a custom SMTP for supabase
-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   console.log(request.url);
@@ -15,14 +13,15 @@ export async function GET(request: NextRequest) {
 
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const next = searchParams.get("redirectedFrom") ?? "home";
+
+  const next = searchParams.get("redirectedFrom") ?? "/home";
+  const decodedNext = decodeURIComponent(next)
+
   const metadata = searchParams.get("metadata") || "";
 
   console.log("metadata: ", metadata);
   console.log("next: ", next);
 
-  // next will still be encoded, we have to decode it first
-  // TODO set up redirection to link it was from
   console.log("token_hash: ", token_hash);
   console.log("type: ", type);
 
@@ -72,6 +71,7 @@ export async function GET(request: NextRequest) {
 
         try {
           // Insert sign up log into the userLog table
+          // TODO implement rolling back of updates in the database, to prevent further errors from occurring due to "User exists in database"
           const newUserLog = await prisma.userLog.create({
             data: {
               userId: newUser.id,
@@ -80,15 +80,14 @@ export async function GET(request: NextRequest) {
           });
           console.log(newUserLog);
 
-          // TODO reformat the next variable to work correctly
-          return NextResponse.redirect(new URL("/" + next, baseURL));
+          return NextResponse.redirect(new URL(decodedNext, baseURL));
         } catch (error) {
           console.error(error);
           const encodedError = encodeURIComponent(
             "An error occurred during email verification"
           );
           return NextResponse.redirect(
-            new URL(`/sign-up?error=${encodedError}`, baseURL)
+            new URL(`/sign-up?error=${encodedError}${decodedNext ? `&redirectedFrom=${encodeURIComponent(decodedNext)}` : ""}`, baseURL)
           );
         }
       } catch (error) {
@@ -97,7 +96,7 @@ export async function GET(request: NextRequest) {
           "An error occurred during email verification"
         );
         return NextResponse.redirect(
-          new URL(`/sign-up?error=${encodedError}`, baseURL)
+          new URL(`/sign-up?error=${encodedError}${decodedNext ? `&redirectedFrom=${encodeURIComponent(decodedNext)}` : ""}`, baseURL)
         );
       }
     } catch (err) {
@@ -106,12 +105,16 @@ export async function GET(request: NextRequest) {
         "An error occurred during email verification"
       );
       return NextResponse.redirect(
-        new URL(`/sign-up?error=${encodedError}`, baseURL)
+        new URL(`/sign-up?error=${encodedError}${decodedNext ? `&redirectedFrom=${encodeURIComponent(decodedNext)}` : ""}`, baseURL)
       );
     }
   } else {
-    console.error("token_hash or type missing");
-    throw new Error("Token hash or type missing");
-    // TODO Redirect to an error page
+    console.error("Token_hash or Type missing");
+    const encodedError = encodeURIComponent(
+      "An error occurred during email verification"
+    );
+    return NextResponse.redirect(
+      new URL(`/sign-up?error=${encodedError}${decodedNext ? `&redirectedFrom=${encodeURIComponent(decodedNext)}` : ""}`, baseURL)
+    );
   }
 }

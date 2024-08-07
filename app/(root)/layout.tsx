@@ -9,40 +9,28 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const supabase = createClient();
+  const { data, error } = await supabase.auth.getUser();
 
-  try {
-    
-    const { data } = await supabase.auth.getUser();
-    if (!data?.user) {
-      throw new Error("User not found");
+  if (error || !data?.user) {
+    if(error){
+      console.error(error);
     }
 
-
-    return (
-      <>
-        <p>{data.user.email}</p>
-        {children}
-      </>
-    );
-
-
-
-
-
-
-
-
-
-  } catch (error) {
-    console.error(error);
     const headerList = headers();
     const redirectFrom = headerList.get("x-current-path");
     
     if (redirectFrom) {
       const encodedRedirectFrom = encodeURIComponent(redirectFrom);
-      redirect(`/login?redirectFrom=${encodedRedirectFrom}`);
+      redirect(`/login?redirectedFrom=${encodedRedirectFrom}`);
     } else {
       redirect("/login");
     }
   }
+
+  return (
+    <>
+      <p>{data.user.email}</p>
+      {children}
+    </>
+  );
 }

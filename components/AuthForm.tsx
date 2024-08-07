@@ -11,7 +11,7 @@ import { authFormSchema } from "@/lib/utils";
 import CustomInput from "./CustomAuthInput";
 import Link from "next/link";
 import CustomSelect from "./CustomSelect";
-import { useRouter, useSearchParams } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { Oval } from "react-loader-spinner";
 import { login, signUp } from "@/actions/user.actions";
 import { useToast } from "./ui/use-toast";
@@ -79,15 +79,25 @@ export default function AuthForm({ type }: AuthFormProps) {
 
   // 2. Define a submit handler.
   async function onSubmit(data: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     try {
       // This will only be called if the form data is valid
       console.log("Form data:", data);
       setIsLoading(true);
       const redirectedFrom = searchParams.get("redirectedFrom") || "";
       if (type === "login") {
-        await login({ ...data });
+        try{
+          const response = await login({ ...data });
+          if(response){
+            redirect(redirectedFrom)
+          }
+          const encodedError = encodeURIComponent("User not found, incorrect email or password")
+          router.replace(`/login?error=${encodedError}${redirectedFrom ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}` : ""}`)
+
+        }catch(error){
+          console.error(error);
+          const encodedError = encodeURIComponent("Error occurred during login process")
+          router.replace(`/login?error=${encodedError}${redirectedFrom ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}` : ""}`)
+        }
       } else if (type === "sign-up") {
         const signUpData = {
           email: data.email,
@@ -101,9 +111,10 @@ export default function AuthForm({ type }: AuthFormProps) {
         try {
           await signUp({ ...signUpData, redirectedFrom });
           setSentEmail(true)
+          form.reset();
         } catch (error) {
           const encodedError = encodeURIComponent("Error occurred in sign up process")
-          router.replace(`/sign-up?error=${encodedError}${redirectedFrom ? `redirectedFrom=${redirectedFrom}` : ""}`)
+          router.replace(`/sign-up?error=${encodedError}${redirectedFrom ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}` : ""}`)
         }
       }
       // Submit form data to your backend or handle it as needed
@@ -128,7 +139,7 @@ export default function AuthForm({ type }: AuthFormProps) {
                 Login{" "}
                 <Link
                   className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                  href={`/login${searchParams.get("redirectFrom") ? `?redirectFrom=${searchParams.get("redirectFrom")}` : ""}`}
+                  href={`/login${searchParams.get("redirectedFrom") ? `?redirectedFrom=${encodeURIComponent(searchParams.get("redirectedFrom")!)}` : ""}`}
                 >
                   here
                 </Link>
@@ -141,7 +152,7 @@ export default function AuthForm({ type }: AuthFormProps) {
                 Sign up{" "}
                 <Link
                   className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                  href={`/sign-up${searchParams.get("redirectFrom") ? `?redirectFrom=${searchParams.get("redirectFrom")}` : ""}`}
+                  href={`/sign-up${searchParams.get("redirectedFrom") ? `?redirectedFrom=${encodeURIComponent(searchParams.get("redirectedFrom")!)}` : ""}`}
                 >
                   here
                 </Link>

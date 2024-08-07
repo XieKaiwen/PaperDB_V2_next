@@ -1,11 +1,24 @@
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
-export default function AuthLayout({
+// TODO set up password reset (low priority)
+
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.auth.getUser();
+
+  if (data?.user) {
+    redirect("/home");
+  }
+  // console.error(error);
+  
   return (
     <>
       <main className="flex flex-row h-screen font-open-sans">

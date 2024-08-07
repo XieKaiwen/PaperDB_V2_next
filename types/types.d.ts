@@ -14,7 +14,7 @@ declare interface SignUpProps{
     phoneNumber: string
     username: string
     educationLevel: string
-    redirectedFrom?: string 
+    redirectedFrom: string 
 }
 
 declare type ParsedMapObject = {

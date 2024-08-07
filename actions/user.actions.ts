@@ -1,23 +1,27 @@
 "use server";
+import { parseStringify } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export async function login({
-  email,
-  password
-}: LoginProps) {
+export async function login({ email, password }: LoginProps) {
   const supabase = createClient();
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  const userEmail = data?.user?.email
-  if (error) {
+  try {
+    const { data } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    const user = data?.user;
+    console.log("Retrieved user: ", user);
+    return parseStringify(user)
+  } catch (error) {
     console.error(error);
-    throw new Error(error.message);
   }
+
   // Instead of redirect, we should pass the user to the client
   // TODO: retrieve user, and also refactor into a try catch block instead
 }
@@ -28,7 +32,7 @@ export async function signUp({
   phoneNumber,
   username,
   educationLevel,
-  redirectedFrom = "",
+  redirectedFrom,
 }: SignUpProps) {
   const headersList = headers();
   const host = headersList.get("host");
@@ -52,7 +56,9 @@ export async function signUp({
         username: username,
         educationLevel: educationLevel,
       },
-      emailRedirectTo: `${origin}/auth/callback?${redirectedFrom ? `redirectedFrom=${redirectedFrom}` : 'redirectedFrom'}`,
+      emailRedirectTo: `${origin}/auth/callback?${
+        redirectedFrom ? `redirectedFrom=${redirectedFrom}` : ""
+      }`,
     },
   });
 
