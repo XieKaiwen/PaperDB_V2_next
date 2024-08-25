@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { getBaseUrl } from "@/lib/utils";
 import { PrismaClient } from "@prisma/client";
+import { supabaseAdmin } from "@/utils/supabase/serverAdmin";
 
 const prisma = new PrismaClient();
 export async function GET(request: NextRequest) {
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get("type") as EmailOtpType | null;
 
   const next = searchParams.get("redirectedFrom") ?? "/home";
-  const decodedNext = decodeURIComponent(next)
+  const decodedNext = decodeURIComponent(next);
 
   const metadata = searchParams.get("metadata") || "";
 
@@ -59,53 +60,78 @@ export async function GET(request: NextRequest) {
         //     username: "exampleuser",
         //   },
         // });
-        const newUser = await prisma.user.create({
-          data: {
-            id: userData.sub,
-            email: userData.email,
-            educationLevel: userData.educationLevel,
-            phoneNumber: userData.phoneNumber,
-            username: userData.username,
-          },
-        });
-
-        try {
-          // Insert sign up log into the userLog table
-          // TODO implement rolling back of updates in the database, to prevent further errors from occurring due to "User exists in database"
+        await prisma.$transaction(async (prisma) => {
+          const newUser = await prisma.user.create({
+            data: {
+              id: userData.sub,
+              email: userData.email,
+              educationLevel: userData.educationLevel,
+              phoneNumber: userData.phoneNumber,
+              username: userData.username,
+            },
+          });
+          console.log("New user: ", newUser);
+          
           const newUserLog = await prisma.userLog.create({
             data: {
               userId: newUser.id,
               logInfo: `${newUser.username} just successfully registered and verified his email (${newUser.email})`,
             },
           });
-          console.log(newUserLog);
+          console.log("new User Log: ", newUserLog);
+        });
 
-          return NextResponse.redirect(new URL(decodedNext, baseURL));
-        } catch (error) {
-          console.error(error);
+        return NextResponse.redirect(new URL(decodedNext, baseURL));
+      } catch (err) {
+        // TODO roll back on supabase entry, and then prompt the user to re-signup for their account. 
+        console.error(err);
+        const { data, error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
+          userData.sub, false
+        )  
+        if(deleteError){
           const encodedError = encodeURIComponent(
-            "An error occurred during email verification"
+            "An error occurred during email verification. Please contact us at [official_email], sorry for the inconvenience"
           );
           return NextResponse.redirect(
-            new URL(`/sign-up?error=${encodedError}${decodedNext ? `&redirectedFrom=${encodeURIComponent(decodedNext)}` : ""}`, baseURL)
+            new URL(
+              `/sign-up?error=${encodedError}${
+                decodedNext
+                  ? `&redirectedFrom=${encodeURIComponent(decodedNext)}`
+                  : ""
+              }`,
+              baseURL
+            )
           );
-        }
-      } catch (error) {
-        console.error(error);
+        }    
+
         const encodedError = encodeURIComponent(
-          "An error occurred during email verification"
+          "An error occurred during email verification. Account creation unsuccessful, please sign up again"
         );
         return NextResponse.redirect(
-          new URL(`/sign-up?error=${encodedError}${decodedNext ? `&redirectedFrom=${encodeURIComponent(decodedNext)}` : ""}`, baseURL)
+          new URL(
+            `/sign-up?error=${encodedError}${
+              decodedNext
+                ? `&redirectedFrom=${encodeURIComponent(decodedNext)}`
+                : ""
+            }`,
+            baseURL
+          )
         );
       }
     } catch (err) {
       console.error(err);
       const encodedError = encodeURIComponent(
-        "An error occurred during email verification"
+        "An error occurred during email verification. Account not successfully created, link might have expired"
       );
       return NextResponse.redirect(
-        new URL(`/sign-up?error=${encodedError}${decodedNext ? `&redirectedFrom=${encodeURIComponent(decodedNext)}` : ""}`, baseURL)
+        new URL(
+          `/sign-up?error=${encodedError}${
+            decodedNext
+              ? `&redirectedFrom=${encodeURIComponent(decodedNext)}`
+              : ""
+          }`,
+          baseURL
+        )
       );
     }
   } else {
@@ -114,7 +140,14 @@ export async function GET(request: NextRequest) {
       "An error occurred during email verification"
     );
     return NextResponse.redirect(
-      new URL(`/sign-up?error=${encodedError}${decodedNext ? `&redirectedFrom=${encodeURIComponent(decodedNext)}` : ""}`, baseURL)
+      new URL(
+        `/sign-up?error=${encodedError}${
+          decodedNext
+            ? `&redirectedFrom=${encodeURIComponent(decodedNext)}`
+            : ""
+        }`,
+        baseURL
+      )
     );
   }
 }

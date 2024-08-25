@@ -11,19 +11,25 @@ import { authFormSchema } from "@/lib/utils";
 import CustomInput from "./CustomAuthInput";
 import Link from "next/link";
 import CustomSelect from "./CustomSelect";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Oval } from "react-loader-spinner";
 import { login, signUp } from "@/actions/user.actions";
 import { useToast } from "./ui/use-toast";
 
+// TODO Add in Oauth buttons below the forms using shadcn separator
+// TODO Add in reset password for "Forgot password" feature
+
 export default function AuthForm({ type }: AuthFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [sentEmail, setSentEmail] = useState(false)
+  const [sentEmail, setSentEmail] = useState(false);
+  const [displayedError, setDisplayedError] = useState(false);
+
   const searchParams = useSearchParams();
   const { toast } = useToast();
+
   useEffect(() => {
-    if (searchParams.get("error")) {
+    if (searchParams.get("error") && !displayedError) {
       const error = searchParams.get("error")!;
       const decodedError = decodeURIComponent(error);
       setTimeout(() => {
@@ -32,21 +38,22 @@ export default function AuthForm({ type }: AuthFormProps) {
           title: "Uh oh! Something went wrong.",
           description: decodedError,
         });
+        setDisplayedError(true);
       }, 100);
     }
-  }, [toast, searchParams]);
+  }, [toast, searchParams, displayedError]);
 
   useEffect(() => {
     if (sentEmail) {
       setTimeout(() => {
         toast({
           title: "Email sent for verification",
-          description: "Please click the link sent to your email to complete the sign up process." ,
+          description:
+            "Please click the link sent to your email to complete the sign up process.",
         });
       }, 100);
     }
   }, [toast, sentEmail]);
-
 
   const formSchema = authFormSchema(type);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -85,20 +92,38 @@ export default function AuthForm({ type }: AuthFormProps) {
       setIsLoading(true);
       const redirectedFrom = searchParams.get("redirectedFrom") || "";
       if (type === "login") {
-        try{
+        try {
           const response = await login({ ...data });
-          if(response){
-            redirect(redirectedFrom)
+          if (response) {
+            router.replace(redirectedFrom);
           }
-          const encodedError = encodeURIComponent("User not found, incorrect email or password")
-          router.replace(`/login?error=${encodedError}${redirectedFrom ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}` : ""}`)
-
-        }catch(error){
+          setDisplayedError(false);
+          const encodedError = encodeURIComponent(
+            "User not found, incorrect email or password"
+          );
+          router.replace(
+            `/login?error=${encodedError}${
+              redirectedFrom
+                ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}`
+                : ""
+            }`
+          );
+        } catch (error) {
+          setDisplayedError(false);
           console.error(error);
-          const encodedError = encodeURIComponent("Error occurred during login process")
-          router.replace(`/login?error=${encodedError}${redirectedFrom ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}` : ""}`)
+          const encodedError = encodeURIComponent(
+            "Error occurred during login process"
+          );
+          router.replace(
+            `/login?error=${encodedError}${
+              redirectedFrom
+                ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}`
+                : ""
+            }`
+          );
         }
       } else if (type === "sign-up") {
+        setSentEmail(false);
         const signUpData = {
           email: data.email,
           password: data.password,
@@ -107,14 +132,26 @@ export default function AuthForm({ type }: AuthFormProps) {
           username: data.username!,
           educationLevel: data.educationLevel!,
         };
-        // TODO Set up sign up flow. Still require testing of email verification process, redirection process and inserting into database, then querying the user data and passing it to the client
         try {
-          await signUp({ ...signUpData, redirectedFrom });
-          setSentEmail(true)
-          form.reset();
+          const response = await signUp({ ...signUpData, redirectedFrom });
+          if (response) {
+            form.reset();
+            setSentEmail(true);
+          }
+          setDisplayedError(false);
         } catch (error) {
-          const encodedError = encodeURIComponent("Error occurred in sign up process")
-          router.replace(`/sign-up?error=${encodedError}${redirectedFrom ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}` : ""}`)
+          setDisplayedError(false);
+          console.error(error);
+          const encodedError = encodeURIComponent(
+            "Error occurred in sign up process"
+          );
+          router.replace(
+            `/sign-up?error=${encodedError}${
+              redirectedFrom
+                ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}`
+                : ""
+            }`
+          );
         }
       }
       // Submit form data to your backend or handle it as needed
@@ -139,7 +176,13 @@ export default function AuthForm({ type }: AuthFormProps) {
                 Login{" "}
                 <Link
                   className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                  href={`/login${searchParams.get("redirectedFrom") ? `?redirectedFrom=${encodeURIComponent(searchParams.get("redirectedFrom")!)}` : ""}`}
+                  href={`/login${
+                    searchParams.get("redirectedFrom")
+                      ? `?redirectedFrom=${encodeURIComponent(
+                          searchParams.get("redirectedFrom")!
+                        )}`
+                      : ""
+                  }`}
                 >
                   here
                 </Link>
@@ -152,7 +195,13 @@ export default function AuthForm({ type }: AuthFormProps) {
                 Sign up{" "}
                 <Link
                   className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                  href={`/sign-up${searchParams.get("redirectedFrom") ? `?redirectedFrom=${encodeURIComponent(searchParams.get("redirectedFrom")!)}` : ""}`}
+                  href={`/sign-up${
+                    searchParams.get("redirectedFrom")
+                      ? `?redirectedFrom=${encodeURIComponent(
+                          searchParams.get("redirectedFrom")!
+                        )}`
+                      : ""
+                  }`}
                 >
                   here
                 </Link>
@@ -212,7 +261,7 @@ export default function AuthForm({ type }: AuthFormProps) {
 
               <Button
                 type="submit"
-                className="w-full bg-lavender-400 hover:bg-lavender-500 text-gray-700"
+                className="w-full bg-lavender-300 hover:bg-lavender-400 text-gray-700"
                 disabled={isLoading}
               >
                 {isLoading ? (

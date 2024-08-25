@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "User" ALTER COLUMN "dateJoined" DROP DEFAULT,
-ALTER COLUMN "dateJoined" SET DATA TYPE DATE;

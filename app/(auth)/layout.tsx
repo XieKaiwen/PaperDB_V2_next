@@ -25,7 +25,7 @@ export default async function AuthLayout({
         {/* Left Section */}
         {children}
         {/* Right Section */}
-        <div className="rounded-l-lg flex flex-col h-screen w-full sticky top-0 items-center justify-center max-lg:hidden bg-gradient-to-r from-lavender-500 to-sky-400 py-10">
+        <div className="rounded-l-lg flex flex-col h-screen w-full sticky top-0 items-center justify-center max-lg:hidden bg-gradient-to-r from-lavender-300 to-sky-300 py-10">
           <div className="max-w-2xl 2xl:max-w-3xl flex flex-col gap-10">
             <h2 className="text-6xl 2xl:text-7xl font-bold text-gray-800 text-left font-merriweather">
               PaperDB

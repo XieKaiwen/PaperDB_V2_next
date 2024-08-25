@@ -8,20 +8,97 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Paper {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  schoolId       String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subjectId      String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  educationLevel edu_level
+  totalMark      Int       @db.SmallInt
+  examType       exam_type
+  visible        Boolean   @default(true)
+  School         School    @relation(fields: [schoolId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Subject        Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model School {
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  schoolType      school_type
+  schoolFullName  String
+  schoolShortName String
+  Paper           Paper[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Subject {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subjectName String  @unique
+  educationLevel edu_level
+  Paper       Paper[]
+  Topic       Topic[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Topic {
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subjectId String  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  topicName String
+  Subject   Subject @relation(fields: [subjectId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model User {
-  id             String    @id @default(uuid())
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email          String    @unique
   dateJoined     DateTime  @default(now()) @db.Timestamptz(6)
-  educationLevel String
+  educationLevel edu_level
   phoneNumber    String
   username       String
   UserLog        UserLog[]
 }
 
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model UserLog {
-  id         String   @id @default(uuid())
-  userId     String
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   logInfo    String
   dateLogged DateTime @default(now()) @db.Timestamptz(6)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+enum edu_level {
+  P1
+  P2
+  P3
+  P4
+  P5
+  P6
+  S1
+  S2
+  S3
+  S4
+  J1
+  J2
+}
+
+enum exam_type {
+  CA1
+  CA2
+  SA1
+  SA2
+  PSLE
+  WA
+  SA
+  O_level      @map("O-level")
+  Common_test  @map("Common test")
+  Block_test   @map("Block test")
+  Prelim_Promo @map("Prelim/Promo")
+  A_level      @map("A-level")
+}
+
+enum school_type {
+  Primary
+  Secondary
+  JC
 }

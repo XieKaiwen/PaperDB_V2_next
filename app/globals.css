@@ -17,3 +17,12 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+body {
+  overflow: hidden; /* Prevent scrollbars from being displayed */
+  overflow-y: scroll; /* Allows vertical scrolling without displaying a scrollbar */
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Hides scrollbar in Webkit browsers */
+}
