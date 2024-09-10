@@ -1,4 +1,5 @@
 import { questionPartSchema } from "@/utils/addQuestionUtils";
+import { authFormSchema } from "@/utils/utils";
 
 // Group type and interface together
 declare type GetLoggedInResponse = {
@@ -60,14 +61,43 @@ declare interface MobileNavProps {
 }
 interface CustomAddQuestionTextAreaProps {
   control: Control<z.infer<typeof questionPartSchema>>
-  index: number
-  label: string
+  name: FieldPath<z.infer<typeof questionPartSchema>>
   placeholder: string
 }
 
 interface CustomAddQuestionFileInputProps {
   control: Control<z.infer<typeof questionPartSchema>>
-  index: number
-  label: string
+  name: FieldPath<z.infer<typeof questionPartSchema>>
+}
 
+interface CustomAuthSelectProps {
+  control: Control<z.infer<typeof authFormSchema>>;
+  name: FieldPath<z.infer<typeof authFormSchema>>;
+  label: string;
+  placeholder: string;
+  selectOptions: { [key: string]: string };
+}
+
+interface CustomAddQuestionSelectProps {
+  control: Control<z.infer<typeof questionPartSchema>>;
+  name: FieldPath<z.infer<typeof questionPartSchema>>;
+  placeholder: string;
+  selectOptions: { [key: string]: string };
+}
+
+interface CustomAuthInputProps {
+  control: Control<z.infer<typeof authFormSchema>>
+  name: FieldPath<z.infer<typeof authFormSchema>>
+  label: string
+  placeholder: string
+}
+
+interface CustomAddQuestionInputProps {
+  control: Control<z.infer<typeof questionPartSchema>>
+  name: FieldPath<z.infer<typeof questionPartSchema>>
+  placeholder: string
+}
+
+interface AddQuestionFormProps {
+  onFormChange: Dispatch<SetStateAction<{}>>
 }

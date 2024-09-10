@@ -1,21 +1,21 @@
 import { questionPartSchema } from "@/utils/addQuestionUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import React, { useEffect } from "react";
+import {v4 as uuidv4} from "uuid"
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Form } from "../ui/form";
 import { Button } from "../ui/button";
-import { MAX_QUESTION_PART_NUM } from "@/constants/constants";
+import { MAX_QUESTION_PART_NUM, questionIndex, questionSubIndex } from "@/constants/constants";
 import CustomAddQuestionTextArea from "./CustomAddQuestionTextArea";
 import CustomAddQuestionFileInput from "./CustomAddQuestionFileInput";
 import Image from "next/image";
-import crossDeleteIcon from '@/assets/cross-delete-icon.svg';
+import crossDeleteIcon from "@/assets/cross-delete-icon.svg";
+import CustomAddQuestionSelect from "./CustomAddQuestionSelect";
+import CustomAddQuestionInput from "./CustomAddQuestionInput";
+import { AddQuestionFormProps } from "@/types/types";
 
-
-
-export default function AddQuestionForm() {
-  const [quesIdx, setQuesIdx] = useState(null);
-  const [quesSubIdx, setQuesSubIdx] = useState(null);
+export default function AddQuestionForm({onFormChange} : AddQuestionFormProps) {
   const form = useForm<z.infer<typeof questionPartSchema>>({
     resolver: zodResolver(questionPartSchema),
     defaultValues: {
@@ -28,27 +28,35 @@ export default function AddQuestionForm() {
     control,
     name: "questionPart",
   });
+  // const formData = useWatch({control:control})
+  // useEffect(() => {
+  //   onFormChange(formData)
+  
+  // }, [formData])
+  // This causes the input fields to always rerender whenever updating the formData state, hence need to work abit more on this
 
   // Functions for appending another Text Part or Image Part
 
   function addTextArea() {
     append({
-      questionIdx: quesIdx,
-      questionSubIdx: quesSubIdx,
-      isImage: false,
+      questionIdx: "",
+      questionSubIdx: "",
+      order: "",
+      isText: true,
       text: "",
     });
   }
   function addImageInput() {
     append({
-      questionIdx: quesIdx,
-      questionSubIdx: quesSubIdx,
-      isImage: true,
+      questionIdx: "",
+      questionSubIdx: "",
+      order: "",
+      isText: false,
       image: new File([], ""),
     });
   }
-  function deleteQuestionPart(index: number){
-    remove(index)
+  function deleteQuestionPart(index: number) {
+    remove(index);
   }
 
   function onSubmit(values: z.infer<typeof questionPartSchema>) {
@@ -63,37 +71,47 @@ export default function AddQuestionForm() {
           className="w-full xl:w-10/12 space-y-3"
         >
           {fields.map((questionPart, index) => {
-            const { questionIdx, questionSubIdx, isImage } = questionPart;
-            const label = `${questionIdx ? questionIdx : "root"}-${
-              questionSubIdx ? questionSubIdx : "null"
-            }-${isImage ? "image" : "text"}`;
-
+            const { isText } = questionPart;
             return (
-              <div key={`${label}-${index}`} className="flex gap-2 items-center w-full">
-                {isImage ? (
-                  <CustomAddQuestionFileInput
-                    key={`${label}-${index}`}
-                    control={form.control}
-                    index={index}
-                    label={label}
-                  />
-                ) : (
-                  <CustomAddQuestionTextArea
-                    key={`${label}-${index}`}
-                    control={form.control}
-                    index={index}
-                    label={label}
-                    placeholder="Enter text here..."
-                  />
-                )}
-                <Button type="button" variant="destructive" size="sm" onClick={() => deleteQuestionPart(index)}>
-                  <Image 
-                    src={crossDeleteIcon}
-                    alt="delete icon"
-                    width={10}
-                    height={10}
-                  />
-                </Button>
+              <div
+                key={uuidv4()}
+                className="flex flex-col flex-1 gap-1 w-full"
+              >
+                <div className="flex gap-1">
+                  {/* Insert selects here, they should all be in 1 row */}
+                  <CustomAddQuestionSelect control={form.control} name={`questionPart.${index}.questionIdx`} placeholder="index" selectOptions={questionIndex}/>
+                  <CustomAddQuestionSelect control={form.control} name={`questionPart.${index}.questionSubIdx`} placeholder="sub index" selectOptions={questionSubIndex}/>
+                  <CustomAddQuestionInput control={form.control} name={`questionPart.${index}.order`} placeholder="order(1, 2, 3...)" />
+                </div>
+                <div
+                  className="flex gap-2 items-center w-full"
+                >
+                  {!isText ? (
+                    <CustomAddQuestionFileInput
+                      control={form.control}
+                      name={`questionPart.${index}.image`}
+                    />
+                  ) : (
+                    <CustomAddQuestionTextArea
+                      control={form.control}
+                      name={`questionPart.${index}.text`}
+                      placeholder="Enter text here..."
+                    />
+                  )}
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => deleteQuestionPart(index)}
+                  >
+                    <Image
+                      src={crossDeleteIcon}
+                      alt="delete icon"
+                      width={10}
+                      height={10}
+                    />
+                  </Button>
+                </div>
               </div>
             );
           })}

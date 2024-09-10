@@ -25,6 +25,7 @@ export const MIN_QUESTION_PART_NUM = 1
 export const MAX_QUESTION_PART_NUM = 50
 
 export const questionIndex = {
+  root: "-",
   a: "a",
   b: "b",
   c: "c",
@@ -54,6 +55,7 @@ export const questionIndex = {
 };
 
 export const questionSubIndex = {
+  root: "-",
   i: "i",
   ii: "ii",
   iii: "iii",

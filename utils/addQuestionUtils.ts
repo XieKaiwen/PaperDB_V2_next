@@ -2,16 +2,27 @@ import { ACCEPTED_IMAGE_TYPES, MAX_QUESTION_PART_NUM, MIN_QUESTION_PART_NUM } fr
 import {z} from "zod"
 
 const textQuestionPartSchema = z.object({
-    questionIdx: z.string().nullable(),
-    questionSubIdx: z.string().nullable(),
-    isImage: z.boolean(),
+    questionIdx: z.string().min(1, {message:"Choose an index"}),
+    questionSubIdx: z.string().min(1, {message:"Choose an sub index"}),
+    order: z.string().refine((val) => {
+        const parsedInt = parseInt(val);
+        if(isNaN(parsedInt)) return false;
+        return true;
+    }, {message: "Please enter a valid number"}),
+    isText: z.boolean(),
     text: z.string().min(1, {message: "Required, delete if not needed"})
 })
 
 const imageQuestionPartSchema = z.object({
-    questionIdx: z.string().nullable(),
-    questionSubIdx: z.string().nullable(),
-    isImage: z.boolean(),
+    questionIdx: z.string().min(1, {message:"Choose an index"}),
+    questionSubIdx: z.string().min(1, {message:"Choose an sub index"}),
+    order: z.string().refine((val) => {
+        const parsedInt = parseInt(val);
+        // console.log(parsedInt)
+        if(isNaN(parsedInt)) return false;
+        return true;
+    }, {message: "Please enter a valid number"}),
+    isText: z.boolean(),
     image: z.instanceof(File).refine((file) => {
         return file && ACCEPTED_IMAGE_TYPES.includes(file.type);
     }, {

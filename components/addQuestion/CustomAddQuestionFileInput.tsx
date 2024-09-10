@@ -3,7 +3,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "../ui/form";
 import { CustomAddQuestionFileInputProps } from "@/types/types";
@@ -11,16 +10,15 @@ import { Input } from "../ui/input";
 
 export default function CustomAddQuestionFileInput({
   control,
-  index,
-  label
+  name,
 }: CustomAddQuestionFileInputProps) {
   return (
     <FormField
       control={control}
-      name={`questionPart.${index}.image`}
+      name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          {/* <FormLabel>{label}</FormLabel> */}
           <FormControl>
             <Input
               type="file"
