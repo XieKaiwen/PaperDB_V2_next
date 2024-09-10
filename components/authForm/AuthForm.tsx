@@ -7,15 +7,16 @@ import { Form } from "@/components/ui/form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { authFormSchema } from "@/lib/utils";
+import { authFormSchema } from "@/utils/utils";
 import CustomInput from "./CustomAuthInput";
 import Link from "next/link";
-import CustomSelect from "./CustomSelect";
+import CustomSelect from "./CustomAuthSelect";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Oval } from "react-loader-spinner";
 import { login, signUp } from "@/actions/user.actions";
-import { useToast } from "./ui/use-toast";
-
+import { useToast } from "../ui/use-toast";
+import { educationLevelOptions } from "@/constants/constants";
+import { AuthFormProps } from "@/types/types";
 // TODO Add in Oauth buttons below the forms using shadcn separator
 // TODO Add in reset password for "Forgot password" feature
 
@@ -70,19 +71,6 @@ export default function AuthForm({ type }: AuthFormProps) {
       }),
     },
   });
-  const educationLevelOptions = {
-    P1: "Primary 1",
-    P2: "Primary 2",
-    P3: "Primary 3",
-    P4: "Primary 4",
-    P5: "Primary 5",
-    S1: "Secondary 1",
-    S2: "Secondary 2",
-    S3: "Secondary 3",
-    S4: "Secondary 4",
-    J1: "JC 1",
-    J2: "JC 2",
-  };
 
   // 2. Define a submit handler.
   async function onSubmit(data: z.infer<typeof formSchema>) {
@@ -211,7 +199,7 @@ export default function AuthForm({ type }: AuthFormProps) {
         </div>
         <div>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {type === "sign-up" && (
                 <>
                   <div className="flex gap-4">

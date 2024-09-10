@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavigationMenuLink } from './ui/navigation-menu'
-import { cn } from '@/lib/utils'
+import { cn } from '@/utils/utils'
 
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,

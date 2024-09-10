@@ -23,7 +23,6 @@ model Paper {
   School                  School                    @relation(fields: [schoolId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   Subject                 Subject                   @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   UserPaperProgressStatus UserPaperProgressStatus[]
-  
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -38,7 +37,7 @@ model School {
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Subject {
   id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  subjectName    String        @unique
+  subjectName    String
   educationLevel edu_level
   MCQQuestion    MCQQuestion[]
   OEQQuestion    OEQQuestion[]
@@ -60,6 +59,7 @@ model User {
   email                   String                    @unique
   dateJoined              DateTime                  @default(now()) @db.Timestamptz(6)
   educationLevel          edu_level
+  role                    user_role                 @default(user)
   phoneNumber             String
   username                String
   UserLog                 UserLog[]
@@ -97,7 +97,7 @@ model MCQQuestion {
 model OEQQuestion {
   id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   subjectId     String          @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  paperId       String         @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  paperId       String          @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   questionNum   Int             @db.SmallInt
   questionInfo  Json
   fullMark      Int             @db.SmallInt
@@ -190,4 +190,9 @@ enum progress_status {
   In_Progress @map("In Progress")
   Submitted
   Marked
+}
+
+enum user_role {
+  user
+  admin
 }

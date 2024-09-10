@@ -31,8 +31,7 @@ export default async function RootLayout({
     <>
       <main className="font-open-sans">
         <NavBar user={user}/>
-        <div className="mt-20">
-          <p>{user.email}</p>
+        <div className="mt-18">
           {children}
         </div>
       </main>

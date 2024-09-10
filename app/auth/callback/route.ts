@@ -2,11 +2,10 @@ import { type EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { createClient } from "@/utils/supabase/server";
-import { getBaseUrl } from "@/lib/utils";
-import { PrismaClient } from "@prisma/client";
+import { getBaseUrl } from "@/utils/utils";
+import prisma from "@/prismaClient/prisma";
 import { supabaseAdmin } from "@/utils/supabase/serverAdmin";
 
-const prisma = new PrismaClient();
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   console.log(request.url);

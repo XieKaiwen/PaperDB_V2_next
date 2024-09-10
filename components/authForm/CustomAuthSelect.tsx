@@ -12,14 +12,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
+} from "../ui/form";
 import { Control, FieldPath } from "react-hook-form";
-import { authFormSchema } from "@/lib/utils";
+import { authFormSchema } from "@/utils/utils";
 import { z } from "zod";
 
 const formSchema = authFormSchema("sign-up");
 
-interface CustomSelectProps {
+interface CustomAuthSelectProps {
   control: Control<z.infer<typeof formSchema>>;
   name: FieldPath<z.infer<typeof formSchema>>;
   label: string;
@@ -27,13 +27,13 @@ interface CustomSelectProps {
   selectOptions: { [key: string]: string };
 }
 
-export default function CustomSelect({
+export default function CustomAuthSelect({
   control,
   name,
   label,
   placeholder,
   selectOptions,
-}: CustomSelectProps) {
+}: CustomAuthSelectProps) {
   return (
     <FormField
       control={control}
@@ -48,7 +48,7 @@ export default function CustomSelect({
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {Object.entries(selectOptions).map(([value, option]) => {
+              {Object.entries(selectOptions).map(([value, option] : [string, string]) => {
                 return (
                   <SelectItem key={option} value={value}>
                     {option}

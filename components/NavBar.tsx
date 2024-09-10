@@ -5,12 +5,8 @@ import Link from "next/link";
 import NavLink from "./NavLink";
 import { usePathname } from "next/navigation";
 import MobileNav from "./MobileNav";
-
-const routes = [
-  { title: "Home", link: "/home" },
-  { title: "Contact Us", link: "/contact-us" },
-  { title: "Papers", link: "/papers" },
-];
+import { NavBarProps } from "@/types/types";
+import { navRoutes as routes } from "@/constants/constants";
 
 export default function NavBar({user} : NavBarProps) {
   const pathname = usePathname();

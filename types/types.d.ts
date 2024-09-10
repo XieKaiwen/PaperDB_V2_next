@@ -1,3 +1,5 @@
+import { questionPartSchema } from "@/utils/addQuestionUtils";
+
 // Group type and interface together
 declare type GetLoggedInResponse = {
   user: User | null;
@@ -55,4 +57,17 @@ declare interface NavBarProps {
 
 declare interface MobileNavProps {
     user: User
+}
+interface CustomAddQuestionTextAreaProps {
+  control: Control<z.infer<typeof questionPartSchema>>
+  index: number
+  label: string
+  placeholder: string
+}
+
+interface CustomAddQuestionFileInputProps {
+  control: Control<z.infer<typeof questionPartSchema>>
+  index: number
+  label: string
+
 }

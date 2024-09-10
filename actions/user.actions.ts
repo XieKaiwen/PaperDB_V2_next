@@ -1,11 +1,12 @@
 "use server";
-import { parseStringify } from "@/lib/utils";
+import { parseStringify } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/prismaClient/prisma";
 import { redirect, RedirectType } from "next/navigation";
+import { GetLoggedInResponse, LoginProps, SignUpProps } from "@/types/types";
 
-const prisma = new PrismaClient();
+
 
 export async function login({ email, password }: LoginProps) {
   const supabase = createClient();

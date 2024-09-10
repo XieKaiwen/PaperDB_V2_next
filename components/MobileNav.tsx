@@ -11,12 +11,8 @@ import {
 import { usePathname } from "next/navigation";
 import NavLink from "./NavLink";
 import { Separator } from "./ui/separator";
+import { navRoutes } from "@/constants/constants";
 
-const routes = [
-  { title: "Home", link: "/home" },
-  { title: "Contact Us", link: "/contact-us" },
-  { title: "Papers", link: "/papers" },
-];
 
 export default function MobileNav({user} : MobileNavProps) {
   const pathname = usePathname();
@@ -50,7 +46,7 @@ export default function MobileNav({user} : MobileNavProps) {
           <Separator />
           <SheetClose asChild>
             <nav className="flex h-full flex-col gap-6 pt-6 text-black font-open-sans">
-              {routes.map((route) => {
+              {navRoutes.map((route) => {
                 const isActive =
                   pathname === route.link ||
                   pathname.startsWith(`${route.link}`);
