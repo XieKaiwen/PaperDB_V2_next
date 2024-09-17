@@ -16,6 +16,10 @@ declare type User = {
   username: string;
 };
 
+declare type AddQuestionFormData = z.infer<typeof questionPartSchema>
+
+declare type AddQuestionFormDataSubscriber = (updatedFormData: AddQuestionFormData) => void
+
 declare interface AuthFormProps {
   type: "sign-up" | "login";
 }
@@ -98,6 +102,7 @@ interface CustomAddQuestionInputProps {
   placeholder: string
 }
 
-interface AddQuestionFormProps {
-  onFormChange: Dispatch<SetStateAction<{}>>
+interface AddQuestionContextProps {
+  updateFormData: (updatedFormData : AddQuestionFormData) => void,
+  subscribeToFormData: (subscriber: AddQuestionFormDataSubscriber) => () => void
 }

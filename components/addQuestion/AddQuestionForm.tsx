@@ -1,21 +1,27 @@
 import { questionPartSchema } from "@/utils/addQuestionUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect } from "react";
-import {v4 as uuidv4} from "uuid"
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form } from "../ui/form";
 import { Button } from "../ui/button";
-import { MAX_QUESTION_PART_NUM, questionIndex, questionSubIndex } from "@/constants/constants";
+import {
+  MAX_QUESTION_PART_NUM,
+  questionIndex,
+  questionSubIndex,
+} from "@/constants/constants";
 import CustomAddQuestionTextArea from "./CustomAddQuestionTextArea";
 import CustomAddQuestionFileInput from "./CustomAddQuestionFileInput";
 import Image from "next/image";
 import crossDeleteIcon from "@/assets/cross-delete-icon.svg";
 import CustomAddQuestionSelect from "./CustomAddQuestionSelect";
 import CustomAddQuestionInput from "./CustomAddQuestionInput";
-import { AddQuestionFormProps } from "@/types/types";
+import { useAddQuestionContext } from "@/hooks/useAddQuestionContext";
 
-export default function AddQuestionForm({onFormChange} : AddQuestionFormProps) {
+export default function AddQuestionForm() {
+
+  const {updateFormData} = useAddQuestionContext()
+
   const form = useForm<z.infer<typeof questionPartSchema>>({
     resolver: zodResolver(questionPartSchema),
     defaultValues: {
@@ -23,19 +29,23 @@ export default function AddQuestionForm({onFormChange} : AddQuestionFormProps) {
     },
   });
   // default value for images should be new File([], "")
-  const { control } = form;
+  const { control, watch } = form;
   const { fields, append, remove } = useFieldArray({
     control,
     name: "questionPart",
   });
-  // const formData = useWatch({control:control})
-  // useEffect(() => {
-  //   onFormChange(formData)
-  
-  // }, [formData])
-  // This causes the input fields to always rerender whenever updating the formData state, hence need to work abit more on this
 
-  // Functions for appending another Text Part or Image Part
+  useEffect(() => {
+    const formSubscription = watch((formData) => {
+      updateFormData(formData)
+    })
+  
+    return () => {
+      formSubscription.unsubscribe()
+    }
+  }, [watch])
+  
+
 
   function addTextArea() {
     append({
@@ -64,7 +74,6 @@ export default function AddQuestionForm({onFormChange} : AddQuestionFormProps) {
   }
 
   return (
-    <>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -73,19 +82,28 @@ export default function AddQuestionForm({onFormChange} : AddQuestionFormProps) {
           {fields.map((questionPart, index) => {
             const { isText } = questionPart;
             return (
-              <div
-                key={uuidv4()}
-                className="flex flex-col flex-1 gap-1 w-full"
-              >
-                <div className="flex gap-1">
+              <div key={questionPart.id} className="flex flex-col flex-1 gap-1 w-full">
+                <div className="flex gap-3">
                   {/* Insert selects here, they should all be in 1 row */}
-                  <CustomAddQuestionSelect control={form.control} name={`questionPart.${index}.questionIdx`} placeholder="index" selectOptions={questionIndex}/>
-                  <CustomAddQuestionSelect control={form.control} name={`questionPart.${index}.questionSubIdx`} placeholder="sub index" selectOptions={questionSubIndex}/>
-                  <CustomAddQuestionInput control={form.control} name={`questionPart.${index}.order`} placeholder="order(1, 2, 3...)" />
+                  <CustomAddQuestionSelect
+                    control={form.control}
+                    name={`questionPart.${index}.questionIdx`}
+                    placeholder="index"
+                    selectOptions={questionIndex}
+                  />
+                  <CustomAddQuestionSelect
+                    control={form.control}
+                    name={`questionPart.${index}.questionSubIdx`}
+                    placeholder="sub-index"
+                    selectOptions={questionSubIndex}
+                  />
+                  <CustomAddQuestionInput
+                    control={form.control}
+                    name={`questionPart.${index}.order`}
+                    placeholder="order(1, 2, 3...)"
+                  />
                 </div>
-                <div
-                  className="flex gap-2 items-center w-full"
-                >
+                <div className="flex gap-2 items-center w-full">
                   {!isText ? (
                     <CustomAddQuestionFileInput
                       control={form.control}
@@ -116,28 +134,27 @@ export default function AddQuestionForm({onFormChange} : AddQuestionFormProps) {
             );
           })}
 
-          <Button type="submit">Submit</Button>
+          <div className="flex gap-4 w-full mt-2">
+            <Button
+              className="w-full"
+              disabled={fields.length >= MAX_QUESTION_PART_NUM}
+              type="button"
+              onClick={addTextArea}
+            >
+              Add Text
+            </Button>
+            <Button
+              className="w-full"
+              disabled={fields.length >= MAX_QUESTION_PART_NUM}
+              type="button"
+              onClick={addImageInput}
+            >
+              Add Image
+            </Button>
+          </div>
+          
+          <Button type="submit" className="w-full">Submit</Button>
         </form>
       </Form>
-
-      <div className="flex gap-4 w-full mt-2">
-        <Button
-          className="w-full"
-          disabled={fields.length >= MAX_QUESTION_PART_NUM}
-          type="button"
-          onClick={addTextArea}
-        >
-          Add Text
-        </Button>
-        <Button
-          className="w-full"
-          disabled={fields.length >= MAX_QUESTION_PART_NUM}
-          type="button"
-          onClick={addImageInput}
-        >
-          Add Image
-        </Button>
-      </div>
-    </>
   );
 }
