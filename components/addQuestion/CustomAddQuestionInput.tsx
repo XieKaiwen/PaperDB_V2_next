@@ -9,9 +9,9 @@ export default function CustomAddQuestionInput({control, name, placeholder}:Cust
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className="flex-1">
           <FormControl>
-            <Input className="lg:w-2/3" placeholder={placeholder} {...field} />
+            <Input  placeholder={placeholder} {...field} />
           </FormControl>
           <FormMessage />
         </FormItem>

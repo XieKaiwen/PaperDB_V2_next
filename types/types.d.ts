@@ -16,9 +16,11 @@ declare type User = {
   username: string;
 };
 
-declare type AddQuestionFormData = z.infer<typeof questionPartSchema>
+declare type AddQuestionFormData = z.infer<typeof questionPartSchema>;
 
-declare type AddQuestionFormDataSubscriber = (updatedFormData: AddQuestionFormData) => void
+declare type AddQuestionFormDataSubscriber = (
+  updatedFormData: AddQuestionFormData
+) => void;
 
 declare interface AuthFormProps {
   type: "sign-up" | "login";
@@ -57,21 +59,21 @@ declare interface NavLinkProps {
 }
 
 declare interface NavBarProps {
-    user: User
+  user: User;
 }
 
 declare interface MobileNavProps {
-    user: User
+  user: User;
 }
 interface CustomAddQuestionTextAreaProps {
-  control: Control<z.infer<typeof questionPartSchema>>
-  name: FieldPath<z.infer<typeof questionPartSchema>>
-  placeholder: string
+  control: Control<z.infer<typeof questionPartSchema>>;
+  name: FieldPath<z.infer<typeof questionPartSchema>>;
+  placeholder: string;
 }
 
 interface CustomAddQuestionFileInputProps {
-  control: Control<z.infer<typeof questionPartSchema>>
-  name: FieldPath<z.infer<typeof questionPartSchema>>
+  control: Control<z.infer<typeof questionPartSchema>>;
+  name: FieldPath<z.infer<typeof questionPartSchema>>;
 }
 
 interface CustomAuthSelectProps {
@@ -90,19 +92,47 @@ interface CustomAddQuestionSelectProps {
 }
 
 interface CustomAuthInputProps {
-  control: Control<z.infer<typeof authFormSchema>>
-  name: FieldPath<z.infer<typeof authFormSchema>>
-  label: string
-  placeholder: string
+  control: Control<z.infer<typeof authFormSchema>>;
+  name: FieldPath<z.infer<typeof authFormSchema>>;
+  label: string;
+  placeholder: string;
 }
 
 interface CustomAddQuestionInputProps {
-  control: Control<z.infer<typeof questionPartSchema>>
-  name: FieldPath<z.infer<typeof questionPartSchema>>
-  placeholder: string
+  control: Control<z.infer<typeof questionPartSchema>>;
+  name: FieldPath<z.infer<typeof questionPartSchema>>;
+  placeholder: string;
 }
 
 interface AddQuestionContextProps {
-  updateFormData: (updatedFormData : AddQuestionFormData) => void,
-  subscribeToFormData: (subscriber: AddQuestionFormDataSubscriber) => () => void
+  updateFormData: (updatedFormData: AddQuestionFormData) => void;
+  subscribeToFormData: (
+    subscriber: AddQuestionFormDataSubscriber
+  ) => () => void;
+}
+
+interface CustomInputProps<T extends FieldValues> {
+  control: Control<T>; // Make control generic
+  name: Path<T>; // Use the generic type for name
+  label?: string;
+  placeholder: string;
+  classname?: string;
+  inputClassName?: string;
+};
+
+interface CustomFileInputProps<T extends FieldValues>{
+  control: Control<T>;
+  name: Path<T>;
+  label?: string;
+  classname?: string;
+  inputClassName?: string;
+}
+
+interface CustomTextAreaProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
+  label?: string;
+  placeholder: string;
+  classname?: string;
+  textAreaClassName?: string;
 }

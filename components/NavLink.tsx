@@ -1,3 +1,4 @@
+import { NavLinkProps } from "@/types/types";
 import { cn } from "@/utils/utils";
 import Link from "next/link";
 import React from "react";

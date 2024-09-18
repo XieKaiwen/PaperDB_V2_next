@@ -33,6 +33,18 @@ const imageQuestionPartSchema = z.object({
 const contentTypeSchema = z.union([textQuestionPartSchema, imageQuestionPartSchema])
 
 export const questionPartSchema = z.object({
+    year: z.string().min(1, {message: "Choose a year"}),
+    educationLevel: z.string().min(1, {message: "Choose an education level"}),
+    school: z.string().min(1, {message: "Choose a school"}),
+    subject: z.string().min(1, {message: "Choose a subject"}),
+    topics: z.array(z.string()).min(1, {message: "At least one topic is required"}),
+    questionType: z.string().min(1, {message: "Choose a question type"}),
+    questionNumber: z.string().refine((val) => {
+        const parsedInt = parseInt(val);
+        // console.log(parsedInt)
+        if(isNaN(parsedInt)) return false;
+        return true;
+    }, {message: "Please enter a valid question number"}),
     questionPart: z.array(contentTypeSchema)
     .min(MIN_QUESTION_PART_NUM, {message: `You need at least ${MIN_QUESTION_PART_NUM} question part`})
     .max(MAX_QUESTION_PART_NUM, {message: `You can have at most ${MAX_QUESTION_PART_NUM} question part`})
