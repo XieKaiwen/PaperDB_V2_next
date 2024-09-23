@@ -1,17 +1,17 @@
-export const educationLevelOptions = {
-  P1: "Primary 1",
-  P2: "Primary 2",
-  P3: "Primary 3",
-  P4: "Primary 4",
-  P5: "Primary 5",
-  P6: "Primary 6",
-  S1: "Secondary 1",
-  S2: "Secondary 2",
-  S3: "Secondary 3",
-  S4: "Secondary 4",
-  J1: "JC 1",
-  J2: "JC 2",
-};
+export const educationLevelOptions = [
+  { value: "P1", label: "Primary 1" },
+  { value: "P2", label: "Primary 2" },
+  { value: "P3", label: "Primary 3" },
+  { value: "P4", label: "Primary 4" },
+  { value: "P5", label: "Primary 5" },
+  { value: "P6", label: "Primary 6" },
+  { value: "S1", label: "Secondary 1" },
+  { value: "S2", label: "Secondary 2" },
+  { value: "S3", label: "Secondary 3" },
+  { value: "S4", label: "Secondary 4" },
+  { value: "J1", label: "JC 1" },
+  { value: "J2", label: "JC 2" }
+];
 
 export const navRoutes = [
   { title: "Home", link: "/home" },
@@ -24,46 +24,47 @@ export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"]
 export const MIN_QUESTION_PART_NUM = 1
 export const MAX_QUESTION_PART_NUM = 50
 
-export const questionIndex = {
-  root: "-",
-  a: "a",
-  b: "b",
-  c: "c",
-  d: "d",
-  e: "e",
-  f: "f",
-  g: "g",
-  h: "h",
-  i: "i",
-  j: "j",
-  k: "k",
-  l: "l",
-  m: "m",
-  n: "n",
-  o: "o",
-  p: "p",
-  q: "q",
-  r: "r",
-  s: "s",
-  t: "t",
-  u: "u",
-  v: "v",
-  w: "w",
-  x: "x",
-  y: "y",
-  z: "z"
-};
+export const questionIndex = [
+  { value: "root", label: "-" },
+  { value: "a", label: "a" },
+  { value: "b", label: "b" },
+  { value: "c", label: "c" },
+  { value: "d", label: "d" },
+  { value: "e", label: "e" },
+  { value: "f", label: "f" },
+  { value: "g", label: "g" },
+  { value: "h", label: "h" },
+  { value: "i", label: "i" },
+  { value: "j", label: "j" },
+  { value: "k", label: "k" },
+  { value: "l", label: "l" },
+  { value: "m", label: "m" },
+  { value: "n", label: "n" },
+  { value: "o", label: "o" },
+  { value: "p", label: "p" },
+  { value: "q", label: "q" },
+  { value: "r", label: "r" },
+  { value: "s", label: "s" },
+  { value: "t", label: "t" },
+  { value: "u", label: "u" },
+  { value: "v", label: "v" },
+  { value: "w", label: "w" },
+  { value: "x", label: "x" },
+  { value: "y", label: "y" },
+  { value: "z", label: "z" }
+];
 
-export const questionSubIndex = {
-  root: "-",
-  i: "i",
-  ii: "ii",
-  iii: "iii",
-  iv: "iv",
-  v: "v",
-  vi: "vi",
-  vii: "vii",
-  viii: "viii",
-  ix: "ix",
-  x: "x"
-};
+
+export const questionSubIndex = [
+  { value: "root", label: "-" },
+  { value: "i", label: "i" },
+  { value: "ii", label: "ii" },
+  { value: "iii", label: "iii" },
+  { value: "iv", label: "iv" },
+  { value: "v", label: "v" },
+  { value: "vi", label: "vi" },
+  { value: "vii", label: "vii" },
+  { value: "viii", label: "viii" },
+  { value: "ix", label: "ix" },
+  { value: "x", label: "x" }
+];

@@ -1,4 +1,4 @@
-import prisma from "@/prismaClient/prisma";
+import prisma from "@/utils/prisma-client/client";
 
 export async function GET() {
     const subjects = await prisma.subject.findMany();

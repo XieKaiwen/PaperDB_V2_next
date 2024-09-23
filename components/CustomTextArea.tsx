@@ -1,20 +1,36 @@
 import React from "react";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
 import { Textarea } from "./ui/textarea";
 import { FieldValues } from "react-hook-form";
 import { CustomTextAreaProps } from "@/types/types";
 
-
-export default function CustomTextArea<T extends FieldValues>({control, name, label, placeholder, classname, textAreaClassName}:CustomTextAreaProps<T>) {
+export default function CustomTextArea<T extends FieldValues>({
+  control,
+  name,
+  label,
+  placeholder,
+  className,
+  textAreaClassName,
+}: CustomTextAreaProps<T>) {
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className={classname}>
+        <FormItem className={className}>
           {label && <FormLabel>{label}</FormLabel>}
           <FormControl>
-            <Textarea className={textAreaClassName} placeholder={placeholder} {...field} />
+            <Textarea
+              className={textAreaClassName}
+              placeholder={placeholder}
+              {...field}
+            />
           </FormControl>
           <FormMessage />
         </FormItem>

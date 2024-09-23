@@ -1,6 +1,6 @@
 import { questionPartSchema } from "@/utils/addQuestionUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useCallback, useEffect } from "react";
+import React, {  useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form } from "../ui/form";
@@ -10,29 +10,37 @@ import {
   questionIndex,
   questionSubIndex,
 } from "@/constants/constants";
-import CustomAddQuestionTextArea from "./CustomAddQuestionTextArea";
-import CustomAddQuestionFileInput from "./CustomAddQuestionFileInput";
 import Image from "next/image";
 import crossDeleteIcon from "@/assets/cross-delete-icon.svg";
-import CustomAddQuestionSelect from "./CustomAddQuestionSelect";
-import CustomAddQuestionInput from "./CustomAddQuestionInput";
 import { useAddQuestionContext } from "@/hooks/useAddQuestionContext";
 import { AddQuestionFormData } from "@/types/types";
 import CustomInput from "../CustomInput";
 import CustomFileInput from "../CustomFileInput";
 import CustomTextArea from "../CustomTextArea";
+import CustomSelect from "../CustomSelect";
 
 // TODO: Add retrieving topics, school and subjects from database.
 // TODO: Add form fields for: year, school, level, subject, checkbox for adding topics,question number, questionType
-// Select component with autocomplete should be used for school, year and subject
+
+// Custom Components have been created for the following:
+// Select component with autocomplete (ComboBox) should be used for school, year and subject
 // Text component to be used for question number, number validation has to be done for question number
 // Radio group should be used for question type: MCQ or OEQ
-// TODO: Refining the form to restrict choice of sub-index to be only be "-" if index is root.
+
+// TODO: Refining the form to restrict choice of sub-index to be only be "-" if index is root. Also limit the choices of the topics after choosing the subjects, similarly for subjects after choosing educationalLevel.
+// To be done through constantly updating the disabled state of checkboxes and filtering options depending on the other fields (e.g. filtering topics based on subject, filtering subjects based on educationalLevel)...
+
 // TODO: Refactoring the questionParts input area (including delete button)
 
-// Not possible to debounce updates by watch()
 
-// TODO: refactor components to be generic and reusable using generic types. (Done)
+/**
+ * Some guidelines on the availability of options for certain fields:
+ * 1. educationLevel decides the options for: school and subject, directly.
+ * 2. subject decides the options for: topics, directly. 
+ * 3. Hence, the order for filtering of form options on change for form data will be: Checking education level -> school/subject -> topic. We are to filter according to this order. 
+ * 4. If option currently selected for school/subject is not appropriate for the new education level, then formfield for school/subject will be reset. But no matter what, with a change in education level, the options for school/subject will be updated.
+ * 5. If option currently selected for topic is not appropriate for the new subject, then formfield for topic will be reset.
+*/
 
 export default function AddQuestionForm() {
   const { updateFormData } = useAddQuestionContext();
@@ -99,58 +107,48 @@ export default function AddQuestionForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="w-full xl:w-10/12 space-y-3"
       >
+        
+        {/* TODO Refactor the questionPart input */}
         {fields.map((questionPart, index) => {
-          const { isText, questionIdx } = questionPart;
+          const { isText } = questionPart;
           return (
             <div key={questionPart.id} className="flex gap-2 items-center">
               <div className="flex flex-col flex-1 gap-1 w-full">
                 <div className="flex gap-3 w-full">
                   {/* Insert selects here, they should all be in 1 row */}
-                  <CustomAddQuestionSelect
+                  <CustomSelect<AddQuestionFormData>
                     control={form.control}
                     name={`questionPart.${index}.questionIdx`}
                     placeholder="index"
                     selectOptions={questionIndex}
+                    className="flex-1"
                   />
-                  <CustomAddQuestionSelect
+                  <CustomSelect<AddQuestionFormData>
                     control={form.control}
                     name={`questionPart.${index}.questionSubIdx`}
                     placeholder="sub-index"
                     selectOptions={questionSubIndex}
+                    className="flex-1"
                   />
-                  {/* <CustomAddQuestionInput
-                    control={form.control}
-                    name={`questionPart.${index}.order`}
-                    placeholder="order(1, 2, 3...)"
-                  /> */}
                   <CustomInput<AddQuestionFormData>
                     control={form.control}
                     name={`questionPart.${index}.order`}
                     placeholder="order(1, 2, 3...)"
-                    classname="flex-1"
+                    className="flex-1"
                   />
                 </div>
                 <div className="w-full">
                   {!isText ? (
-                    // <CustomAddQuestionFileInput
-                    //   control={form.control}
-                    //   name={`questionPart.${index}.image`}
-                    // />
                     <CustomFileInput<AddQuestionFormData>
                       control={form.control}
                       name={`questionPart.${index}.image`}
                     />
                   ) : (
-                    // <CustomAddQuestionTextArea
-                    //   control={form.control}
-                    //   name={`questionPart.${index}.text`}
-                    //   placeholder="Enter text here..."
-                    // />
                     <CustomTextArea<AddQuestionFormData>
                       control={form.control}
                       name={`questionPart.${index}.text`}
                       placeholder="Enter text here..."
-                      classname="flex-1"
+                      className="flex-1"
                     />
                   )}
                 </div>

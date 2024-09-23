@@ -65,16 +65,16 @@ declare interface NavBarProps {
 declare interface MobileNavProps {
   user: User;
 }
-interface CustomAddQuestionTextAreaProps {
-  control: Control<z.infer<typeof questionPartSchema>>;
-  name: FieldPath<z.infer<typeof questionPartSchema>>;
-  placeholder: string;
-}
+// interface CustomAddQuestionTextAreaProps {
+//   control: Control<z.infer<typeof questionPartSchema>>;
+//   name: FieldPath<z.infer<typeof questionPartSchema>>;
+//   placeholder: string;
+// }
 
-interface CustomAddQuestionFileInputProps {
-  control: Control<z.infer<typeof questionPartSchema>>;
-  name: FieldPath<z.infer<typeof questionPartSchema>>;
-}
+// interface CustomAddQuestionFileInputProps {
+//   control: Control<z.infer<typeof questionPartSchema>>;
+//   name: FieldPath<z.infer<typeof questionPartSchema>>;
+// }
 
 interface CustomAuthSelectProps {
   control: Control<z.infer<typeof authFormSchema>>;
@@ -84,12 +84,12 @@ interface CustomAuthSelectProps {
   selectOptions: { [key: string]: string };
 }
 
-interface CustomAddQuestionSelectProps {
-  control: Control<z.infer<typeof questionPartSchema>>;
-  name: FieldPath<z.infer<typeof questionPartSchema>>;
-  placeholder: string;
-  selectOptions: { [key: string]: string };
-}
+// interface CustomAddQuestionSelectProps {
+//   control: Control<z.infer<typeof questionPartSchema>>;
+//   name: FieldPath<z.infer<typeof questionPartSchema>>;
+//   placeholder: string;
+//   selectOptions: { [key: string]: string };
+// }
 
 interface CustomAuthInputProps {
   control: Control<z.infer<typeof authFormSchema>>;
@@ -98,11 +98,11 @@ interface CustomAuthInputProps {
   placeholder: string;
 }
 
-interface CustomAddQuestionInputProps {
-  control: Control<z.infer<typeof questionPartSchema>>;
-  name: FieldPath<z.infer<typeof questionPartSchema>>;
-  placeholder: string;
-}
+// interface CustomAddQuestionInputProps {
+//   control: Control<z.infer<typeof questionPartSchema>>;
+//   name: FieldPath<z.infer<typeof questionPartSchema>>;
+//   placeholder: string;
+// }
 
 interface AddQuestionContextProps {
   updateFormData: (updatedFormData: AddQuestionFormData) => void;
@@ -116,15 +116,15 @@ interface CustomInputProps<T extends FieldValues> {
   name: Path<T>; // Use the generic type for name
   label?: string;
   placeholder: string;
-  classname?: string;
+  className?: string;
   inputClassName?: string;
-};
+}
 
-interface CustomFileInputProps<T extends FieldValues>{
+interface CustomFileInputProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   label?: string;
-  classname?: string;
+  className?: string;
   inputClassName?: string;
 }
 
@@ -133,6 +133,44 @@ interface CustomTextAreaProps<T extends FieldValues> {
   name: Path<T>;
   label?: string;
   placeholder: string;
-  classname?: string;
+  className?: string;
   textAreaClassName?: string;
+}
+
+interface CustomSelectProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
+  placeholder: string;
+  selectOptions: { value: string; label: string }[];
+  className?: string;
+  selectClassName?: string;
+}
+
+interface CustomRadioProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
+  options: { value: string; label: string }[];
+  label?: string;
+  className?: string;
+  radioClassName?: string;
+}
+
+interface CustomComboBoxProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
+  placeholder: string;
+  options: { value: string; label: string }[];
+  onSelectChange: (name: string, value: unknown, config?: Object) => void;
+  label?: string;
+  className?: string;
+  selectClassName?: string;
+}
+
+interface CustomFormMultipleCheckBoxProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
+  options: { value: string; label: string }[];
+  label?: string;
+  description?: string;
+  className?: string;
 }

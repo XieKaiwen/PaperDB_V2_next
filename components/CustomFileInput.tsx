@@ -14,7 +14,7 @@ export default function CustomFileInput<T extends FieldValues>({
   control,
   name,
   label,
-  classname,
+  className,
   inputClassName
 }: CustomFileInputProps<T>) {
   return (
@@ -22,7 +22,7 @@ export default function CustomFileInput<T extends FieldValues>({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className={classname}>
+        <FormItem className={className}>
           {label && <FormLabel>{label}</FormLabel>}
           <FormControl>
             <Input

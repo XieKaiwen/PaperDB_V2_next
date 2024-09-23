@@ -1,10 +1,32 @@
-import prisma from "@/prismaClient/prisma";
-import { unstable_cache } from "next/cache";
+import prisma from "@/utils/prisma-client/client";
 
-export const getAllSubjects = unstable_cache(
-  async () => {
-    return await prisma.subject.findMany();
-  },
-  ["all-subjects"],
-  { revalidate: 3600, tags: ["all-subjects"] }
-);
+export async function getAllSubjects() {
+  try {
+    const allSubjects = await prisma.subject.findMany();
+    return allSubjects;
+  } catch (e) {
+    console.error(e);
+    throw new DataFetchingError();
+  }
+}
+
+export async function getAllTopics() {
+  try {
+    const allTopics = await prisma.topic.findMany();
+    return allTopics;
+  } catch (e) {
+    console.error(e);
+    throw new DataFetchingError();
+  }
+}
+
+
+export async function getAllSchools(){
+  try {
+    const allSchools = await prisma.school.findMany();
+    return allSchools;
+  } catch (e) {
+    console.error(e);
+    throw new DataFetchingError();
+  }
+}

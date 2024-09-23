@@ -4,40 +4,43 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from "../ui/form";
+} from "./ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { CustomAddQuestionSelectProps } from "@/types/types";
+} from "./ui/select";
+import { CustomSelectProps } from "@/types/types";
+import { FieldValues } from "react-hook-form";
 
-export default function CustomAddQuestionSelect({
+export default function CustomSelect<T extends FieldValues>({
   control,
   name,
   placeholder,
   selectOptions,
-}: CustomAddQuestionSelectProps) {
+  className,
+  selectClassName
+}: CustomSelectProps<T>) {
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex-1">
+        <FormItem className={className}>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
               <SelectTrigger>
                 <SelectValue placeholder={placeholder} />
               </SelectTrigger>
             </FormControl>
-            <SelectContent>
-              {Object.entries(selectOptions).map(
-                ([value, option]: [string, string]) => {
+            <SelectContent className={selectClassName}>
+              {selectOptions.map(
+                (option) => {
                   return (
-                    <SelectItem key={option} value={value}>
-                      {option}
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
                     </SelectItem>
                   );
                 }

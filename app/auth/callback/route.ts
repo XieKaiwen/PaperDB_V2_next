@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { createClient } from "@/utils/supabase/server";
 import { getBaseUrl } from "@/utils/utils";
-import prisma from "@/prismaClient/prisma";
+import prisma from "@/utils/prisma-client/client";
 import { supabaseAdmin } from "@/utils/supabase/serverAdmin";
 
 export async function GET(request: NextRequest) {

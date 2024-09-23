@@ -15,7 +15,7 @@ export default function CustomInput<T extends FieldValues>({
   name,
   label,
   placeholder,
-  classname,
+  className,
   inputClassName
 }:CustomInputProps<T>) {
   return (
@@ -23,10 +23,10 @@ export default function CustomInput<T extends FieldValues>({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className={classname}>
+        <FormItem className={className}>
           {label &&<FormLabel className="text-sm">{label}</FormLabel>}
           <FormControl>
-            <Input placeholder={placeholder} {...field} />
+            <Input className={inputClassName} placeholder={placeholder} {...field} />
           </FormControl>
           <FormMessage />
         </FormItem>
