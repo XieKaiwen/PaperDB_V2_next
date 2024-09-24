@@ -36,23 +36,25 @@ model School {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Subject {
-  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  subjectName    String
-  educationLevel edu_level
-  MCQQuestion    MCQQuestion[]
-  OEQQuestion    OEQQuestion[]
-  Paper          Paper[]
-  Topic          Topic[]
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subjectName     String        @unique
+  educationLevels edu_level[]
+  MCQQuestion     MCQQuestion[]
+  OEQQuestion     OEQQuestion[]
+  Paper           Paper[]
+  Topic           Topic[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Topic {
-  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  subjectId String  @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  topicName String
-  Subject   Subject @relation(fields: [subjectId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subjectId      String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  topicName      String
+  educationLevel edu_level
+  Subject        Subject   @relation(fields: [subjectId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
+// Add a role enum 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model User {
   id                      String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -124,8 +126,8 @@ model UserOEQAnswer {
   id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId        String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   OEQId         String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  index         String?
   subIndex      String?
-  subSubIndex   String?
   userAnswer    String
   obtainedMarks Float?      @default(0) @db.Real
   marked        Boolean     @default(false)

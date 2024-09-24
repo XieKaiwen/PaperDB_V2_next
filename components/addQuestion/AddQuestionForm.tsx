@@ -1,23 +1,29 @@
-import { questionPartSchema } from "@/utils/addQuestionUtils";
+import { questionPartSchema, validateTopicWithinEducationLevel } from "@/utils/addQuestionUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, {  useEffect } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
+import React, { useEffect, useMemo } from "react";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Form } from "../ui/form";
 import { Button } from "../ui/button";
 import {
+  educationLevelOptions,
   MAX_QUESTION_PART_NUM,
-  questionIndex,
-  questionSubIndex,
+  schoolTypeMapToEduLevel,
 } from "@/constants/constants";
-import Image from "next/image";
-import crossDeleteIcon from "@/assets/cross-delete-icon.svg";
 import { useAddQuestionContext } from "@/hooks/useAddQuestionContext";
 import { AddQuestionFormData } from "@/types/types";
-import CustomInput from "../CustomInput";
-import CustomFileInput from "../CustomFileInput";
-import CustomTextArea from "../CustomTextArea";
+import QuestionPartInput from "./QuestionPartInput";
 import CustomSelect from "../CustomSelect";
+import CustomComboBox from "../CustomComboBox";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  getAllSchools,
+  getAllSubjects,
+  getAllTopics,
+} from "@/actions/queryData.actions";
+import { generateOptionsFromJsonList } from "@/utils/utils";
+import CustomFormCheckBox from "../CustomFormMultipleCheckBox";
+import { edu_level } from "@prisma/client";
 
 // TODO: Add retrieving topics, school and subjects from database.
 // TODO: Add form fields for: year, school, level, subject, checkbox for adding topics,question number, questionType
@@ -27,22 +33,49 @@ import CustomSelect from "../CustomSelect";
 // Text component to be used for question number, number validation has to be done for question number
 // Radio group should be used for question type: MCQ or OEQ
 
-// TODO: Refining the form to restrict choice of sub-index to be only be "-" if index is root. Also limit the choices of the topics after choosing the subjects, similarly for subjects after choosing educationalLevel.
-// To be done through constantly updating the disabled state of checkboxes and filtering options depending on the other fields (e.g. filtering topics based on subject, filtering subjects based on educationalLevel)...
-
-// TODO: Refactoring the questionParts input area (including delete button)
-
+// TODO: For subject, turn the educationLevel to an array of the enum
 
 /**
  * Some guidelines on the availability of options for certain fields:
  * 1. educationLevel decides the options for: school and subject, directly.
- * 2. subject decides the options for: topics, directly. 
- * 3. Hence, the order for filtering of form options on change for form data will be: Checking education level -> school/subject -> topic. We are to filter according to this order. 
+ * 2. subject decides the options for: topics, directly.
+ * 3. Hence, the order for filtering of form options on change for form data will be: Checking education level -> school/subject -> topic. We are to filter according to this order.
  * 4. If option currently selected for school/subject is not appropriate for the new education level, then formfield for school/subject will be reset. But no matter what, with a change in education level, the options for school/subject will be updated.
  * 5. If option currently selected for topic is not appropriate for the new subject, then formfield for topic will be reset.
-*/
+ */
 
 export default function AddQuestionForm() {
+  // TODO: Fix! Prisma cannot run on client
+  const {
+    isPending: isSubjectsPending,
+    isError: isSubjectsError,
+    data: allSubjects,
+    error: subjectsError,
+  } = useSuspenseQuery({
+    queryKey: ["subjects"],
+    queryFn: getAllSubjects,
+  });
+
+  const {
+    isPending: isTopicsPending,
+    isError: isTopicsError,
+    data: allTopics,
+    error: topicsError,
+  } = useSuspenseQuery({
+    queryKey: ["topics"],
+    queryFn: getAllTopics,
+  });
+
+  const {
+    isPending: isSchoolsPending,
+    isError: isSchoolsError,
+    data: allSchools,
+    error: schoolsError,
+  } = useSuspenseQuery({
+    queryKey: ["schools"],
+    queryFn: getAllSchools,
+  });
+
   const { updateFormData } = useAddQuestionContext();
 
   const form = useForm<z.infer<typeof questionPartSchema>>({
@@ -65,15 +98,94 @@ export default function AddQuestionForm() {
     name: "questionPart",
   });
 
+  const watchedEducationalLevel = watch("educationLevel");
+  const watchedSubject = watch("subject");
+  const watchedSchool = watch("school");
+  const watchedTopics = watch("topics");
+  const allFormData = useWatch({ control });
+  // useEffect(() => {
+  //   const formSubscription = watch((formData) => {
+  //     updateFormData(formData);
+  //   });
+
+  //   return () => {
+  //     formSubscription.unsubscribe();
+  //   };
+  // }, [watch]);
+
+  // Changed to using useWatch for allFormData because unlike watch, useWatch waits for any rendering to end before updating the allFormData value, hence does not result in updating of state: formData in questionPreview if there is already a rendering happening
+
   useEffect(() => {
-    const formSubscription = watch((formData) => {
-      updateFormData(formData);
+    updateFormData(allFormData);
+  }, [allFormData, updateFormData])
+
+  const subjectOptions: { value: string; label: string }[] = useMemo(() => {
+    if (watchedEducationalLevel) {
+      const filteredSubjects = allSubjects.filter(
+        (subject) => subject.educationLevels.includes(watchedEducationalLevel as edu_level)
+      );
+
+      const optionList = generateOptionsFromJsonList(filteredSubjects, "id", "subjectName")
+      optionList.sort((a, b) => a.label.localeCompare(b.label))
+      return optionList;
+    }
+    return [];
+  }, [allSubjects, watchedEducationalLevel]);
+
+  const schoolOptions: { value: string; label: string }[] = useMemo(() => {
+    if (watchedEducationalLevel) {
+      const filteredSchools = allSchools.filter((school) =>
+        schoolTypeMapToEduLevel[school.schoolType].includes(
+          watchedEducationalLevel
+        )
+      );
+      const optionList = generateOptionsFromJsonList(
+        filteredSchools,
+        "id",
+        "schoolFullName"
+      );
+      optionList.sort((a, b) => a.label.localeCompare(b.label))
+      return optionList
+    }
+    return [];
+  }, [allSchools, watchedEducationalLevel]);
+
+  const topicsOptions: { value: string; label: string }[] = useMemo(() => {
+    if (!watchedSubject) {
+      return [];
+    }
+    // const listOfSubjectIds = subjectOptions.map((subject) => subject.value)
+    const filteredTopics = allTopics.filter((topic) => {
+      return topic.subjectId === watchedSubject && validateTopicWithinEducationLevel(topic.educationLevel, watchedEducationalLevel);
     });
 
-    return () => {
-      formSubscription.unsubscribe();
-    };
-  }, [watch]);
+    const optionList = generateOptionsFromJsonList(filteredTopics, "id", "topicName");
+    optionList.sort((a, b) => a.label.localeCompare(b.label))
+    return optionList
+  }, [allTopics, subjectOptions, watchedSubject]);
+
+  // Moving the resetting of fields to useEffect instead of using them in useMemo because, using them in useMemo will cause an update in Controller while causing a re-render of the form as well, which is illegal
+
+  useEffect(() => {
+    if (!subjectOptions.find((subject) => watchedSubject === subject.value))
+      form.resetField("subject");
+  }, [subjectOptions])
+
+  useEffect(() => {
+    if (!schoolOptions.find((school) => watchedSchool === school.value))
+      form.resetField("school");
+  }, [schoolOptions])
+
+  useEffect(() => {
+    watchedTopics.forEach((topic) => {
+      if (!topicsOptions.find((option) => option.value === topic)) {
+        form.resetField("topics");
+        return;
+      }
+    });
+  }, [topicsOptions])
+
+
 
   function addTextArea() {
     append({
@@ -107,66 +219,60 @@ export default function AddQuestionForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="w-full xl:w-10/12 space-y-3"
       >
-        
+        {/* Insert educationLevel, school, subject in one line, then topics popover in another */}
+        <CustomSelect<AddQuestionFormData>
+          control={control}
+          name="educationLevel"
+          placeholder="Level of Education"
+          selectOptions={educationLevelOptions}
+          className="flex-1 font-medium"
+        />
+
+        <div className="flex flex-1 flex-wrap justify-between gap-2">
+          <CustomComboBox<AddQuestionFormData>
+            control={control}
+            name="school"
+            placeholder="School"
+            commandPlaceholder="Search for school..."
+            commandEmptyText="No schools found"
+            options={schoolOptions || []}
+            onSelectChange={form.setValue}
+            className=""
+          />
+          <CustomComboBox<AddQuestionFormData>
+            control={control}
+            name="subject"
+            placeholder="Subject"
+            commandPlaceholder="Search for subject..."
+            commandEmptyText="No subjects found"
+            options={subjectOptions || []}
+            onSelectChange={form.setValue}
+            className=""
+          />
+        </div>
+        {/* TODO make this a popover */}
+        <div className="flex flex-1 flex-wrap justify-between gap-2">
+          <CustomFormCheckBox<AddQuestionFormData>
+            control={control}
+            name="topics"
+            options={topicsOptions}
+            label="Topics"
+            className="flex flex-col flex-1 gap-1"
+          />
+        </div>
+
         {/* TODO Refactor the questionPart input */}
         {fields.map((questionPart, index) => {
           const { isText } = questionPart;
           return (
-            <div key={questionPart.id} className="flex gap-2 items-center">
-              <div className="flex flex-col flex-1 gap-1 w-full">
-                <div className="flex gap-3 w-full">
-                  {/* Insert selects here, they should all be in 1 row */}
-                  <CustomSelect<AddQuestionFormData>
-                    control={form.control}
-                    name={`questionPart.${index}.questionIdx`}
-                    placeholder="index"
-                    selectOptions={questionIndex}
-                    className="flex-1"
-                  />
-                  <CustomSelect<AddQuestionFormData>
-                    control={form.control}
-                    name={`questionPart.${index}.questionSubIdx`}
-                    placeholder="sub-index"
-                    selectOptions={questionSubIndex}
-                    className="flex-1"
-                  />
-                  <CustomInput<AddQuestionFormData>
-                    control={form.control}
-                    name={`questionPart.${index}.order`}
-                    placeholder="order(1, 2, 3...)"
-                    className="flex-1"
-                  />
-                </div>
-                <div className="w-full">
-                  {!isText ? (
-                    <CustomFileInput<AddQuestionFormData>
-                      control={form.control}
-                      name={`questionPart.${index}.image`}
-                    />
-                  ) : (
-                    <CustomTextArea<AddQuestionFormData>
-                      control={form.control}
-                      name={`questionPart.${index}.text`}
-                      placeholder="Enter text here..."
-                      className="flex-1"
-                    />
-                  )}
-                </div>
-              </div>
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onClick={() => deleteQuestionPart(index)}
-              >
-                <Image
-                  src={crossDeleteIcon}
-                  alt="delete icon"
-                  width={10}
-                  height={10}
-                />
-              </Button>
-            </div>
+            <QuestionPartInput<AddQuestionFormData>
+              key={questionPart.id}
+              isText={isText}
+              control={control}
+              id={questionPart.id}
+              index={index}
+              deleteQuestionPart={deleteQuestionPart}
+            />
           );
         })}
 

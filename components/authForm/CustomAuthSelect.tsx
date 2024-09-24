@@ -24,7 +24,7 @@ interface CustomAuthSelectProps {
   name: FieldPath<z.infer<typeof formSchema>>;
   label: string;
   placeholder: string;
-  selectOptions: { [key: string]: string };
+  selectOptions: { label: string; value: string }[];
 }
 
 export default function CustomAuthSelect({
@@ -48,10 +48,10 @@ export default function CustomAuthSelect({
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {Object.entries(selectOptions).map(([value, option] : [string, string]) => {
+              {selectOptions.map((option) => {
                 return (
-                  <SelectItem key={option} value={value}>
-                    {option}
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
                   </SelectItem>
                 );
               })}

@@ -49,3 +49,10 @@ export const questionPartSchema = z.object({
     .min(MIN_QUESTION_PART_NUM, {message: `You need at least ${MIN_QUESTION_PART_NUM} question part`})
     .max(MAX_QUESTION_PART_NUM, {message: `You can have at most ${MAX_QUESTION_PART_NUM} question part`})
 })  
+
+export function validateTopicWithinEducationLevel(topicEducationLevel: string, watchedEducationLevel: string) {
+    if(topicEducationLevel[0] === watchedEducationLevel[0]){
+        return watchedEducationLevel >= topicEducationLevel
+    }
+    return false
+}

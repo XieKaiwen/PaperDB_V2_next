@@ -68,3 +68,9 @@ export const questionSubIndex = [
   { value: "ix", label: "ix" },
   { value: "x", label: "x" }
 ];
+
+export const schoolTypeMapToEduLevel = {
+  Primary: ["P1", "P2", "P3", "P4", "P5", "P6"],
+  Secondary: ["S1", "S2", "S3", "S4"],
+  JC: ["J1", "J2"]
+}

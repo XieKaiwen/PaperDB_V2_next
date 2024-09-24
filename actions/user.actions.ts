@@ -113,6 +113,8 @@ export async function getLoggedInUser(): Promise<GetLoggedInResponse> {
   const supabase = createClient();
   try {
     const { data } = await supabase.auth.getUser();
+    // console.log(data);
+    
     if (!data?.user) {
       return parseStringify(response);
     }

@@ -26,7 +26,7 @@ export default async function AdminPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <section id="adminPage">
+      <section id="admin-page">
         <AddQuestionPage />
       </section>
     </HydrationBoundary>

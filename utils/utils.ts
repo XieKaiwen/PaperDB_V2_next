@@ -90,6 +90,20 @@ export function getBaseUrl(request: NextRequest): string {
   return `${protocol}://${host}`;
 }
 
+export function generateYearList(){
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for(let i = currentYear; i >= 2000; i--){
+    years.push({value: `${i}`, label: `${i}`});
+  }
+  return years;
+}
 
 
+export function generateOptionsFromJsonList(JSONList: Record<string, any>[], valueKey: string, labelKey: string): {value: string; label: string}[] {
+  const optionsList = JSONList.map((item) => {
+    return {value: item[valueKey], label: item[labelKey]}
+  })
 
+  return optionsList
+}

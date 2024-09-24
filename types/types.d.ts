@@ -1,5 +1,7 @@
 import { questionPartSchema } from "@/utils/addQuestionUtils";
 import { authFormSchema } from "@/utils/utils";
+import { UserMetadata } from "@supabase/supabase-js";
+import { FieldValues } from "react-hook-form";
 
 // Group type and interface together
 declare type GetLoggedInResponse = {
@@ -59,11 +61,11 @@ declare interface NavLinkProps {
 }
 
 declare interface NavBarProps {
-  user: User;
+  user: UserMetadata ;
 }
 
 declare interface MobileNavProps {
-  user: User;
+  user: UserMetadata;
 }
 // interface CustomAddQuestionTextAreaProps {
 //   control: Control<z.infer<typeof questionPartSchema>>;
@@ -159,9 +161,12 @@ interface CustomComboBoxProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   placeholder: string;
+  commandPlaceholder: string;
+  commandEmptyText: string;
   options: { value: string; label: string }[];
-  onSelectChange: (name: string, value: unknown, config?: Object) => void;
+  onSelectChange: (name: Path<T>, value: unknown, config?: Object) => void;
   label?: string;
+  description?: string;
   className?: string;
   selectClassName?: string;
 }
@@ -173,4 +178,12 @@ interface CustomFormMultipleCheckBoxProps<T extends FieldValues> {
   label?: string;
   description?: string;
   className?: string;
+}
+
+interface QuestionPartInputProps<T extends FieldValues>{
+  isText: boolean
+  control: Control<T>;
+  id: string;
+  index: number;
+  deleteQuestionPart: (index:number) => void;
 }

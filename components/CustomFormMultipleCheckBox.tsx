@@ -25,7 +25,7 @@ export default function CustomFormCheckBox<T extends FieldValues>({
       name={name}
       render={() => (
         <FormItem className={className}>
-          <div className="mb-4">
+          <div className="mb-1">
             {label && <FormLabel className="text-base">{label}</FormLabel>}
             {description && <FormDescription> {description} </FormDescription>}
           </div>

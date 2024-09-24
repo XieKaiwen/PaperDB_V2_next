@@ -1,6 +1,8 @@
 import { useAddQuestionContext } from '@/hooks/useAddQuestionContext'
 import React, { useEffect, useState } from 'react'
 
+// TODO: fix bad setState somewhere between QuestionPreview and AddQuestionForm, likely to have happened in context
+
 export default function QuestionPreview() {
     const {subscribeToFormData} = useAddQuestionContext()
     const [formData, setFormData] = useState({})
@@ -11,7 +13,7 @@ export default function QuestionPreview() {
         })
 
         return () => unsubscribeToFormData()
-    }, [subscribeToFormData])
+    }, [subscribeToFormData, setFormData])
   return (
     <div>
         QuestionPreview

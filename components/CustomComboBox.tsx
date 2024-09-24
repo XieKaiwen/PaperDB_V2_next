@@ -48,9 +48,14 @@ export default function CustomComboBox<T extends FieldValues>({
   options,
   onSelectChange,
   label,
+  description,
   placeholder,
+  commandPlaceholder,
+  commandEmptyText,
   className,
 }: CustomComboBoxProps<T>) {
+  // console.log(options);
+  
   return (
     <FormField
       control={control}
@@ -58,17 +63,17 @@ export default function CustomComboBox<T extends FieldValues>({
       render={({ field }) => (
         <FormItem className={cn("flex flex-col", className)}>
           {label && <FormLabel>{label}</FormLabel>}
-          <FormDescription>
-            This is the language that will be used in the dashboard.
-          </FormDescription>
+          {description && <FormDescription>
+            {description}
+          </FormDescription>}
           <Popover>
-            <PopoverTrigger asChild>
+            <PopoverTrigger className="w-[200px] lg:w-[250px] xl:w-[300px]" asChild>
               <FormControl>
                 <Button
                   variant="outline"
                   role="combobox"
                   className={cn(
-                    "w-[200px] justify-between",
+                    "w-[200px] lg:w-[250px] xl:w-[300px] justify-between",
                     !field.value && "text-muted-foreground"
                   )}
                 >
@@ -86,15 +91,15 @@ export default function CustomComboBox<T extends FieldValues>({
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
+            <PopoverContent className="w-[200px] lg:w-[250px] xl:w-[300px] p-0">
               <Command>
-                <CommandInput placeholder="Search language..." />
+                <CommandInput placeholder={commandPlaceholder} />
                 <CommandList>
-                  <CommandEmpty>No language found.</CommandEmpty>
+                  <CommandEmpty>{commandEmptyText}</CommandEmpty>
                   <CommandGroup>
                     {options.map((option) => (
                       <CommandItem
-                        value={option.value}
+                        value={option.label}
                         key={option.value}
                         onSelect={() => {
                           // form.setValue("language", language.value);

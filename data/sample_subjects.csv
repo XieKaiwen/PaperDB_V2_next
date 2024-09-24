@@ -1,57 +1,18 @@
-id,subjectName,educationLevel
-00f89a09-5f2a-4622-8014-bf7d550bdfd5,Integrated Science,S1
-01d6ea06-1788-47f9-9ea0-2cda9608f726,H1 Economics,J2
-020f0f5a-2539-47cd-877f-f645e39004c1,H1 Chemistry,J2
-03a9352d-26df-4d6a-8303-9290089d72ea,Science,P4
-03ecdc30-b3a0-46c2-bbfe-cba6dd7285a3,H1 Physics,J2
-1102101c-2d1e-4bae-9631-aa906f736efd,Science,P3
-23aa7028-3c41-4344-8dff-07ad13a7b74a,Mathematics,P3
-2b7953e4-cb6f-4aad-bcfc-9fd925def449,English,P5
-2e549368-5a17-4f95-bc51-5ad91f75f664,Chinese,P2
-30c7a99f-bfd6-47ee-a618-9982bed29e36,H1 Economics,J1
-3143bef8-2771-462d-962b-49dd56bdae31,H2 Physics,J2
-326f8820-1938-4d95-bbcd-e8de25f3eb6c,Chemistry,S3
-3fa7a9f9-7ea1-415f-8924-bd2ae10df218,H2 Chemistry,J2
-447ee7da-bd91-4320-88fb-ec0999d8a54e,Mathematics,P6
-453cdfe2-cfcc-4b45-9860-bd287670be95,Integrated Science,S2
-4daf746d-63cf-47db-bdf5-766736e45012,Biology,S4
-5810fe82-a5fc-44d6-a490-7341b7196e30,Mathematics,P1
-5c48ce61-c829-48dc-824b-330d43a022f5,Mathematics,P4
-5d77a2d3-758a-45e5-a824-8f84ec670a59,H1 Mathematics,J1
-5f05a0a3-3096-4971-a231-b46741baed1e,Chinese,P3
-6242a6e1-5b9c-49c2-8b69-dbc1da559cfd,Physics,S4
-654ac7d3-6f0e-46c6-9689-ba88ebdcae02,Chinese,P4
-668ec909-c20f-43bd-b001-3b96fcdadcdd,H2 Physics,J1
-81bb8357-f361-4567-abc6-39fba2f5d53a,Physics,S3
-84c38db4-134e-4f6c-8e1b-45b3a84494f3,A-Math,S3
-84c45605-886d-467a-998d-f42c685b75b0,H1 Chemistry,J1
-8fcaf789-3263-444b-8bec-e1d91ee18f0e,English,P2
-9071ac51-8dfb-4da0-a07c-aa55bb6c05d3,H2 Chemistry,J1
-941064c8-687d-4408-8538-4e145e04279a,Mathematics,P5
-95aca1b8-b50b-4d31-a3c3-4b1a2ece515d,Higher Chinese,P6
-95fdf84b-d099-4a97-8b27-68cd59e86ba2,H2 Economics,J1
-96cf372e-e8bc-4c24-b010-a7318f6eab66,General Paper,J2
-9dcc2706-535e-4f10-93fa-285701a61932,Chemistry,S4
-9e0635cf-fcad-4edc-9098-03e9015e9eec,H1 Mathematics,J2
-a34af250-46f3-4c3f-aa60-f58cd363c587,E-Math,S1
-a9f1c121-b3e7-4b6e-957e-1d124d4658bd,General Paper,J1
-aea2eb62-5195-4802-82f6-018351c8b390,E-Math,S2
-af8aedfa-04b3-49c1-b49a-492eb8c45693,H2 Mathematics,J2
-afdbca03-9817-4e15-b637-d0ef2b73e648,Higher Chinese,P5
-b51bf2b6-899e-4bec-a5f4-32d382d2d69e,H1 Physics,J1
-b525ab4b-e649-466e-b683-de6faa1606d3,Mathematics,P2
-c292604c-66ae-439b-803c-6ba3c8bab696,Chinese,P1
-c4bec70f-03c5-4623-8790-093f08b06ff2,E-Math,S4
-c6489820-18db-4fdc-a854-008a7b9fbe77,English,P3
-c6626940-8258-46b2-a60d-376d69bc5810,H2 Economics,J2
-cdafb324-5d29-445e-93a1-0499e665d468,Biology,S3
-d7cb591c-59dc-4eaf-bfad-69e4b0062c22,Chinese,P6
-d829b3ec-109b-4a9a-89a2-bdbfd1a874de,English,P1
-da80863b-765d-417c-b8fe-3b2f25005efe,E-Math,S3
-dc837d85-ee6d-4111-89cc-4b1d06f18812,Chinese,P5
-dedefde6-6670-4158-bccf-8bccad6ca584,English,P4
-e0589825-67cf-4d8f-9700-bd00434089f1,English,P6
-e9816098-6683-49cc-ad38-88caf7063890,H2 Mathematics,J1
-f244fd27-f41b-486f-a847-e1d776b12966,Science,P6
-f6a20cb3-b778-48d3-b340-5d7c4a18f584,Science,P5
-fec3f265-1105-405f-89a2-a3218b4ca0e1,A-Math,S4
+id,subjectName,educationLevels
+0482017b-337f-456b-955d-dac934669b9c,Biology,"[""S3"",""S4""]"
+05474789-d2c1-4526-8fb4-c94bdee6ca8a,E-Math,"[""S1"",""S2"",""S3"",""S4""]"
+0cb1491c-5702-4d5d-8bab-b2eda9e9ac30,H2 Chemistry,"[""J1"",""J2""]"
+2cf3bc65-fb26-4a70-86d5-2bdd17ec6e47,Integrated Science,"[""S1"",""S2""]"
+38d229c6-044f-4e98-907a-6a501802f291,A-Math,"[""S3"",""S4""]"
+502d3a5b-210a-4ecc-b66a-b058b3eb6b04,Mathematics,"[""P1"",""P2"",""P3"",""P4"",""P5"",""P6""]"
+524c227b-f408-47b3-ae7c-1ec0e48ae000,Higher Chinese,"[""P5"",""P6""]"
+69a2098d-eda9-47e2-8f61-5548125783a3,H1 Mathematics,"[""J1"",""J2""]"
+69eed9c9-20e1-457e-9d77-d5e8faefc190,Science,"[""P3"",""P4"",""P5"",""P6""]"
+6b16d3e0-9d77-4cd7-9052-68bb228f41e0,Chemistry,"[""S3"",""S4""]"
+6c0c954b-eff8-412f-a8ae-3c3148604102,H1 Chemistry,"[""J1"",""J2""]"
+71563fbf-325d-4e52-b59b-6c59141ec06f,H1 Physics,"[""J1"",""J2""]"
+7fabab43-310d-4cb0-94c6-74ebbc5bb9c1,English,"[""P1"",""P2"",""P3"",""P4"",""P5"",""P6""]"
+8e59bd39-2264-4429-b956-ef03f9c17bb3,H1 Economics,"[""J1"",""J2""]"
+8fac043b-d4bd-4850-a0e6-a418b76ae578,H2 Physics,"[""J1"",""J2""]"
+f1297924-9017-4f77-9ed1-4d2d67b010f4,General Paper,"[""J1"",""J2""]"
+f21a788f-f03d-4e7e-be16-acbc0a35c7b7,Chinese,"[""P1"",""P2"",""P3"",""P4"",""P5"",""P6""]"
