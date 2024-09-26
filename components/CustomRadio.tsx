@@ -12,7 +12,7 @@ export default function CustomRadio<T extends FieldValues>({control, name, optio
       name={name}
       render={({ field }) => (
         <FormItem className={cn("space-y-2", className)}>
-          {label && <FormLabel>{label}</FormLabel>}
+          {label && <FormLabel className="text-sm font-semibold">{label}</FormLabel>}
           <FormControl>
             <RadioGroup
               onValueChange={field.onChange}
@@ -20,7 +20,7 @@ export default function CustomRadio<T extends FieldValues>({control, name, optio
               className={cn("flex flex-col space-y-1", radioClassName)}
             >
               {options.map((option) => (
-                <FormItem key={option.value} className="flex items-center space-x-3 space-y-0">
+                <FormItem key={option.value} className="flex items-center space-x-2 space-y-0">
                   <FormControl>
                     <RadioGroupItem value={option.value} />
                   </FormControl>

@@ -1,7 +1,7 @@
 import { Merriweather, Open_Sans } from "next/font/google";
 import "./globals.css";;
 import ReactQueryClientProvider from "@/utils/react-query-client/ReactQueryClientProvider";
-export const dynamic = "force-dynamic";
+
 
 const merriweather = Merriweather({
   subsets: ["latin"], // Specifies the character subset to load, useful for performance optimization.

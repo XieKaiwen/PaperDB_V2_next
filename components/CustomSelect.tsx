@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "./ui/form";
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import {
   Select,
   SelectContent,
@@ -20,8 +15,10 @@ export default function CustomSelect<T extends FieldValues>({
   name,
   placeholder,
   selectOptions,
+  label,
+  description,
   className,
-  selectClassName
+  selectClassName,
 }: CustomSelectProps<T>) {
   return (
     <FormField
@@ -29,6 +26,12 @@ export default function CustomSelect<T extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem className={className}>
+          <div className="mb-1">
+            {label && (
+              <FormLabel className="font-semibold text-sm">{label}</FormLabel>
+            )}
+            {description && <FormDescription> {description} </FormDescription>}
+          </div>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
               <SelectTrigger>
@@ -36,15 +39,13 @@ export default function CustomSelect<T extends FieldValues>({
               </SelectTrigger>
             </FormControl>
             <SelectContent className={selectClassName}>
-              {selectOptions.map(
-                (option) => {
-                  return (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  );
-                }
-              )}
+              {selectOptions.map((option) => {
+                return (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
           <FormMessage />

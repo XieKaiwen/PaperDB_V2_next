@@ -1,3 +1,4 @@
+"use server"
 import prisma from "@/utils/prisma-client/client";
 
 export async function getAllSubjects() {

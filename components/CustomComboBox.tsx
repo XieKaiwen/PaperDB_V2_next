@@ -62,7 +62,7 @@ export default function CustomComboBox<T extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem className={cn("flex flex-col", className)}>
-          {label && <FormLabel>{label}</FormLabel>}
+          {label && <FormLabel className="font-semibold text-sm">{label}</FormLabel>}
           {description && <FormDescription>
             {description}
           </FormDescription>}

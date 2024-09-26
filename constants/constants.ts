@@ -19,6 +19,11 @@ export const navRoutes = [
   { title: "Papers", link: "/papers" },
 ];
 
+export const questionTypeOptions = [
+  { value: "MCQ", label: "MCQ" },
+  { value: "OEQ", label: "OEQ" },
+]
+
 export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"]
 
 export const MIN_QUESTION_PART_NUM = 1

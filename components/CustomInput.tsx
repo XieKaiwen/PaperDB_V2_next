@@ -24,7 +24,7 @@ export default function CustomInput<T extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem className={className}>
-          {label &&<FormLabel className="text-sm">{label}</FormLabel>}
+          {label &&<FormLabel className="text-sm font-semibold">{label}</FormLabel>}
           <FormControl>
             <Input className={inputClassName} placeholder={placeholder} {...field} />
           </FormControl>

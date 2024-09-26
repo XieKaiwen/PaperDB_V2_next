@@ -2,6 +2,7 @@ import { questionPartSchema } from "@/utils/addQuestionUtils";
 import { authFormSchema } from "@/utils/utils";
 import { UserMetadata } from "@supabase/supabase-js";
 import { FieldValues } from "react-hook-form";
+import { Label } from "@/components/ui/label";
 
 // Group type and interface together
 declare type GetLoggedInResponse = {
@@ -61,7 +62,7 @@ declare interface NavLinkProps {
 }
 
 declare interface NavBarProps {
-  user: UserMetadata ;
+  user: UserMetadata;
 }
 
 declare interface MobileNavProps {
@@ -144,6 +145,8 @@ interface CustomSelectProps<T extends FieldValues> {
   name: Path<T>;
   placeholder: string;
   selectOptions: { value: string; label: string }[];
+  label?: string;
+  description?: string;
   className?: string;
   selectClassName?: string;
 }
@@ -180,10 +183,28 @@ interface CustomFormMultipleCheckBoxProps<T extends FieldValues> {
   className?: string;
 }
 
-interface QuestionPartInputProps<T extends FieldValues>{
-  isText: boolean
+interface QuestionPartInputProps<T extends FieldValues> {
+  isText: boolean;
   control: Control<T>;
   id: string;
   index: number;
-  deleteQuestionPart: (index:number) => void;
+  deleteQuestionPart: (index: number) => void;
+}
+
+interface CustomPopoverMultipleCheckBoxProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
+  options: { value: string; label: string }[];
+  triggerText: string;
+  emptyPopoverText: string;
+  label?: string;
+  description?: string;
+  className?: string;
+}
+
+interface QuestionInfoInputProps<T extends FieldValues> {
+  control: Control<T>;
+  form: UseFormReturn<T>;
+  optionsDict: { [key: string]: { value: string; label: string }[] };
+  className?: string;
 }

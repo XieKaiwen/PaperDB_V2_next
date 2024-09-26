@@ -1,6 +1,9 @@
-import { questionPartSchema, validateTopicWithinEducationLevel } from "@/utils/addQuestionUtils";
+import {
+  questionPartSchema,
+  validateTopicWithinEducationLevel,
+} from "@/utils/addQuestionUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Form } from "../ui/form";
@@ -8,22 +11,22 @@ import { Button } from "../ui/button";
 import {
   educationLevelOptions,
   MAX_QUESTION_PART_NUM,
+  questionTypeOptions,
   schoolTypeMapToEduLevel,
 } from "@/constants/constants";
 import { useAddQuestionContext } from "@/hooks/useAddQuestionContext";
 import { AddQuestionFormData } from "@/types/types";
 import QuestionPartInput from "./QuestionPartInput";
-import CustomSelect from "../CustomSelect";
-import CustomComboBox from "../CustomComboBox";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   getAllSchools,
   getAllSubjects,
   getAllTopics,
 } from "@/actions/queryData.actions";
-import { generateOptionsFromJsonList } from "@/utils/utils";
-import CustomFormCheckBox from "../CustomFormMultipleCheckBox";
+import { generateOptionsFromJsonList, generateYearList } from "@/utils/utils";
 import { edu_level } from "@prisma/client";
+import { debounce } from "lodash";
+import QuestionInfoInput from "./QuestionInfoInput";
 
 // TODO: Add retrieving topics, school and subjects from database.
 // TODO: Add form fields for: year, school, level, subject, checkbox for adding topics,question number, questionType
@@ -32,8 +35,6 @@ import { edu_level } from "@prisma/client";
 // Select component with autocomplete (ComboBox) should be used for school, year and subject
 // Text component to be used for question number, number validation has to be done for question number
 // Radio group should be used for question type: MCQ or OEQ
-
-// TODO: For subject, turn the educationLevel to an array of the enum
 
 /**
  * Some guidelines on the availability of options for certain fields:
@@ -47,30 +48,30 @@ import { edu_level } from "@prisma/client";
 export default function AddQuestionForm() {
   // TODO: Fix! Prisma cannot run on client
   const {
-    isPending: isSubjectsPending,
-    isError: isSubjectsError,
+    // isPending: isSubjectsPending,
+    // isError: isSubjectsError,
     data: allSubjects,
-    error: subjectsError,
+    // error: subjectsError,
   } = useSuspenseQuery({
     queryKey: ["subjects"],
     queryFn: getAllSubjects,
   });
 
   const {
-    isPending: isTopicsPending,
-    isError: isTopicsError,
+    // isPending: isTopicsPending,
+    // isError: isTopicsError,
     data: allTopics,
-    error: topicsError,
+    // error: topicsError,
   } = useSuspenseQuery({
     queryKey: ["topics"],
     queryFn: getAllTopics,
   });
 
   const {
-    isPending: isSchoolsPending,
-    isError: isSchoolsError,
+    // isPending: isSchoolsPending,
+    // isError: isSchoolsError,
     data: allSchools,
-    error: schoolsError,
+    // error: schoolsError,
   } = useSuspenseQuery({
     queryKey: ["schools"],
     queryFn: getAllSchools,
@@ -103,6 +104,14 @@ export default function AddQuestionForm() {
   const watchedSchool = watch("school");
   const watchedTopics = watch("topics");
   const allFormData = useWatch({ control });
+  // debounce the updateFormData function to avoid excessive re-renders, optimising performance
+  const debounceUpdateFormData = useCallback(
+    debounce((formData: AddQuestionFormData) => {
+      updateFormData(formData);
+    }, 500),
+    [updateFormData]
+  );
+
   // useEffect(() => {
   //   const formSubscription = watch((formData) => {
   //     updateFormData(formData);
@@ -116,17 +125,23 @@ export default function AddQuestionForm() {
   // Changed to using useWatch for allFormData because unlike watch, useWatch waits for any rendering to end before updating the allFormData value, hence does not result in updating of state: formData in questionPreview if there is already a rendering happening
 
   useEffect(() => {
-    updateFormData(allFormData);
-  }, [allFormData, updateFormData])
+    debounceUpdateFormData(allFormData);
+
+    return () => debounceUpdateFormData.cancel();
+  }, [allFormData, debounceUpdateFormData]);
 
   const subjectOptions: { value: string; label: string }[] = useMemo(() => {
     if (watchedEducationalLevel) {
-      const filteredSubjects = allSubjects.filter(
-        (subject) => subject.educationLevels.includes(watchedEducationalLevel as edu_level)
+      const filteredSubjects = allSubjects.filter((subject) =>
+        subject.educationLevels.includes(watchedEducationalLevel as edu_level)
       );
 
-      const optionList = generateOptionsFromJsonList(filteredSubjects, "id", "subjectName")
-      optionList.sort((a, b) => a.label.localeCompare(b.label))
+      const optionList = generateOptionsFromJsonList(
+        filteredSubjects,
+        "id",
+        "subjectName"
+      );
+      optionList.sort((a, b) => a.label.localeCompare(b.label));
       return optionList;
     }
     return [];
@@ -144,8 +159,8 @@ export default function AddQuestionForm() {
         "id",
         "schoolFullName"
       );
-      optionList.sort((a, b) => a.label.localeCompare(b.label))
-      return optionList
+      optionList.sort((a, b) => a.label.localeCompare(b.label));
+      return optionList;
     }
     return [];
   }, [allSchools, watchedEducationalLevel]);
@@ -156,36 +171,66 @@ export default function AddQuestionForm() {
     }
     // const listOfSubjectIds = subjectOptions.map((subject) => subject.value)
     const filteredTopics = allTopics.filter((topic) => {
-      return topic.subjectId === watchedSubject && validateTopicWithinEducationLevel(topic.educationLevel, watchedEducationalLevel);
+      return (
+        topic.subjectId === watchedSubject &&
+        validateTopicWithinEducationLevel(
+          topic.educationLevel,
+          watchedEducationalLevel
+        )
+      );
     });
 
-    const optionList = generateOptionsFromJsonList(filteredTopics, "id", "topicName");
-    optionList.sort((a, b) => a.label.localeCompare(b.label))
-    return optionList
+    const optionList = generateOptionsFromJsonList(
+      filteredTopics,
+      "id",
+      "topicName"
+    );
+    optionList.sort((a, b) => a.label.localeCompare(b.label));
+    return optionList;
   }, [allTopics, subjectOptions, watchedSubject]);
 
+  const yearOptions = useMemo(() => {
+    return generateYearList();
+  }, []);
   // Moving the resetting of fields to useEffect instead of using them in useMemo because, using them in useMemo will cause an update in Controller while causing a re-render of the form as well, which is illegal
 
   useEffect(() => {
     if (!subjectOptions.find((subject) => watchedSubject === subject.value))
       form.resetField("subject");
-  }, [subjectOptions])
+  }, [subjectOptions]);
 
   useEffect(() => {
     if (!schoolOptions.find((school) => watchedSchool === school.value))
       form.resetField("school");
-  }, [schoolOptions])
+  }, [schoolOptions]);
 
   useEffect(() => {
-    watchedTopics.forEach((topic) => {
+    watchedTopics.every((topic) => {
       if (!topicsOptions.find((option) => option.value === topic)) {
         form.resetField("topics");
-        return;
+        return false;
       }
+      return true;
     });
-  }, [topicsOptions])
+  }, [topicsOptions]);
 
-
+  const optionsDict = useMemo(() => {
+    return {
+      educationLevelOptions,
+      schoolOptions,
+      subjectOptions,
+      topicsOptions,
+      yearOptions,
+      questionTypeOptions,
+    };
+  }, [
+    educationLevelOptions,
+    schoolOptions,
+    subjectOptions,
+    topicsOptions,
+    yearOptions,
+    questionTypeOptions,
+  ]);
 
   function addTextArea() {
     append({
@@ -217,50 +262,14 @@ export default function AddQuestionForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full xl:w-10/12 space-y-3"
+        className="w-full xl:w-10/12 space-y-7"
       >
-        {/* Insert educationLevel, school, subject in one line, then topics popover in another */}
-        <CustomSelect<AddQuestionFormData>
+        <QuestionInfoInput<AddQuestionFormData>
+          optionsDict={optionsDict}
           control={control}
-          name="educationLevel"
-          placeholder="Level of Education"
-          selectOptions={educationLevelOptions}
-          className="flex-1 font-medium"
+          form={form}
+          className="space-y-3"
         />
-
-        <div className="flex flex-1 flex-wrap justify-between gap-2">
-          <CustomComboBox<AddQuestionFormData>
-            control={control}
-            name="school"
-            placeholder="School"
-            commandPlaceholder="Search for school..."
-            commandEmptyText="No schools found"
-            options={schoolOptions || []}
-            onSelectChange={form.setValue}
-            className=""
-          />
-          <CustomComboBox<AddQuestionFormData>
-            control={control}
-            name="subject"
-            placeholder="Subject"
-            commandPlaceholder="Search for subject..."
-            commandEmptyText="No subjects found"
-            options={subjectOptions || []}
-            onSelectChange={form.setValue}
-            className=""
-          />
-        </div>
-        {/* TODO make this a popover */}
-        <div className="flex flex-1 flex-wrap justify-between gap-2">
-          <CustomFormCheckBox<AddQuestionFormData>
-            control={control}
-            name="topics"
-            options={topicsOptions}
-            label="Topics"
-            className="flex flex-col flex-1 gap-1"
-          />
-        </div>
-
         {/* TODO Refactor the questionPart input */}
         {fields.map((questionPart, index) => {
           const { isText } = questionPart;
@@ -275,29 +284,30 @@ export default function AddQuestionForm() {
             />
           );
         })}
+        <div className="space-y-2">
+          <div className="flex gap-4 w-full mt-2">
+            <Button
+              className="w-full"
+              disabled={fields.length >= MAX_QUESTION_PART_NUM}
+              type="button"
+              onClick={addTextArea}
+            >
+              Add Text
+            </Button>
+            <Button
+              className="w-full"
+              disabled={fields.length >= MAX_QUESTION_PART_NUM}
+              type="button"
+              onClick={addImageInput}
+            >
+              Add Image
+            </Button>
+          </div>
 
-        <div className="flex gap-4 w-full mt-2">
-          <Button
-            className="w-full"
-            disabled={fields.length >= MAX_QUESTION_PART_NUM}
-            type="button"
-            onClick={addTextArea}
-          >
-            Add Text
-          </Button>
-          <Button
-            className="w-full"
-            disabled={fields.length >= MAX_QUESTION_PART_NUM}
-            type="button"
-            onClick={addImageInput}
-          >
-            Add Image
+          <Button type="submit" className="w-full">
+            Submit
           </Button>
         </div>
-
-        <Button type="submit" className="w-full">
-          Submit
-        </Button>
       </form>
     </Form>
   );
