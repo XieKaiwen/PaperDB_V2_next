@@ -7,12 +7,11 @@ import CustomInput from "../CustomInput";
 import CustomRadio from "../CustomRadio";
 import { FieldValues } from "react-hook-form";
 
-
 export default function QuestionInfoInput<T extends FieldValues>({
   control,
   form,
   optionsDict,
-  className
+  className,
 }: QuestionInfoInputProps<T>) {
   const {
     educationLevelOptions,
@@ -20,8 +19,11 @@ export default function QuestionInfoInput<T extends FieldValues>({
     subjectOptions,
     topicsOptions,
     yearOptions,
-    questionTypeOptions
+    questionTypeOptions,
+    examTypeOptions,
   } = optionsDict;
+  // TODO Change all placeholders to font-normal
+  // TODO Make app responsive by changing comboboxes to Drawer component when below certain breakpoint
   return (
     <div className={className}>
       <CustomSelect<AddQuestionFormData>
@@ -67,6 +69,15 @@ export default function QuestionInfoInput<T extends FieldValues>({
           emptyPopoverText="No topics found (Check if level and subjects are chosen)"
           label="Topics"
         />
+        <CustomInput<AddQuestionFormData>
+          control={control}
+          name="questionNumber"
+          placeholder="Enter number..."
+          label="Question No."
+          className="flex-1"
+        />
+      </div>
+      <div className="flex flex-1 flex-wrap gap-2 justify-center align-middle">
         <CustomSelect<AddQuestionFormData>
           control={control}
           name="year"
@@ -75,12 +86,14 @@ export default function QuestionInfoInput<T extends FieldValues>({
           label="Year"
           className="flex-1"
         />
-        <CustomInput<AddQuestionFormData>
+        <CustomSelect<AddQuestionFormData>
           control={control}
-          name="questionNumber"
-          placeholder="Enter number..."
-          label="Question No."
-          className="flex-1"
+          name="examType"
+          placeholder="Select exam type..."
+          selectOptions={examTypeOptions || []}
+          label="Exam Type"
+          emptySelectText="Select education level first"
+          className="flex-1 font-medium"
         />
       </div>
       <CustomRadio<AddQuestionFormData>

@@ -1,6 +1,6 @@
 import { AddQuestionFormData, QuestionPartInputProps } from '@/types/types'
 import React from 'react'
-import { FieldValues } from 'react-hook-form'
+import { FieldValues, useFieldArray } from 'react-hook-form'
 import CustomSelect from '../CustomSelect'
 import { questionIndex, questionSubIndex } from '@/constants/constants'
 import CustomInput from '../CustomInput'
@@ -11,7 +11,8 @@ import Image from 'next/image'
 import crossDeleteIcon from '@/assets/cross-delete-icon.svg';
 
 export default function QuestionPartInput<T extends FieldValues>({isText, control, id, index, deleteQuestionPart}: QuestionPartInputProps<T>) {
-    return (
+  
+  return (
         <div key={id} className="flex gap-2 items-center">
           <div className="flex flex-col flex-1 gap-1 w-full">
             <div className="flex gap-3 w-full">

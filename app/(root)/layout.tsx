@@ -1,4 +1,5 @@
 import NavBar from "@/components/NavBar";
+import { debugStyle } from "@/constants/constants";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -33,7 +34,7 @@ export default async function RootLayout({
   return (
     <main className="font-open-sans">
       <NavBar user={user} />
-      <div className="mt-18">{children}</div>
+      <div className="pt-16">{children}</div>
     </main>
   );
 }

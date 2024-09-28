@@ -1,3 +1,7 @@
+import { edu_level, exam_type } from "@prisma/client";
+
+export const debugStyle = { border: '1px solid red' };
+
 export const educationLevelOptions = [
   { value: "P1", label: "Primary 1" },
   { value: "P2", label: "Primary 2" },
@@ -19,10 +23,6 @@ export const navRoutes = [
   { title: "Papers", link: "/papers" },
 ];
 
-export const questionTypeOptions = [
-  { value: "MCQ", label: "MCQ" },
-  { value: "OEQ", label: "OEQ" },
-]
 
 export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"]
 
@@ -79,3 +79,78 @@ export const schoolTypeMapToEduLevel = {
   Secondary: ["S1", "S2", "S3", "S4"],
   JC: ["J1", "J2"]
 }
+
+export const questionTypeOptions = [
+  { value: "MCQ", label: "MCQ" },
+  { value: "OEQ", label: "OEQ" },
+]
+
+export const examTypeEducationLevelMapping : {examType: string; enumValue: exam_type;educationLevel: edu_level[]}[] = [
+  {
+    examType: 'CA1',
+    enumValue: 'CA1',
+    educationLevel: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'] // Example levels, adjust as needed
+  },
+  {
+    examType: 'CA2',
+    enumValue: 'CA2',
+    educationLevel: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
+  },
+  {
+    examType: 'SA1',
+    enumValue: 'SA1',
+    educationLevel: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
+  },
+  {
+    examType: 'SA2',
+    enumValue: 'SA2',
+    educationLevel: ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
+  },
+  {
+    examType: 'PSLE',
+    enumValue: 'PSLE',
+    educationLevel: ['P6'] // PSLE is typically for Primary 6 students
+  },
+  {
+    examType: 'WA',
+    enumValue: 'WA',
+    educationLevel: ['S1', 'S2', 'S3', 'S4'] // Example secondary levels, adjust as needed
+  },
+  {
+    examType: 'SA',
+    enumValue: 'SA',
+    educationLevel: ['S1', 'S2', 'S3', 'S4']
+  },
+  {
+    examType: 'O-level',
+    enumValue: 'O_level',
+    educationLevel: ['S4'] // Typically for Secondary 4 students
+  },
+  {
+    examType: 'Common test',
+    enumValue: 'Common_test',
+    educationLevel: ['S1', 'S2', 'S3', 'S4']
+  },
+  {
+    examType: 'Block test',
+    enumValue: 'Block_test',
+    educationLevel: ['S1', 'S2', 'S3', 'S4']
+  },
+  {
+    examType: 'Prelim/Promo',
+    enumValue: 'Prelim_Promo',
+    educationLevel: ['J1', 'J2'] // For Junior College students
+  },
+  {
+    examType: 'A-level',
+    enumValue: 'A_level',
+    educationLevel: ['J2'] // Typically for Junior College 2 students
+  }
+];
+
+// Breakpoint constants
+export const SM_BREAKPOINT = 640
+export const MD_BREAKPOINT = 768
+export const LG_BREAKPOINT = 1024
+export const XL_BREAKPOINT = 1280
+export const XXL_BREAKPOINT = 1536

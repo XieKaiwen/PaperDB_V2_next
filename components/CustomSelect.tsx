@@ -17,6 +17,7 @@ export default function CustomSelect<T extends FieldValues>({
   selectOptions,
   label,
   description,
+  emptySelectText,
   className,
   selectClassName,
 }: CustomSelectProps<T>) {
@@ -38,7 +39,7 @@ export default function CustomSelect<T extends FieldValues>({
                 <SelectValue placeholder={placeholder} />
               </SelectTrigger>
             </FormControl>
-            <SelectContent className={selectClassName}>
+            { selectOptions.length > 0 ? <SelectContent className={selectClassName}>
               {selectOptions.map((option) => {
                 return (
                   <SelectItem key={option.value} value={option.value}>
@@ -46,7 +47,9 @@ export default function CustomSelect<T extends FieldValues>({
                   </SelectItem>
                 );
               })}
-            </SelectContent>
+            </SelectContent> :
+            <SelectContent className="text-sm text-slate-700 flex justify-center items-center">{emptySelectText}</SelectContent>
+            }
           </Select>
           <FormMessage />
         </FormItem>

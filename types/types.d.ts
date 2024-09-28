@@ -3,6 +3,7 @@ import { authFormSchema } from "@/utils/utils";
 import { UserMetadata } from "@supabase/supabase-js";
 import { FieldValues } from "react-hook-form";
 import { Label } from "@/components/ui/label";
+import { Prisma, Subject } from "@prisma/client";
 
 // Group type and interface together
 declare type GetLoggedInResponse = {
@@ -147,6 +148,7 @@ interface CustomSelectProps<T extends FieldValues> {
   selectOptions: { value: string; label: string }[];
   label?: string;
   description?: string;
+  emptySelectText?: string;
   className?: string;
   selectClassName?: string;
 }
@@ -207,4 +209,16 @@ interface QuestionInfoInputProps<T extends FieldValues> {
   form: UseFormReturn<T>;
   optionsDict: { [key: string]: { value: string; label: string }[] };
   className?: string;
+}
+
+interface QuestionPreviewProps {
+  allSubjects: Subject[];
+  allTopics: Topic[];
+  allSchools: School[];
+}
+
+interface AddQuestionFormProps{
+  allSubjects: Subject[];
+  allTopics: Topic[];
+  allSchools: School[];
 }

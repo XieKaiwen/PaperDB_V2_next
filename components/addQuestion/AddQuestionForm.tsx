@@ -3,30 +3,32 @@ import {
   validateTopicWithinEducationLevel,
 } from "@/utils/addQuestionUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useCallback, useEffect, useMemo } from "react";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useFieldArray,
+  useForm,
+  useFormState,
+  useWatch,
+} from "react-hook-form";
 import { z } from "zod";
 import { Form } from "../ui/form";
 import { Button } from "../ui/button";
 import {
   educationLevelOptions,
+  examTypeEducationLevelMapping,
   MAX_QUESTION_PART_NUM,
+  MD_BREAKPOINT,
   questionTypeOptions,
   schoolTypeMapToEduLevel,
 } from "@/constants/constants";
 import { useAddQuestionContext } from "@/hooks/useAddQuestionContext";
-import { AddQuestionFormData } from "@/types/types";
+import { AddQuestionFormData, AddQuestionFormProps } from "@/types/types";
 import QuestionPartInput from "./QuestionPartInput";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  getAllSchools,
-  getAllSubjects,
-  getAllTopics,
-} from "@/actions/queryData.actions";
 import { generateOptionsFromJsonList, generateYearList } from "@/utils/utils";
-import { edu_level } from "@prisma/client";
+import { edu_level, school_type } from "@prisma/client";
 import { debounce } from "lodash";
 import QuestionInfoInput from "./QuestionInfoInput";
+import { Oval } from "react-loader-spinner";
 
 // TODO: Add retrieving topics, school and subjects from database.
 // TODO: Add form fields for: year, school, level, subject, checkbox for adding topics,question number, questionType
@@ -45,37 +47,31 @@ import QuestionInfoInput from "./QuestionInfoInput";
  * 5. If option currently selected for topic is not appropriate for the new subject, then formfield for topic will be reset.
  */
 
-export default function AddQuestionForm() {
-  // TODO: Fix! Prisma cannot run on client
-  const {
-    // isPending: isSubjectsPending,
-    // isError: isSubjectsError,
-    data: allSubjects,
-    // error: subjectsError,
-  } = useSuspenseQuery({
-    queryKey: ["subjects"],
-    queryFn: getAllSubjects,
-  });
+export default function AddQuestionForm({allSubjects, allTopics, allSchools} : AddQuestionFormProps) {
+  
 
-  const {
-    // isPending: isTopicsPending,
-    // isError: isTopicsError,
-    data: allTopics,
-    // error: topicsError,
-  } = useSuspenseQuery({
-    queryKey: ["topics"],
-    queryFn: getAllTopics,
-  });
+  // Handle change in breakpoints, affects the labels in school select field
+  const [isWindowSizeBelowBreakpoint, setIsWindowSizeBelowBreakpoint] =
+    useState(false);
+  const debouncedSetIsWindowSizeBelowBreakpoint = useCallback(
+    debounce(() => {
+      setIsWindowSizeBelowBreakpoint(window.innerWidth < MD_BREAKPOINT);
+    }, 300),
+    [setIsWindowSizeBelowBreakpoint]
+  );
 
-  const {
-    // isPending: isSchoolsPending,
-    // isError: isSchoolsError,
-    data: allSchools,
-    // error: schoolsError,
-  } = useSuspenseQuery({
-    queryKey: ["schools"],
-    queryFn: getAllSchools,
-  });
+  useEffect(() => {
+    debouncedSetIsWindowSizeBelowBreakpoint();
+    window.addEventListener("resize", debouncedSetIsWindowSizeBelowBreakpoint);
+
+    return () => {
+      window.removeEventListener(
+        "resize",
+        debouncedSetIsWindowSizeBelowBreakpoint
+      );
+      debouncedSetIsWindowSizeBelowBreakpoint.cancel();
+    };
+  }, [debouncedSetIsWindowSizeBelowBreakpoint]);
 
   const { updateFormData } = useAddQuestionContext();
 
@@ -87,6 +83,7 @@ export default function AddQuestionForm() {
       school: "",
       subject: "",
       topics: [],
+      // examType: "",
       questionType: "",
       questionNumber: "",
       questionPart: [],
@@ -98,6 +95,7 @@ export default function AddQuestionForm() {
     control,
     name: "questionPart",
   });
+  const { isSubmitting } = useFormState({ control });
 
   const watchedEducationalLevel = watch("educationLevel");
   const watchedSubject = watch("subject");
@@ -112,18 +110,7 @@ export default function AddQuestionForm() {
     [updateFormData]
   );
 
-  // useEffect(() => {
-  //   const formSubscription = watch((formData) => {
-  //     updateFormData(formData);
-  //   });
-
-  //   return () => {
-  //     formSubscription.unsubscribe();
-  //   };
-  // }, [watch]);
-
   // Changed to using useWatch for allFormData because unlike watch, useWatch waits for any rendering to end before updating the allFormData value, hence does not result in updating of state: formData in questionPreview if there is already a rendering happening
-
   useEffect(() => {
     debounceUpdateFormData(allFormData);
 
@@ -147,23 +134,25 @@ export default function AddQuestionForm() {
     return [];
   }, [allSubjects, watchedEducationalLevel]);
 
+  // TODO: Need to improve short name for schools, too confusing. For example:
+  // Rosyth School and Red Swastika School are RS and RSS respectively. Very easily confused
   const schoolOptions: { value: string; label: string }[] = useMemo(() => {
     if (watchedEducationalLevel) {
       const filteredSchools = allSchools.filter((school) =>
-        schoolTypeMapToEduLevel[school.schoolType].includes(
+        schoolTypeMapToEduLevel[school.schoolType as school_type].includes(
           watchedEducationalLevel
         )
       );
       const optionList = generateOptionsFromJsonList(
         filteredSchools,
         "id",
-        "schoolFullName"
+        isWindowSizeBelowBreakpoint ? "schoolShortName" : "schoolFullName"
       );
       optionList.sort((a, b) => a.label.localeCompare(b.label));
       return optionList;
     }
     return [];
-  }, [allSchools, watchedEducationalLevel]);
+  }, [allSchools, watchedEducationalLevel, isWindowSizeBelowBreakpoint]);
 
   const topicsOptions: { value: string; label: string }[] = useMemo(() => {
     if (!watchedSubject) {
@@ -192,18 +181,21 @@ export default function AddQuestionForm() {
   const yearOptions = useMemo(() => {
     return generateYearList();
   }, []);
+  const examTypeOptions = useMemo(() => {
+    if(!watchedEducationalLevel) return []
+    const filteredExamTypes = examTypeEducationLevelMapping.filter((examType) => examType.educationLevel.includes(watchedEducationalLevel as edu_level))
+    return generateOptionsFromJsonList(filteredExamTypes, "enumValue", "examType")
+  }, [watchedEducationalLevel])
   // Moving the resetting of fields to useEffect instead of using them in useMemo because, using them in useMemo will cause an update in Controller while causing a re-render of the form as well, which is illegal
 
   useEffect(() => {
     if (!subjectOptions.find((subject) => watchedSubject === subject.value))
       form.resetField("subject");
   }, [subjectOptions]);
-
   useEffect(() => {
     if (!schoolOptions.find((school) => watchedSchool === school.value))
       form.resetField("school");
   }, [schoolOptions]);
-
   useEffect(() => {
     watchedTopics.every((topic) => {
       if (!topicsOptions.find((option) => option.value === topic)) {
@@ -222,6 +214,7 @@ export default function AddQuestionForm() {
       topicsOptions,
       yearOptions,
       questionTypeOptions,
+      examTypeOptions
     };
   }, [
     educationLevelOptions,
@@ -230,6 +223,7 @@ export default function AddQuestionForm() {
     topicsOptions,
     yearOptions,
     questionTypeOptions,
+    examTypeOptions
   ]);
 
   function addTextArea() {
@@ -254,7 +248,8 @@ export default function AddQuestionForm() {
     remove(index);
   }
 
-  function onSubmit(values: z.infer<typeof questionPartSchema>) {
+  async function onSubmit(values: z.infer<typeof questionPartSchema>) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log(values);
   }
 
@@ -262,13 +257,13 @@ export default function AddQuestionForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full xl:w-10/12 space-y-7"
+        className="p-2 w-full space-y-7"
       >
         <QuestionInfoInput<AddQuestionFormData>
           optionsDict={optionsDict}
           control={control}
           form={form}
-          className="space-y-3"
+          className="space-y-4"
         />
         {/* TODO Refactor the questionPart input */}
         {fields.map((questionPart, index) => {
@@ -304,8 +299,23 @@ export default function AddQuestionForm() {
             </Button>
           </div>
 
-          <Button type="submit" className="w-full">
-            Submit
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <div className="flex gap-4">
+                <p>Loading</p>
+                <Oval
+                  visible={true}
+                  height="20"
+                  width="20"
+                  color="#a3c4ff"
+                  ariaLabel="oval-loading"
+                  wrapperStyle={{}}
+                  wrapperClass=""
+                />
+              </div>
+            ) : (
+              "Submit"
+            )}
           </Button>
         </div>
       </form>

@@ -80,7 +80,7 @@ export default function CustomPopoverMultipleCheckBox<T extends FieldValues>({
                 />
               ))}
             </PopoverContent> :
-            <PopoverContent className="text-sm text-slate-700 flex justify-center items-center"> {emptyPopoverText} </PopoverContent>
+            <PopoverContent className="w-full text-sm text-slate-700 text-center"> {emptyPopoverText} </PopoverContent>
           }
           </Popover>
           <FormMessage />

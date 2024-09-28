@@ -1,7 +1,7 @@
 import { Merriweather, Open_Sans } from "next/font/google";
-import "./globals.css";;
+import "./globals.css";
 import ReactQueryClientProvider from "@/utils/react-query-client/ReactQueryClientProvider";
-
+import { debugStyle } from "@/constants/constants";
 
 const merriweather = Merriweather({
   subsets: ["latin"], // Specifies the character subset to load, useful for performance optimization.
@@ -32,8 +32,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
       <body
-        className={`min-h-screen bg-background antialiased w-full ${merriweather.variable} ${openSans.variable}`}
+        className={`min-h-screen antialiased w-full ${merriweather.variable} ${openSans.variable}`}
+        // className={` bg-background antialiased w-full ${merriweather.variable} ${openSans.variable}`}
       >
         <ReactQueryClientProvider>{children}</ReactQueryClientProvider>
       </body>
