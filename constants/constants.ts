@@ -1,5 +1,4 @@
 import { edu_level, exam_type } from "@prisma/client";
-
 export const debugStyle = { border: '1px solid red' };
 
 export const educationLevelOptions = [

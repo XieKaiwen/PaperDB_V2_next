@@ -1,8 +1,6 @@
 import { useAddQuestionContext } from "@/hooks/useAddQuestionContext";
 import { AddQuestionFormData, QuestionPreviewProps } from "@/types/types";
-import React, { useEffect, useState } from "react";
-
-// TODO: fix bad setState somewhere between QuestionPreview and AddQuestionForm, likely to have happened in context
+import React, { useEffect, useMemo, useState } from "react";
 
 export default function QuestionPreview({
   allSchools,
@@ -10,7 +8,7 @@ export default function QuestionPreview({
   allTopics,
 }: QuestionPreviewProps) {
   const { subscribeToFormData } = useAddQuestionContext();
-  const [formData, setFormData] = useState<AddQuestionFormData | null>(null);
+  const [formData, setFormData] = useState<AddQuestionFormData>({});
 
   useEffect(() => {
     const unsubscribeToFormData = subscribeToFormData((updatedFormData) => {
@@ -33,36 +31,41 @@ export default function QuestionPreview({
     // return `${schoolName} ${yearName} ${educationLevel ? `- ${educationLevel}` : ""}`
     return [`${schoolName} ${yearName}`, `${educationLevel} ${examType}`];
   }
-  if (formData === null) {
-    return;
-  }
 
   // Deconstruct formData
   const {
-    year,
-    educationLevel,
-    school: chosenSchool,
-    subject: chosenSubject,
-    topics: chosenTopics,
-    examType,
-    questionType, // Do not need to display this
-    questionNumber,
-    questionPart,
+    year = "",
+    educationLevel = "",
+    school: chosenSchool = "",
+    subject: chosenSubject = "",
+    topics: chosenTopics = [],
+    examType = "",
+    questionType = "", // Do not need to display this
+    questionNumber = "",
+    questionPart = [],
   } = formData as AddQuestionFormData;
+
   const questionTitle = constructQuestionTitle(
     chosenSchool,
     year,
     educationLevel,
     examType || ""
   );
-  const topicList = chosenTopics.map(
-    (topicId: string) =>
-      allTopics.find((topic) => topic.id === topicId)?.topicName
-  );
-  const topicString = topicList.join(", ");
+
+  const topicString = useMemo(() => {
+    const topicList: string[] = chosenTopics.map(
+      (topicId: string) =>
+        allTopics.find((topic) => topic.id === topicId)?.topicName
+    );
+    topicList.sort((a, b) => a.localeCompare(b));
+    return topicList.join(", ");
+  }, [chosenTopics]);
+  // Cannot have any return statements before hooks
+
+
   return (
     // TODO: Create a question title component
-    <div className="w-full" >
+    <div className="w-full">
       <pre>{JSON.stringify(formData, null, 2)}</pre>
       <div className="space-y-3">
         <div className="flex flex-1 flex-col justify-center items-center font-merriweather font-bold">
@@ -90,7 +93,6 @@ export default function QuestionPreview({
           )}
         </div>
       </div>
-
       QUESTION
     </div>
   );

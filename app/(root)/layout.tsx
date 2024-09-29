@@ -34,7 +34,7 @@ export default async function RootLayout({
   return (
     <main className="font-open-sans">
       <NavBar user={user} />
-      <div className="pt-16">{children}</div>
+      <div className="mt-16 p-6">{children}</div>
     </main>
   );
 }

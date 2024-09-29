@@ -35,6 +35,9 @@ const config = {
       margin: {
         '18': '4.5rem', // 72px
       },
+      padding: {
+        '18': '4.5rem', // 72px
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

@@ -11,6 +11,8 @@ import {
   getAllTopics,
 } from "@/actions/queryData.actions";
 
+// TODO Create a small tool that uses OpenAI API to turn pictures of a question into the correct format
+
 export default function AddQuestionPage() {
   const {
     // isPending: isSubjectsPending,
@@ -41,71 +43,43 @@ export default function AddQuestionPage() {
     queryKey: ["schools"],
     queryFn: getAllSchools,
   });
-  // return (
-  //   <AddQuestionContextProvider>
-  //     <div className="flex h-full">
-  //       <div id="add-question-form" className="flex-1 p-4">
-  //         <div className="flex flex-col w-full max-h-144 overflow-y-auto">
-  //           <AddQuestionForm
-  //             allSchools={allSchools}
-  //             allSubjects={allSubjects}
-  //             allTopics={allTopics}
-  //           />
-  //         </div>
-  //       </div>
-  //       <Separator orientation="vertical" className="mx-2" />
-  //       <div id="question-preview" className="flex-1 p-4">
-  //         <div className="flex flex-col w-full max-h-144 overflow-y-auto">
-  //           <QuestionPreview
-  //             allSchools={allSchools}
-  //             allSubjects={allSubjects}
-  //             allTopics={allTopics}
-  //           />
-  //         </div>
-  //       </div>
-  //     </div>
-  //   </AddQuestionContextProvider>
-  // );
+
   return (
     <AddQuestionContextProvider>
-      {/* <div className="flex h-full">
-        <div id="add-question-form" className="flex-1 h-full overflow-hidden">
-          <div className="p-4 max-h-full overflow-y-auto">
+      <div className="flex h-full">
+        <div id="add-question-form" className="flex-1 h-full">
+          <div className="p-4 max-h-144 overflow-y-auto">
             <AddQuestionForm
               allSchools={allSchools}
               allSubjects={allSubjects}
               allTopics={allTopics}
             />
           </div>
-        </div> */}
-      <div 
-        // className="flex h-screen"
-        className="flex"
-      >
-        <div id="add-question-form" className="flex-1 p-4">
+        </div>
+        {/* <div id="add-question-form" className="flex-1 p-4">
           <AddQuestionForm
             allSchools={allSchools}
             allSubjects={allSubjects}
             allTopics={allTopics}
           />
-        </div>
+        </div> */}
         <Separator orientation="vertical" className="mx-4" />
-        {/* <div id="question-preview" className="flex-1 overflow-y-hidden">
-          <div className="p-4 max-h-full overflow-y-auto">
+        <div id="question-preview" className="flex-1 h-full">
+          <div className="p-4 max-h-144 overflow-y-auto">
             <QuestionPreview
               allSchools={allSchools}
               allSubjects={allSubjects}
               allTopics={allTopics}
             />
           </div>
-        </div> */}
-        <div id="question-preview" className="flex-1 p-4">
+        </div>
+        {/* <div id="question-preview" className="flex-1 p-4">
           <QuestionPreview
             allSchools={allSchools}
             allSubjects={allSubjects}
             allTopics={allTopics}
           />
-        </div>
+        </div> */}
       </div>
     </AddQuestionContextProvider>
   );
