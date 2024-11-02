@@ -5,8 +5,11 @@
     "build": "next build",
     "start": "next start",
     "preinstall": "npx only-allow pnpm",
-    "git-commit-local": "bash src/bash-scripts/git-commit-local.sh",
-    "git-commit-remote": "bash src/bash-scripts/git-commit-remote.sh"
+    "commit-local": "bash src/bash-scripts/git-commit-local.sh",
+    "commit-remote": "bash src/bash-scripts/git-commit-remote.sh",
+    "db-seed": "bash src/bash-scripts/db/seed-db.sh",
+    "db-push": "bash src/bash-scripts/db/db-push.sh",
+    "db-migrate": "bash src/bash-scripts/db/db-migrate.sh"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
