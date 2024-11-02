@@ -4,7 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import prisma from "@/utils/prisma-client/client";
 import { redirect, RedirectType } from "next/navigation";
-import { GetLoggedInResponse, LoginProps, SignUpProps } from "@/types/types";
+import { GetLoggedInResponse, LoginProps, SignUpProps } from "@/src/types/types";
 
 
 

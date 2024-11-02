@@ -20,18 +20,15 @@ import {
   MD_BREAKPOINT,
   questionTypeOptions,
   schoolTypeMapToEduLevel,
-} from "@/constants/constants";
-import { useAddQuestionContext } from "@/hooks/useAddQuestionContext";
-import { AddQuestionFormData, AddQuestionFormProps } from "@/types/types";
+} from "@/src/constants/constants";
+import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
+import { AddQuestionFormData, AddQuestionFormProps } from "@/src/types/types";
 import QuestionPartInput from "./QuestionPartInput";
 import { generateOptionsFromJsonList, generateYearList } from "@/utils/utils";
 import { edu_level, school_type } from "@prisma/client";
 import { debounce } from "lodash";
 import QuestionInfoInput from "./QuestionInfoInput";
 import { Oval } from "react-loader-spinner";
-
-// TODO: Add retrieving topics, school and subjects from database.
-// TODO: Add form fields for: year, school, level, subject, checkbox for adding topics,question number, questionType
 
 // Custom Components have been created for the following:
 // Select component with autocomplete (ComboBox) should be used for school, year and subject
@@ -46,6 +43,8 @@ import { Oval } from "react-loader-spinner";
  * 4. If option currently selected for school/subject is not appropriate for the new education level, then formfield for school/subject will be reset. But no matter what, with a change in education level, the options for school/subject will be updated.
  * 5. If option currently selected for topic is not appropriate for the new subject, then formfield for topic will be reset.
  */
+// TODO: Change questionNumber to a select component, with default of 0
+// TODO: Optimise the form and reduce latency, right now it is horrendously optimised HAHAHHAHAH
 
 export default function AddQuestionForm({allSubjects, allTopics, allSchools} : AddQuestionFormProps) {
   
@@ -106,7 +105,7 @@ export default function AddQuestionForm({allSubjects, allTopics, allSchools} : A
   const debounceUpdateFormData = useCallback(
     debounce((formData: AddQuestionFormData) => {
       updateFormData(formData);
-    }, 500),
+    }, 2000),
     [updateFormData]
   );
 

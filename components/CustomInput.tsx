@@ -8,7 +8,7 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 import { FieldValues } from "react-hook-form";
-import { CustomInputProps } from "@/types/types";
+import { CustomInputProps } from "@/src/types/types";
 
 export default function CustomInput<T extends FieldValues>({
   control,

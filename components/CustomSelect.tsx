@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { CustomSelectProps } from "@/types/types";
+import { CustomSelectProps } from "@/src/types/types";
 import { FieldValues } from "react-hook-form";
 
 export default function CustomSelect<T extends FieldValues>({

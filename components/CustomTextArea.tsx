@@ -8,7 +8,7 @@ import {
 } from "./ui/form";
 import { Textarea } from "./ui/textarea";
 import { FieldValues } from "react-hook-form";
-import { CustomTextAreaProps } from "@/types/types";
+import { CustomTextAreaProps } from "@/src/types/types";
 
 export default function CustomTextArea<T extends FieldValues>({
   control,

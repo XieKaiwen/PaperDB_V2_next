@@ -15,8 +15,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Oval } from "react-loader-spinner";
 import { login, signUp } from "@/actions/user.actions";
 import { useToast } from "../ui/use-toast";
-import { educationLevelOptions } from "@/constants/constants";
-import { AuthFormProps } from "@/types/types";
+import { educationLevelOptions } from "@/src/constants/constants";
+import { AuthFormProps } from "@/src/types/types";
 // TODO Add in Oauth buttons below the forms using shadcn separator
 // TODO Add in reset password for "Forgot password" feature
 

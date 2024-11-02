@@ -1,6 +1,6 @@
 import React from "react";
 import CustomSelect from "../CustomSelect";
-import { AddQuestionFormData, QuestionInfoInputProps } from "@/types/types";
+import { AddQuestionFormData, QuestionInfoInputProps } from "@/src/types/types";
 import CustomComboBox from "../CustomComboBox";
 import CustomPopoverMultipleCheckBox from "../CustomPopoverMultipleCheckbox";
 import CustomInput from "../CustomInput";

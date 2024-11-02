@@ -26,6 +26,42 @@ declare type AddQuestionFormDataSubscriber = (
   updatedFormData: AddQuestionFormData
 ) => void;
 
+declare type FormQuestionPartWithText = {
+  questionIdx: string;
+  questionSubIdx: string;
+  order: string;
+  isText: true;
+  text: string;
+};
+
+declare type FormQuestionPartWithImage = {
+  questionIdx: string;
+  questionSubIdx: string;
+  order: string;
+  isText: false;
+  image: File;
+};
+
+declare type FormQuestionPart = FormQuestionPartWithText | FormQuestionPartWithImage;
+
+declare type FormQuestionPartWithTextParsed = {
+  questionIdx: string;
+  questionSubIdx: string;
+  order: number;
+  isText: true;
+  text: string;
+};
+
+declare type FormQuestionPartWithImageParsed = {
+  questionIdx: string;
+  questionSubIdx: string;
+  order: number;
+  isText: false;
+  image: File;
+};
+
+declare type FormQuestionPartParsed = FormQuestionPartWithTextParsed | FormQuestionPartWithImageParsed;
+
 declare interface AuthFormProps {
   type: "sign-up" | "login";
 }
@@ -221,4 +257,10 @@ interface AddQuestionFormProps{
   allSubjects: Subject[];
   allTopics: Topic[];
   allSchools: School[];
+}
+
+interface ImageReaderProps {
+  content: File,
+  width: number,
+  height: number
 }

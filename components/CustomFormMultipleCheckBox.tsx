@@ -8,7 +8,7 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Checkbox } from "./ui/checkbox";
-import { CustomFormMultipleCheckBoxProps } from "@/types/types";
+import { CustomFormMultipleCheckBoxProps } from "@/src/types/types";
 import { FieldValues, UseControllerReturn } from "react-hook-form";
 
 export default function CustomFormCheckBox<T extends FieldValues>({

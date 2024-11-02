@@ -3,7 +3,7 @@ import {
   getAllSubjects,
   getAllTopics,
 } from "@/actions/queryData.actions";
-import AddQuestionPage from "@/components/addQuestion/AddQuestionPage";
+import AddQuestionPage from "@/components/addQuestionPage/AddQuestionPage";
 import { getQueryClient } from "@/utils/react-query-client/client";
 import {
   dehydrate,
@@ -35,8 +35,8 @@ export default async function AdminPage() {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <section id="admin-page" 
-        className=" h-screen"
-        // className=""
+        // className=" h-screen"
+        className=""
       >
         <AddQuestionPage />
       </section>

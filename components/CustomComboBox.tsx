@@ -20,7 +20,7 @@ import {
   CommandList,
 } from "./ui/command";
 import { valuesIn } from "lodash";
-import { CustomComboBoxProps } from "@/types/types";
+import { CustomComboBoxProps } from "@/src/types/types";
 import { FieldValues } from "react-hook-form";
 
 // TODO Add types and props

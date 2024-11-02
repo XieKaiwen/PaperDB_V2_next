@@ -2,7 +2,7 @@ import {
   ACCEPTED_IMAGE_TYPES,
   MAX_QUESTION_PART_NUM,
   MIN_QUESTION_PART_NUM,
-} from "@/constants/constants";
+} from "@/src/constants/constants";
 import { exam_type } from "@prisma/client";
 import { z } from "zod";
 
@@ -44,7 +44,7 @@ const imageQuestionPartSchema = z.object({
   ),
 });
 
-const contentTypeSchema = z.union([
+export const contentTypeSchema = z.union([
   textQuestionPartSchema,
   imageQuestionPartSchema,
 ]);

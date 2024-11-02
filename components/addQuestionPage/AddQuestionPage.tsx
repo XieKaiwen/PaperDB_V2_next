@@ -3,7 +3,7 @@ import React from "react";
 import { Separator } from "../ui/separator";
 import AddQuestionForm from "./AddQuestionForm";
 import QuestionPreview from "./QuestionPreview";
-import { AddQuestionContextProvider } from "@/contexts/AddQuestionContext";
+import { AddQuestionContextProvider } from "@/components/contexts/AddQuestionContext";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   getAllSchools,
@@ -46,9 +46,9 @@ export default function AddQuestionPage() {
 
   return (
     <AddQuestionContextProvider>
-      <div className="flex h-full">
-        <div id="add-question-form" className="flex-1 h-full">
-          <div className="p-4 max-h-144 overflow-y-auto">
+      <div className="flex w-full">
+        <div id="add-question-form" className="min-w-9/20 flex-1 h-full">
+          <div className="p-4 max-h-screen overflow-y-auto min-h-0" style={{contain: 'layout'}}>
             <AddQuestionForm
               allSchools={allSchools}
               allSubjects={allSubjects}
@@ -56,16 +56,16 @@ export default function AddQuestionPage() {
             />
           </div>
         </div>
-        {/* <div id="add-question-form" className="flex-1 p-4">
+        {/* <div id="add-question-form" className="min-w-9/20 p-4">
           <AddQuestionForm
             allSchools={allSchools}
             allSubjects={allSubjects}
             allTopics={allTopics}
           />
         </div> */}
-        <Separator orientation="vertical" className="mx-4" />
-        <div id="question-preview" className="flex-1 h-full">
-          <div className="p-4 max-h-144 overflow-y-auto">
+        <Separator orientation="vertical" className="mx-4 min-h-screen" />
+        <div id="question-preview" className="min-w-9/20 h-full">
+          <div className="p-4 max-h-screen overflow-y-auto min-h-0" style={{contain: 'layout'}}>
             <QuestionPreview
               allSchools={allSchools}
               allSubjects={allSubjects}
@@ -73,7 +73,7 @@ export default function AddQuestionPage() {
             />
           </div>
         </div>
-        {/* <div id="question-preview" className="flex-1 p-4">
+        {/* <div id="question-preview" className="min-w-9/20 flex-1 p-4">
           <QuestionPreview
             allSchools={allSchools}
             allSubjects={allSubjects}
@@ -83,4 +83,5 @@ export default function AddQuestionPage() {
       </div>
     </AddQuestionContextProvider>
   );
+
 }

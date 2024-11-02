@@ -2,7 +2,7 @@ import React from "react";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { cn } from "@/utils/utils";
-import { CustomRadioProps } from "@/types/types";
+import { CustomRadioProps } from "@/src/types/types";
 import { FieldValues } from "react-hook-form";
 
 export default function CustomRadio<T extends FieldValues>({control, name, options, label, className, radioClassName } : CustomRadioProps<T>) {

@@ -6,7 +6,7 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import { CustomFileInputProps } from "@/types/types";
+import { CustomFileInputProps } from "@/src/types/types";
 import { Input } from "./ui/input";
 import { FieldValues } from "react-hook-form";
 

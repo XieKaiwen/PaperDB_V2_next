@@ -11,8 +11,8 @@ import {
 import { usePathname } from "next/navigation";
 import NavLink from "./NavLink";
 import { Separator } from "./ui/separator";
-import { navRoutes } from "@/constants/constants";
-import { MobileNavProps } from "@/types/types";
+import { navRoutes } from "@/src/constants/constants";
+import { MobileNavProps } from "@/src/types/types";
 
 
 export default function MobileNav({user} : MobileNavProps) {
