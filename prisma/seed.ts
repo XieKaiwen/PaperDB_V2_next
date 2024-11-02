@@ -3,6 +3,9 @@ import fs from 'fs';
 import { parse } from 'csv-parse/sync';
 import path from 'path';
 
+const DATA_FOLDER_ROUTE = "../src/data/"
+
+
 interface CsvData {
   [key: string]: string;
 }
@@ -15,7 +18,7 @@ interface TableConfig {
 
 const tableConfigs: TableConfig[] = [
   {
-    fileName: '../data/sample_schools.csv',
+    fileName: 'sample_schools.csv',
     model: prisma.school,
     dataTransform: (data) => ({
       id: data.id,
@@ -25,7 +28,7 @@ const tableConfigs: TableConfig[] = [
     }),
   },
   {
-    fileName: '../data/sample_subjects.csv',
+    fileName: 'sample_subjects.csv',
     model: prisma.subject,
     dataTransform: (data) => ({
       id: data.id,
@@ -35,7 +38,7 @@ const tableConfigs: TableConfig[] = [
   },
   // Add more table configs here as needed
   {
-    fileName: '../data/sample_topic.csv',
+    fileName: 'sample_topic.csv',
     model: prisma.topic,
     dataTransform: (data) => ({
       id: data.id,
@@ -47,7 +50,7 @@ const tableConfigs: TableConfig[] = [
 ];
 
 function readCsvFile(filePath: string): CsvData[] {
-  const fileContent = fs.readFileSync(filePath, 'utf-8');
+  const fileContent = fs.readFileSync(DATA_FOLDER_ROUTE + filePath, 'utf-8');
   return parse(fileContent, {
     columns: true,
     skip_empty_lines: true,

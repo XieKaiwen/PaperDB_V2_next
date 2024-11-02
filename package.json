@@ -4,7 +4,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "preinstall": "npx only-allow pnpm"
+    "preinstall": "npx only-allow pnpm",
+    "git-commit-local": "bash src/bash-scripts/git-commit-local.sh",
+    "git-commit-remote": "bash src/bash-scripts/git-commit-remote.sh"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
