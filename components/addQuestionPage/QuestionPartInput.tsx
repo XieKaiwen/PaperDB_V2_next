@@ -8,7 +8,7 @@ import CustomFileInput from '../CustomFileInput'
 import CustomTextArea from '../CustomTextArea'
 import { Button } from '../ui/button'
 import Image from 'next/image'
-import crossDeleteIcon from '@/assets/cross-delete-icon.svg';
+import crossDeleteIcon from '@/src/assets/cross-delete-icon.svg';
 
 export default function QuestionPartInput<T extends FieldValues>({isText, control, id, index, deleteQuestionPart}: QuestionPartInputProps<T>) {
   

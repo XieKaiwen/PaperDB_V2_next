@@ -22,7 +22,7 @@ import {
   schoolTypeMapToEduLevel,
 } from "@/src/constants/constants";
 import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
-import { AddQuestionFormData, AddQuestionFormProps } from "@/src/types/types";
+import { AddQuestionFormData } from "@/src/types/types";
 import QuestionPartInput from "./QuestionPartInput";
 import { generateOptionsFromJsonList, generateYearList } from "@/utils/utils";
 import { edu_level, school_type } from "@prisma/client";
@@ -46,8 +46,9 @@ import { Oval } from "react-loader-spinner";
 // TODO: Change questionNumber to a select component, with default of 0
 // TODO: Optimise the form and reduce latency, right now it is horrendously optimised HAHAHHAHAH
 
-export default function AddQuestionForm({allSubjects, allTopics, allSchools} : AddQuestionFormProps) {
-  
+export default function AddQuestionForm() {
+  // RETRIEVE CONTEXT VALUES
+  const { formData: {update : debounceUpdateFormData}, data: {subjects: allSubjects, topics: allTopics, schools: allSchools} } = useAddQuestionContext();
 
   // Handle change in breakpoints, affects the labels in school select field
   const [isWindowSizeBelowBreakpoint, setIsWindowSizeBelowBreakpoint] =
@@ -72,8 +73,9 @@ export default function AddQuestionForm({allSubjects, allTopics, allSchools} : A
     };
   }, [debouncedSetIsWindowSizeBelowBreakpoint]);
 
-  const { updateFormData } = useAddQuestionContext();
 
+
+  // SET UP FORM AND WATCHED VALUES
   const form = useForm<z.infer<typeof questionPartSchema>>({
     resolver: zodResolver(questionPartSchema),
     defaultValues: {
@@ -82,12 +84,13 @@ export default function AddQuestionForm({allSubjects, allTopics, allSchools} : A
       school: "",
       subject: "",
       topics: [],
-      // examType: "",
+      examType: undefined,
       questionType: "",
       questionNumber: "",
       questionPart: [],
     },
   });
+
   // default value for images should be new File([], "")
   const { control, watch } = form;
   const { fields, append, remove } = useFieldArray({
@@ -96,30 +99,17 @@ export default function AddQuestionForm({allSubjects, allTopics, allSchools} : A
   });
   const { isSubmitting } = useFormState({ control });
 
-  const watchedEducationalLevel = watch("educationLevel");
-  const watchedSubject = watch("subject");
-  const watchedSchool = watch("school");
-  const watchedTopics = watch("topics");
-  const allFormData = useWatch({ control });
-  // debounce the updateFormData function to avoid excessive re-renders, optimising performance
-  const debounceUpdateFormData = useCallback(
-    debounce((formData: AddQuestionFormData) => {
-      updateFormData(formData);
-    }, 2000),
-    [updateFormData]
-  );
-
-  // Changed to using useWatch for allFormData because unlike watch, useWatch waits for any rendering to end before updating the allFormData value, hence does not result in updating of state: formData in questionPreview if there is already a rendering happening
+  const watchedFormValues = watch();
+  const {year, educationLevel, school, subject, topics, examType, questionType, questionNumber, questionPart} = watchedFormValues
+  
   useEffect(() => {
-    debounceUpdateFormData(allFormData);
-
-    return () => debounceUpdateFormData.cancel();
-  }, [allFormData, debounceUpdateFormData]);
+    debounceUpdateFormData(watchedFormValues);
+  }, [watchedFormValues]);
 
   const subjectOptions: { value: string; label: string }[] = useMemo(() => {
-    if (watchedEducationalLevel) {
+    if (educationLevel) {
       const filteredSubjects = allSubjects.filter((subject) =>
-        subject.educationLevels.includes(watchedEducationalLevel as edu_level)
+        subject.educationLevels.includes(educationLevel as edu_level)
       );
 
       const optionList = generateOptionsFromJsonList(
@@ -131,15 +121,15 @@ export default function AddQuestionForm({allSubjects, allTopics, allSchools} : A
       return optionList;
     }
     return [];
-  }, [allSubjects, watchedEducationalLevel]);
+  }, [allSubjects, educationLevel]);
 
   // TODO: Need to improve short name for schools, too confusing. For example:
   // Rosyth School and Red Swastika School are RS and RSS respectively. Very easily confused
   const schoolOptions: { value: string; label: string }[] = useMemo(() => {
-    if (watchedEducationalLevel) {
+    if (educationLevel) {
       const filteredSchools = allSchools.filter((school) =>
-        schoolTypeMapToEduLevel[school.schoolType as school_type].includes(
-          watchedEducationalLevel
+        schoolTypeMapToEduLevel[school.schoolType].includes(
+          educationLevel
         )
       );
       const optionList = generateOptionsFromJsonList(
@@ -151,19 +141,19 @@ export default function AddQuestionForm({allSubjects, allTopics, allSchools} : A
       return optionList;
     }
     return [];
-  }, [allSchools, watchedEducationalLevel, isWindowSizeBelowBreakpoint]);
+  }, [allSchools, educationLevel, isWindowSizeBelowBreakpoint]);
 
   const topicsOptions: { value: string; label: string }[] = useMemo(() => {
-    if (!watchedSubject) {
+    if (!subject) {
       return [];
     }
     // const listOfSubjectIds = subjectOptions.map((subject) => subject.value)
     const filteredTopics = allTopics.filter((topic) => {
       return (
-        topic.subjectId === watchedSubject &&
+        topic.subjectId === subject &&
         validateTopicWithinEducationLevel(
           topic.educationLevel,
-          watchedEducationalLevel
+          educationLevel
         )
       );
     });
@@ -175,29 +165,29 @@ export default function AddQuestionForm({allSubjects, allTopics, allSchools} : A
     );
     optionList.sort((a, b) => a.label.localeCompare(b.label));
     return optionList;
-  }, [allTopics, subjectOptions, watchedSubject]);
+  }, [allTopics, subjectOptions, subject]);
 
   const yearOptions = useMemo(() => {
     return generateYearList();
   }, []);
   const examTypeOptions = useMemo(() => {
-    if(!watchedEducationalLevel) return []
-    const filteredExamTypes = examTypeEducationLevelMapping.filter((examType) => examType.educationLevel.includes(watchedEducationalLevel as edu_level))
+    if(!educationLevel) return []
+    const filteredExamTypes = examTypeEducationLevelMapping.filter((examType) => examType.educationLevel.includes(educationLevel as edu_level))
     return generateOptionsFromJsonList(filteredExamTypes, "enumValue", "examType")
-  }, [watchedEducationalLevel])
+  }, [educationLevel])
   // Moving the resetting of fields to useEffect instead of using them in useMemo because, using them in useMemo will cause an update in Controller while causing a re-render of the form as well, which is illegal
 
   useEffect(() => {
-    if (!subjectOptions.find((subject) => watchedSubject === subject.value))
+    if (!subjectOptions.find((subjectOption) => subject === subjectOption.value))
       form.resetField("subject");
   }, [subjectOptions]);
   useEffect(() => {
-    if (!schoolOptions.find((school) => watchedSchool === school.value))
+    if (!schoolOptions.find((schoolOption) => school === schoolOption.value))
       form.resetField("school");
   }, [schoolOptions]);
   useEffect(() => {
-    watchedTopics.every((topic) => {
-      if (!topicsOptions.find((option) => option.value === topic)) {
+    topics.every((topic) => {
+      if (!topicsOptions.find((topicOption) => topicOption.value === topic)) {
         form.resetField("topics");
         return false;
       }
@@ -264,7 +254,6 @@ export default function AddQuestionForm({allSubjects, allTopics, allSchools} : A
           form={form}
           className="space-y-4"
         />
-        {/* TODO Refactor the questionPart input */}
         {fields.map((questionPart, index) => {
           const { isText } = questionPart;
           return (

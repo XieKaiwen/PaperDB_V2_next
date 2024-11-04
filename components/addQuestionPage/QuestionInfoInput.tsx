@@ -60,7 +60,7 @@ export default function QuestionInfoInput<T extends FieldValues>({
         />
       </div>
       {/* TODO make this a popover */}
-      <div className="flex flex-1 flex-wrap gap-2 justify-center align-middle">
+      <div className="flex flex-1 flex-wrap gap-2 justify-between ">
         <CustomPopoverMultipleCheckBox<AddQuestionFormData>
           control={control}
           name="topics"

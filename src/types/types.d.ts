@@ -1,5 +1,5 @@
 import { questionPartSchema } from "@/utils/addQuestionUtils";
-import { authFormSchema } from "@/utils/utils";
+import { authFormSchema } from "@/utils/authFormUtils";
 import { UserMetadata } from "@supabase/supabase-js";
 import { FieldValues } from "react-hook-form";
 import { Label } from "@/components/ui/label";
@@ -144,12 +144,6 @@ interface CustomAuthInputProps {
 //   placeholder: string;
 // }
 
-interface AddQuestionContextProps {
-  updateFormData: (updatedFormData: AddQuestionFormData) => void;
-  subscribeToFormData: (
-    subscriber: AddQuestionFormDataSubscriber
-  ) => () => void;
-}
 
 interface CustomInputProps<T extends FieldValues> {
   control: Control<T>; // Make control generic
@@ -245,18 +239,6 @@ interface QuestionInfoInputProps<T extends FieldValues> {
   form: UseFormReturn<T>;
   optionsDict: { [key: string]: { value: string; label: string }[] };
   className?: string;
-}
-
-interface QuestionPreviewProps {
-  allSubjects: Subject[];
-  allTopics: Topic[];
-  allSchools: School[];
-}
-
-interface AddQuestionFormProps{
-  allSubjects: Subject[];
-  allTopics: Topic[];
-  allSchools: School[];
 }
 
 interface ImageReaderProps {

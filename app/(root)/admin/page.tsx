@@ -2,7 +2,7 @@ import {
   getAllSchools,
   getAllSubjects,
   getAllTopics,
-} from "@/actions/queryData.actions";
+} from "@/src/actions/queryData.actions";
 import AddQuestionPage from "@/components/addQuestionPage/AddQuestionPage";
 import { getQueryClient } from "@/utils/react-query-client/client";
 import {
@@ -17,7 +17,6 @@ import React from "react";
 // TODO: Add retrieving topics, school and subjects from database. Then pass to AddQuestionPage
 
 export default async function AdminPage() {
-  // TOD Change fetching of data to using react-query instead
   const queryClient = getQueryClient();
   queryClient.prefetchQuery({
     queryKey: ["subjects"],

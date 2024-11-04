@@ -1,7 +1,7 @@
 import { ImageReaderProps } from '@/src/types/types';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react'
-import placeholderImage from '@/assets/image-placeholder.png';
+import placeholderImage from '@/src/assets/image-placeholder.png';
 
 export default function ImageReader({content, width, height} : ImageReaderProps) {
     const [imageUrl, setImageUrl] = useState<string | null>(null);

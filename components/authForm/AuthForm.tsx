@@ -7,13 +7,13 @@ import { Form } from "@/components/ui/form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { authFormSchema } from "@/utils/utils";
+import { authFormSchema } from "@/utils/authFormUtils";
 import CustomInput from "./CustomAuthInput";
 import Link from "next/link";
 import CustomSelect from "./CustomAuthSelect";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Oval } from "react-loader-spinner";
-import { login, signUp } from "@/actions/user.actions";
+import { login, signUp } from "@/src/actions/user.actions";
 import { useToast } from "../ui/use-toast";
 import { educationLevelOptions } from "@/src/constants/constants";
 import { AuthFormProps } from "@/src/types/types";

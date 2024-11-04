@@ -73,7 +73,7 @@ export default function CustomComboBox<T extends FieldValues>({
                   variant="outline"
                   role="combobox"
                   className={cn(
-                    "w-[200px] lg:w-[250px] xl:w-[300px] justify-between",
+                    "w-[250px] xl:w-[300px] justify-between",
                     !field.value && "text-muted-foreground"
                   )}
                 >

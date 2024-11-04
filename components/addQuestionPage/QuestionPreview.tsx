@@ -3,23 +3,18 @@ import {
   AddQuestionFormData,
   FormQuestionPart,
   FormQuestionPartParsed,
-  FormQuestionPartWithImage,
-  FormQuestionPartWithText,
-  QuestionPreviewProps,
 } from "@/src/types/types";
 import { convertRomanToInt } from "@/utils/utils";
 import React, { useEffect, useMemo, useState } from "react";
 import ImageReader from "./ImageReader";
 
-
 // TODO: Scrap the live preview and make it such that its a generated preview when clicking a button, to optimise the user experience, fix the "laggy input issue"
 
-export default function QuestionPreview({
-  allSchools,
-  allSubjects,
-  allTopics,
-}: QuestionPreviewProps) {
-  const { subscribeToFormData } = useAddQuestionContext();
+export default function QuestionPreview() {
+  const {
+    formData: { subscribe: subscribeToFormData },
+    data: { schools: allSchools, subjects: allSubjects, topics: allTopics },
+  } = useAddQuestionContext();
   const [formData, setFormData] = useState<AddQuestionFormData>({});
 
   useEffect(() => {
@@ -30,6 +25,7 @@ export default function QuestionPreview({
     return () => unsubscribeToFormData();
   }, [subscribeToFormData, setFormData]);
 
+  // FUNCTION FOR CONSTRUCTING the question title: school name, year, education level and examType
   function constructQuestionTitle(
     schoolId: string,
     year: string,
@@ -57,6 +53,7 @@ export default function QuestionPreview({
     questionPart = [],
   } = formData as AddQuestionFormData;
 
+  // CONSTRUCT THE QUESTION TITLE
   const questionTitle = constructQuestionTitle(
     chosenSchool,
     year,
@@ -64,6 +61,7 @@ export default function QuestionPreview({
     examType || ""
   );
 
+  // CREATE LIST OF TOPICS
   const topicString = useMemo(() => {
     const topicList: string[] = chosenTopics.map(
       (topicId: string) =>
@@ -143,7 +141,6 @@ export default function QuestionPreview({
       }
     );
 
-
     Object.keys(questionPartsSortedGrouped.questionLeafs).forEach((key) => {
       questionPartsSortedGrouped.questionLeafs[key] = Array.from(
         questionPartsSortedGrouped.questionLeafs[key] as Set<string>
@@ -152,7 +149,7 @@ export default function QuestionPreview({
       );
     });
     console.log(questionPartsSortedGrouped);
-    
+
     return questionPartsSortedGrouped;
   }, [questionPart]);
 
@@ -165,7 +162,9 @@ export default function QuestionPreview({
   return (
     // TODO: Create a question title component
     <div className="w-full">
-      <pre className="whitespace-pre-wrap break-words">{JSON.stringify(formData, null, 2)}</pre>
+      <pre className="whitespace-pre-wrap break-words">
+        {JSON.stringify(formData, null, 2)}
+      </pre>
       <div className="space-y-3">
         <div className="flex flex-1 flex-col justify-center items-center font-merriweather font-bold">
           <h2 className="text-lg">{questionTitle[0]}</h2>
@@ -204,10 +203,24 @@ export default function QuestionPreview({
                 // Return the root elements here
                 const { isText, content } = part;
                 if (isText) {
-                  return <p key={content} className="w-full text-sm text-start whitespace-pre-wrap break-words">{part.content}</p>;
+                  return (
+                    <p
+                      key={content}
+                      className="w-full text-sm text-start whitespace-pre-wrap break-words"
+                    >
+                      {part.content}
+                    </p>
+                  );
                 } else {
                   // return <img key={idx} src={URL.createObjectURL(part.content)} alt="Question Image" />;
-                  return <ImageReader content={content} width={700} height={700} key={idx} />;
+                  return (
+                    <ImageReader
+                      content={content}
+                      width={700}
+                      height={700}
+                      key={idx}
+                    />
+                  );
                 }
               }
             )}
