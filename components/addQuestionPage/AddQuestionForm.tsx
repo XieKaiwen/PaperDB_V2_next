@@ -25,11 +25,11 @@ import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
 import { AddQuestionFormData } from "@/src/types/types";
 import QuestionPartInput from "./QuestionPartInput";
 import { generateOptionsFromJsonList, generateYearList } from "@/utils/utils";
-import { edu_level, school_type } from "@prisma/client";
+import { edu_level } from "@prisma/client";
 import { debounce } from "lodash";
 import QuestionInfoInput from "./QuestionInfoInput";
 import { Oval } from "react-loader-spinner";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 // Custom Components have been created for the following:
 // Select component with autocomplete (ComboBox) should be used for school, year and subject
 // Text component to be used for question number, number validation has to be done for question number
@@ -47,32 +47,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 export default function AddQuestionForm() {
   // RETRIEVE CONTEXT VALUES
-  const { formData: {update : debounceUpdateFormData}, data: {subjects: allSubjects, topics: allTopics, schools: allSchools} } = useAddQuestionContext();
-
-  // Handle change in breakpoints, affects the labels in school select field
-  const [isWindowSizeBelowBreakpoint, setIsWindowSizeBelowBreakpoint] =
-    useState(false);
-  const debouncedSetIsWindowSizeBelowBreakpoint = useCallback(
-    debounce(() => {
-      setIsWindowSizeBelowBreakpoint(window.innerWidth < MD_BREAKPOINT);
-    }, 300),
-    [setIsWindowSizeBelowBreakpoint]
-  );
-
-  useEffect(() => {
-    debouncedSetIsWindowSizeBelowBreakpoint();
-    window.addEventListener("resize", debouncedSetIsWindowSizeBelowBreakpoint);
-
-    return () => {
-      window.removeEventListener(
-        "resize",
-        debouncedSetIsWindowSizeBelowBreakpoint
-      );
-      debouncedSetIsWindowSizeBelowBreakpoint.cancel();
-    };
-  }, [debouncedSetIsWindowSizeBelowBreakpoint]);
-
-
+  const {
+    formData: { update: debounceUpdateFormData },
+    data: { subjects: allSubjects, topics: allTopics, schools: allSchools },
+  } = useAddQuestionContext();
 
   // SET UP FORM AND WATCHED VALUES
   const form = useForm<z.infer<typeof questionPartSchema>>({
@@ -100,15 +78,34 @@ export default function AddQuestionForm() {
 
   // const watchedFormValues = watch();
   // const {year, educationLevel, school, subject, topics, examType, questionType, questionNumber, questionPart} = watchedFormValues
-  
+
   // Changing to using useWatch because watch() causes a rerender of the form whenever there is a change in formValues, i do not want that
   const watchedValues = useWatch({
     control,
-    name: ["year", "educationLevel", "school", "subject", "topics", "examType", "questionType", "questionNumber", "questionPart"], // Fields to watch
+    name: [
+      "year",
+      "educationLevel",
+      "school",
+      "subject",
+      "topics",
+      "examType",
+      "questionType",
+      "questionNumber",
+      "questionPart",
+    ], // Fields to watch
   });
   // destructure watchedValues
-  const [ year, educationLevel, school, subject, topics, examType, questionType, questionNumber, questionPart ] = watchedValues;
-  
+  const [
+    year,
+    educationLevel,
+    school,
+    subject,
+    topics,
+    examType,
+    questionType,
+    questionNumber,
+    questionPart,
+  ] = watchedValues;
 
   useEffect(() => {
     debounceUpdateFormData({
@@ -122,10 +119,19 @@ export default function AddQuestionForm() {
       questionNumber,
       questionPart,
     });
-  }, [year, educationLevel, school, subject, topics, examType, questionType, questionNumber, questionPart]);
+  }, [
+    year,
+    educationLevel,
+    school,
+    subject,
+    topics,
+    examType,
+    questionType,
+    questionNumber,
+    questionPart,
+  ]);
 
-
-// FUNCTIONS FOR FILTERING FORM OPTIONS
+  // FUNCTIONS FOR FILTERING FORM OPTIONS
   const subjectOptions: { value: string; label: string }[] = useMemo(() => {
     if (educationLevel) {
       const filteredSubjects = allSubjects.filter((subject) =>
@@ -148,20 +154,18 @@ export default function AddQuestionForm() {
   const schoolOptions: { value: string; label: string }[] = useMemo(() => {
     if (educationLevel) {
       const filteredSchools = allSchools.filter((school) =>
-        schoolTypeMapToEduLevel[school.schoolType].includes(
-          educationLevel
-        )
+        schoolTypeMapToEduLevel[school.schoolType].includes(educationLevel)
       );
       const optionList = generateOptionsFromJsonList(
         filteredSchools,
         "id",
-        isWindowSizeBelowBreakpoint ? "schoolShortName" : "schoolFullName"
+        "schoolFullName"
       );
       optionList.sort((a, b) => a.label.localeCompare(b.label));
       return optionList;
     }
     return [];
-  }, [allSchools, educationLevel, isWindowSizeBelowBreakpoint]);
+  }, [allSchools, educationLevel]);
 
   const topicsOptions: { value: string; label: string }[] = useMemo(() => {
     if (!subject) {
@@ -171,10 +175,7 @@ export default function AddQuestionForm() {
     const filteredTopics = allTopics.filter((topic) => {
       return (
         topic.subjectId === subject &&
-        validateTopicWithinEducationLevel(
-          topic.educationLevel,
-          educationLevel
-        )
+        validateTopicWithinEducationLevel(topic.educationLevel, educationLevel)
       );
     });
 
@@ -191,14 +192,22 @@ export default function AddQuestionForm() {
     return generateYearList();
   }, []);
   const examTypeOptions = useMemo(() => {
-    if(!educationLevel) return []
-    const filteredExamTypes = examTypeEducationLevelMapping.filter((examType) => examType.educationLevel.includes(educationLevel as edu_level))
-    return generateOptionsFromJsonList(filteredExamTypes, "enumValue", "examType")
-  }, [educationLevel])
+    if (!educationLevel) return [];
+    const filteredExamTypes = examTypeEducationLevelMapping.filter((examType) =>
+      examType.educationLevel.includes(educationLevel as edu_level)
+    );
+    return generateOptionsFromJsonList(
+      filteredExamTypes,
+      "enumValue",
+      "examType"
+    );
+  }, [educationLevel]);
   // Moving the resetting of fields to useEffect instead of using them in useMemo because, using them in useMemo will cause an update in Controller while causing a re-render of the form as well, which is illegal
 
   useEffect(() => {
-    if (!subjectOptions.find((subjectOption) => subject === subjectOption.value))
+    if (
+      !subjectOptions.find((subjectOption) => subject === subjectOption.value)
+    )
       form.resetField("subject");
   }, [subjectOptions]);
   useEffect(() => {
@@ -223,7 +232,7 @@ export default function AddQuestionForm() {
       topicsOptions,
       yearOptions,
       questionTypeOptions,
-      examTypeOptions
+      examTypeOptions,
     };
   }, [
     educationLevelOptions,
@@ -232,7 +241,7 @@ export default function AddQuestionForm() {
     topicsOptions,
     yearOptions,
     questionTypeOptions,
-    examTypeOptions
+    examTypeOptions,
   ]);
 
   const addTextArea = useCallback(() => {
@@ -245,7 +254,7 @@ export default function AddQuestionForm() {
       id: uuidv4(),
     });
   }, [append]);
-  
+
   const addImageInput = useCallback(() => {
     append({
       questionIdx: "",
@@ -256,9 +265,12 @@ export default function AddQuestionForm() {
       id: uuidv4(),
     });
   }, [append]);
-  const deleteQuestionPart = useCallback((index: number)=>{
-    remove(index);
-  }, [remove])
+  const deleteQuestionPart = useCallback(
+    (index: number) => {
+      remove(index);
+    },
+    [remove]
+  );
 
   async function onSubmit(values: z.infer<typeof questionPartSchema>) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
