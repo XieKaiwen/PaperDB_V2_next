@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
+} from "../ui/select";
 import { CustomSelectProps } from "@/src/types/types";
 import { FieldValues } from "react-hook-form";
 

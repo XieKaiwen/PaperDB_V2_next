@@ -1,11 +1,11 @@
 import { AddQuestionFormData, QuestionPartInputProps } from "@/src/types/types";
 import React, { useCallback } from "react";
-import { FieldValues, useFieldArray } from "react-hook-form";
-import CustomSelect from "../CustomSelect";
+import { FieldValues } from "react-hook-form";
+import CustomSelect from "../form-components/CustomSelect";
 import { questionIndex, questionSubIndex } from "@/src/constants/constants";
-import CustomInput from "../CustomInput";
-import CustomFileInput from "../CustomFileInput";
-import CustomTextArea from "../CustomTextArea";
+import CustomInput from "@/components/form-components/CustomInput";
+import CustomFileInput from "@/components/form-components/CustomFileInput";
+import CustomTextArea from "@/components/form-components/CustomTextArea";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import crossDeleteIcon from "@/src/assets/cross-delete-icon.svg";

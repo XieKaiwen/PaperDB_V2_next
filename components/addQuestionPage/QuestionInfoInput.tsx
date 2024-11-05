@@ -1,10 +1,10 @@
 import React from "react";
-import CustomSelect from "../CustomSelect";
+import CustomSelect from "../form-components/CustomSelect";
 import { AddQuestionFormData, QuestionInfoInputProps } from "@/src/types/types";
-import CustomComboBox from "../CustomComboBox";
-import CustomPopoverMultipleCheckBox from "../CustomPopoverMultipleCheckbox";
-import CustomInput from "../CustomInput";
-import CustomRadio from "../CustomRadio";
+import CustomComboBox from "@/components/form-components/CustomComboBox";
+import CustomPopoverMultipleCheckBox from "@/components/form-components/CustomPopoverMultipleCheckbox";
+import CustomInput from "@/components/form-components/CustomInput";
+import CustomRadio from "@/components/form-components/CustomRadio";
 import { FieldValues } from "react-hook-form";
 
 export default function QuestionInfoInput<T extends FieldValues>({
