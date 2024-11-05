@@ -5,9 +5,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
+} from "../ui/form";
 import { CustomFileInputProps } from "@/src/types/types";
-import { Input } from "./ui/input";
+import { Input } from "../ui/input";
 import { FieldValues } from "react-hook-form";
 
 

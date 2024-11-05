@@ -7,12 +7,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { Checkbox } from "./ui/checkbox";
+} from "../ui/form";
+import { Checkbox } from "../ui/checkbox";
 import { CustomPopoverMultipleCheckBoxProps } from "@/src/types/types";
 import { FieldValues, UseControllerReturn } from "react-hook-form";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Button } from "./ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Button } from "../ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 export default function CustomPopoverMultipleCheckBox<T extends FieldValues>({

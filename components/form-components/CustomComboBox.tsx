@@ -6,9 +6,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Button } from "./ui/button";
+} from "../ui/form";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Button } from "../ui/button";
 import { cn } from "@/utils/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 import {
@@ -18,7 +18,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "./ui/command";
+} from "../ui/command";
 import { valuesIn } from "lodash";
 import { CustomComboBoxProps } from "@/src/types/types";
 import { FieldValues } from "react-hook-form";

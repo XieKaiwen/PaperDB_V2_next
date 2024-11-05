@@ -1,6 +1,6 @@
 import React from "react";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { cn } from "@/utils/utils";
 import { CustomRadioProps } from "@/src/types/types";
 import { FieldValues } from "react-hook-form";

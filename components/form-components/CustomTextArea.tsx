@@ -5,8 +5,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "./ui/form";
-import { Textarea } from "./ui/textarea";
+} from "../ui/form";
+import { Textarea } from "../ui/textarea";
 import { Control, FieldValues, Path } from "react-hook-form";
 import { debounce } from "lodash";
 
