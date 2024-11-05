@@ -79,7 +79,7 @@ export default function QuestionPreview() {
 
   // CONSTRUCT THE QuestionContentCombinedJSON here
   const questionContentCombinedJSON = useMemo(() => {
-    return processQuestionPartIntoQuestionContentJSON(questionPart);
+    return processQuestionPartIntoQuestionContentJSON(questionPart); // questionLeafs should be null if there are no children from the root
   }, [questionPart])
 
   // DECONSTRUCT THE QuestionContentCombinedJSON

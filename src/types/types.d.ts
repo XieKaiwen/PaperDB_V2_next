@@ -97,7 +97,7 @@ type ProcessedQuestionContentCombinedJSON = {
       };
     };
   };
-  questionLeafs: { [key: string]: string[] };
+  questionLeafs: { [key: string]: string[] } | null;
 };
 
 declare interface AuthFormProps {

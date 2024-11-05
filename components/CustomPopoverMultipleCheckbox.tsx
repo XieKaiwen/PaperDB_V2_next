@@ -26,6 +26,11 @@ export default function CustomPopoverMultipleCheckBox<T extends FieldValues>({
   className,
 }: CustomPopoverMultipleCheckBoxProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Update the open state using the onOpenChange prop
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+  };
   return (
     <FormField
       control={control}
@@ -38,14 +43,14 @@ export default function CustomPopoverMultipleCheckBox<T extends FieldValues>({
             )}
             {description && <FormDescription> {description} </FormDescription>}
           </div>
-          <Popover>
+          <Popover onOpenChange={handleOpenChange}>
             <PopoverTrigger asChild className="text-sm">
-              <Button variant="outline" onClick={() => setIsOpen(prev => !prev)}>
+              <Button variant="outline">
                 {triggerText} 
                 {isOpen ? <ChevronUp className="ml-1" size={16} /> : <ChevronDown className="ml-1" size={16} />}
               </Button>
             </PopoverTrigger>
-            {options.length > 0 ? <PopoverContent className="flex flex-col gap-2 max-h-56 overflow-auto">
+            { isOpen && (options.length > 0 ? <PopoverContent className="flex flex-col gap-2 max-h-56 overflow-auto">
               {options.map((option) => (
                 <FormField
                   key={option.value}
@@ -80,7 +85,7 @@ export default function CustomPopoverMultipleCheckBox<T extends FieldValues>({
                 />
               ))}
             </PopoverContent> :
-            <PopoverContent className="w-full text-sm text-slate-700 text-center"> {emptyPopoverText} </PopoverContent>
+            <PopoverContent className="w-full text-sm text-slate-700 text-center"> {emptyPopoverText} </PopoverContent>)
           }
           </Popover>
           <FormMessage />

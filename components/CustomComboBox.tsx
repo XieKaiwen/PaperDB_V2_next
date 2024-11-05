@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FormControl,
   FormDescription,
@@ -55,19 +55,27 @@ export default function CustomComboBox<T extends FieldValues>({
   className,
 }: CustomComboBoxProps<T>) {
   // console.log(options);
-  
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Update the open state using the onOpenChange prop
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+  };
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
         <FormItem className={cn("flex flex-col", className)}>
-          {label && <FormLabel className="font-semibold text-sm">{label}</FormLabel>}
-          {description && <FormDescription>
-            {description}
-          </FormDescription>}
-          <Popover>
-            <PopoverTrigger className="w-[200px] lg:w-[250px] xl:w-[300px]" asChild>
+          {label && (
+            <FormLabel className="font-semibold text-sm">{label}</FormLabel>
+          )}
+          {description && <FormDescription>{description}</FormDescription>}
+          <Popover onOpenChange={handleOpenChange}>
+            <PopoverTrigger
+              className="w-[200px] lg:w-[250px] xl:w-[300px]"
+              asChild
+            >
               <FormControl>
                 <Button
                   variant="outline"
@@ -77,50 +85,46 @@ export default function CustomComboBox<T extends FieldValues>({
                     !field.value && "text-muted-foreground"
                   )}
                 >
-                  {/* {field.value
-                        ? languages.find(
-                            (language) => language.value === field.value
-                          )?.label
-                        : "Select language"} */}
                   {field.value
-                        ? options.find(
-                            (option) => option.value === field.value
-                          )?.label
-                        : placeholder}
+                    ? options.find((option) => option.value === field.value)
+                        ?.label
+                    : placeholder}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] lg:w-[250px] xl:w-[300px] p-0">
-              <Command>
-                <CommandInput placeholder={commandPlaceholder} />
-                <CommandList>
-                  <CommandEmpty>{commandEmptyText}</CommandEmpty>
-                  <CommandGroup>
-                    {options.map((option) => (
-                      <CommandItem
-                        value={option.label}
-                        key={option.value}
-                        onSelect={() => {
-                          // form.setValue("language", language.value);
-                          onSelectChange(name, option.value);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            option.value === field.value
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                        {option.label}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
+            {isOpen && (
+              <PopoverContent className="w-[200px] lg:w-[250px] xl:w-[300px] p-0">
+                <Command>
+                  <CommandInput placeholder={commandPlaceholder} />
+                  <CommandList>
+                    <CommandEmpty>{commandEmptyText}</CommandEmpty>
+                    <CommandGroup>
+                      {options.map((option) => (
+                        <CommandItem
+                          value={option.label}
+                          key={option.value}
+                          onSelect={() => {
+                            // form.setValue("language", language.value);
+                            onSelectChange(name, option.value);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              option.value === field.value
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                          {option.label}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            )}
           </Popover>
           <FormMessage />
         </FormItem>

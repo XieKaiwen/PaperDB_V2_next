@@ -169,10 +169,13 @@ export function processQuestionPartIntoQuestionContentJSON(
       questionContentJSON.questionContent.indexed[idx][subIdx] = questionContentJSON.questionContent.indexed[idx][subIdx].map(({ order, ...rest }) => rest);
     });
   });
-
+  if(Object.keys(tempLeafSets).length === 0){
+    questionContentJSON.questionLeafs = null;
+    return questionContentJSON
+  }
   // Convert Sets to sorted arrays and assign to questionLeafs
   Object.keys(tempLeafSets).forEach((key) => {
-    questionContentJSON.questionLeafs[key] = Array.from(tempLeafSets[key]).sort(
+    questionContentJSON.questionLeafs![key] = Array.from(tempLeafSets[key]).sort(
       (a, b) => convertRomanToInt(a) - convertRomanToInt(b)
     );
   });
