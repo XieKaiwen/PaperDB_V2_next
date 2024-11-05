@@ -4,25 +4,11 @@ import { Separator } from "../ui/separator";
 import AddQuestionForm from "./AddQuestionForm";
 import QuestionPreview from "./QuestionPreview";
 import { AddQuestionContextProvider } from "@/components/contexts/AddQuestionContext";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  getAllSchools,
-  getAllSubjects,
-  getAllTopics,
-} from "@/src/actions/queryData.actions";
 
 // TODO Create a small tool that uses OpenAI API to turn pictures of a question into the correct format
 
 export default function AddQuestionPage() {
-  const {
-    // isPending: isSubjectsPending,
-    // isError: isSubjectsError,
-    data: allSubjects,
-    // error: subjectsError,
-  } = useSuspenseQuery({
-    queryKey: ["subjects"],
-    queryFn: getAllSubjects,
-  });
+
 
   return (
     <AddQuestionContextProvider>

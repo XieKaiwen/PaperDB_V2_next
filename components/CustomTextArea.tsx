@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   FormControl,
   FormField,
@@ -7,10 +7,20 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Textarea } from "./ui/textarea";
-import { FieldValues } from "react-hook-form";
-import { CustomTextAreaProps } from "@/src/types/types";
+import { Control, FieldValues, Path } from "react-hook-form";
+import { debounce } from "lodash";
 
-export default function CustomTextArea<T extends FieldValues>({
+interface CustomTextAreaProps<T extends FieldValues> {
+  control: Control<T>;
+  name: Path<T>;
+  label?: string;
+  placeholder: string;
+  className?: string;
+  textAreaClassName?: string;
+}
+
+
+const CustomTextArea = React.memo(function CustomTextArea<T extends FieldValues>({
   control,
   name,
   label,
@@ -18,6 +28,7 @@ export default function CustomTextArea<T extends FieldValues>({
   className,
   textAreaClassName,
 }: CustomTextAreaProps<T>) {
+
   return (
     <FormField
       control={control}
@@ -37,4 +48,6 @@ export default function CustomTextArea<T extends FieldValues>({
       )}
     />
   );
-}
+}) as <T>(props: T) => JSX.Element;
+
+export default CustomTextArea;

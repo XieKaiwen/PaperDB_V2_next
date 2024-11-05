@@ -75,3 +75,16 @@ export function convertRomanToInt(romanNumeral: string): number {
 
   return romanToIntMap[romanNumeral];
 }
+
+export function removeImagesFromHtml(htmlString: string) {
+  // Create a temporary DOM element to parse the HTML string
+  const tempElement = document.createElement('div');
+  tempElement.innerHTML = htmlString;
+
+  // Select all <img> elements and remove them
+  const images = tempElement.querySelectorAll('img');
+  images.forEach(img => img.remove());
+
+  // Return the modified HTML as a string
+  return tempElement.innerHTML;
+}

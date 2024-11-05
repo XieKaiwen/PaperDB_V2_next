@@ -3,10 +3,13 @@ import {
   AddQuestionFormData,
   FormQuestionPart,
   FormQuestionPartParsed,
+  ProcessedQuestionPart,
 } from "@/src/types/types";
 import { convertRomanToInt } from "@/utils/utils";
 import React, { useEffect, useMemo, useState } from "react";
 import ImageReader from "./ImageReader";
+import { processQuestionPartIntoQuestionContentJSON } from "@/utils/addQuestionUtils";
+import QuestionSectionDisplay from "../QuestionSectionDisplay";
 
 // TODO: Scrap the live preview and make it such that its a generated preview when clicking a button, to optimise the user experience, fix the "laggy input issue"
 
@@ -23,7 +26,7 @@ export default function QuestionPreview() {
     });
 
     return () => unsubscribeToFormData();
-  }, [subscribeToFormData, setFormData]);
+  }, [setFormData]);
 
   // FUNCTION FOR CONSTRUCTING the question title: school name, year, education level and examType
   function constructQuestionTitle(
@@ -53,6 +56,8 @@ export default function QuestionPreview() {
     questionPart = [],
   } = formData as AddQuestionFormData;
 
+   console.log(JSON.stringify(questionPart, null, 2));
+
   // CONSTRUCT THE QUESTION TITLE
   const questionTitle = constructQuestionTitle(
     chosenSchool,
@@ -72,99 +77,22 @@ export default function QuestionPreview() {
   }, [chosenTopics]);
   // Cannot have any return statements before hooks
 
-  const StructuredJSONFormatQuestionInfo = useMemo(() => {
-    // Early return if questionPart is empty
-    if (!questionPart || questionPart.length === 0) {
-      return {
-        questionContent: { indexed: {} },
-        questionLeafs: {},
-      };
-    }
+  // CONSTRUCT THE QuestionContentCombinedJSON here
+  const questionContentCombinedJSON = useMemo(() => {
+    return processQuestionPartIntoQuestionContentJSON(questionPart);
+  }, [questionPart])
 
-    // Group by questionIdx then by questionSubIdx
-    // Refactor this, and create a type for it
+  // DECONSTRUCT THE QuestionContentCombinedJSON
+  const {questionContent: {root:questionRoot, indexed:questionIndexedParts}, questionLeafs} = questionContentCombinedJSON
+    
 
-    const questionPartParsed = questionPart
-      .filter(
-        (part: FormQuestionPart) => part.questionIdx && part.questionSubIdx
-      )
-      .map((part: FormQuestionPart) => {
-        const { order, ...props } = part;
-        return { ...props, order: parseInt(order || "0") || 0 };
-      });
-
-    questionPartParsed.sort(
-      (a: FormQuestionPartParsed, b: FormQuestionPartParsed) =>
-        a.order - b.order
-    );
-
-    const questionPartsSortedGrouped = questionPartParsed.reduce(
-      (acc: Record<string, any>, part: FormQuestionPartParsed) => {
-        const { questionIdx, questionSubIdx, isText } = part;
-
-        // Common content extraction logic
-        const content = isText ? part.text : part.image;
-
-        // Handle operations when questionIdx === "root"
-        if (questionIdx === "root") {
-          // Add content to the root questionContent
-          acc.questionContent[questionIdx].push({
-            isText,
-            content,
-          });
-        } else {
-          // Handle operations when questionIdx !== "root"
-          // Ensure indexed and leaf structures are initialized once
-          acc.questionContent.indexed[questionIdx] =
-            acc.questionContent.indexed[questionIdx] || {};
-          acc.questionContent.indexed[questionIdx][questionSubIdx] =
-            acc.questionContent.indexed[questionIdx][questionSubIdx] || [];
-          acc.questionContent.indexed[questionIdx][questionSubIdx].push({
-            isText,
-            content,
-          });
-
-          // Use Set to avoid duplicates and simplify adding to questionLeafs
-          acc.questionLeafs[questionIdx] =
-            acc.questionLeafs[questionIdx] || new Set();
-          acc.questionLeafs[questionIdx].add(questionSubIdx);
-        }
-        // Sort the leafs once after all entries are added
-        return acc;
-      },
-      {
-        questionContent: {
-          root: [],
-          indexed: {},
-        },
-        questionLeafs: {},
-      }
-    );
-
-    Object.keys(questionPartsSortedGrouped.questionLeafs).forEach((key) => {
-      questionPartsSortedGrouped.questionLeafs[key] = Array.from(
-        questionPartsSortedGrouped.questionLeafs[key] as Set<string>
-      ).sort(
-        (a: string, b: string) => convertRomanToInt(a) - convertRomanToInt(b)
-      );
-    });
-    console.log(questionPartsSortedGrouped);
-
-    return questionPartsSortedGrouped;
-  }, [questionPart]);
-
-  // console.log(JSON.stringify(StructuredJSONFormatQuestionInfo, null, 2));
-  const {
-    questionContent: { root = [], indexed },
-    questionLeafs,
-  } = StructuredJSONFormatQuestionInfo;
 
   return (
     // TODO: Create a question title component
     <div className="w-full">
-      <pre className="whitespace-pre-wrap break-words">
+      {/* <pre className="whitespace-pre-wrap break-words">
         {JSON.stringify(formData, null, 2)}
-      </pre>
+      </pre> */}
       <div className="space-y-3">
         <div className="flex flex-1 flex-col justify-center items-center font-merriweather font-bold">
           <h2 className="text-lg">{questionTitle[0]}</h2>
@@ -189,39 +117,28 @@ export default function QuestionPreview() {
               <p className="font-normal">{topicString}</p>
             </div>
           )}
+          {
+            questionNumber && (
+              <p>
+                Question Number:{" "}
+                <span className="font-normal">{questionNumber}</span>
+              </p>
+            )
+          }
         </div>
 
-        {root.length > 0 && (
+        {/* DISPLAYING THE CONTENT FOR ROOT ELEMENT */}
+        {/* TODO: CREATING A COMPONENT QuestionSectionDisplay, and then use React memo on it */}
+        {questionRoot.length > 0 && (
           <main className="flex flex-col gap-2 justify-center items-center">
-            {root.map(
+            {questionRoot.map(
               (
-                part:
-                  | { isText: true; content: string }
-                  | { isText: false; content: File },
+                part: ProcessedQuestionPart,
                 idx: number
               ) => {
                 // Return the root elements here
-                const { isText, content } = part;
-                if (isText) {
-                  return (
-                    <p
-                      key={content}
-                      className="w-full text-sm text-start whitespace-pre-wrap break-words"
-                    >
-                      {part.content}
-                    </p>
-                  );
-                } else {
-                  // return <img key={idx} src={URL.createObjectURL(part.content)} alt="Question Image" />;
-                  return (
-                    <ImageReader
-                      content={content}
-                      width={700}
-                      height={700}
-                      key={idx}
-                    />
-                  );
-                }
+                const { isText, content, id } = part;
+                return <QuestionSectionDisplay id={id} content={content} key={id} isText={isText} />
               }
             )}
           </main>

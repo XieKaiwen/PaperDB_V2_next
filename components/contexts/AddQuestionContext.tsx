@@ -65,7 +65,7 @@ function AddQuestionContextProvider({ children }: { children: ReactNode }) {
       formDataSubscribers.current.forEach((subscriber) => {
         subscriber(updatedFormData);
       });
-    }, 1000) // Adjust the debounce delay (300ms in this case) as needed
+    }, 2000) // Adjust the debounce delay (300ms in this case) as needed
   ).current;
 
   // Let the subscribeToFormData be a Ref as well to increase stability

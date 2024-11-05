@@ -1,4 +1,4 @@
-import { z } from "zod/lib/external";
+import z from "zod"
 
 
 export const authFormSchema = (type: string) => z

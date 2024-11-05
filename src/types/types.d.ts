@@ -62,6 +62,44 @@ declare type FormQuestionPartWithImageParsed = {
 
 declare type FormQuestionPartParsed = FormQuestionPartWithTextParsed | FormQuestionPartWithImageParsed;
 
+declare type AddQuestionFormQuestionPart = {
+  questionIdx: string;
+  questionSubIdx: string;
+  order: string;
+  isText: true;
+  text: string;
+  id:string;
+}| {
+  questionIdx: string;
+  questionSubIdx: string;
+  order: string;
+  isText: false;
+  image: File;
+  id:string;
+}
+
+type ProcessedQuestionPart = {
+  isText: true;
+  content: string;
+  id: string;
+} | {
+  isText: false;
+  content: File;
+  id: string;
+};
+
+type ProcessedQuestionContentCombinedJSON = {
+  questionContent: {
+    root: ProcessedQuestionContent[];
+    indexed: {
+      [key: string]: {
+        [subKey: string]: ProcessedQuestionContent[];
+      };
+    };
+  };
+  questionLeafs: { [key: string]: string[] };
+};
+
 declare interface AuthFormProps {
   type: "sign-up" | "login";
 }
@@ -160,15 +198,6 @@ interface CustomFileInputProps<T extends FieldValues> {
   label?: string;
   className?: string;
   inputClassName?: string;
-}
-
-interface CustomTextAreaProps<T extends FieldValues> {
-  control: Control<T>;
-  name: Path<T>;
-  label?: string;
-  placeholder: string;
-  className?: string;
-  textAreaClassName?: string;
 }
 
 interface CustomSelectProps<T extends FieldValues> {

@@ -26,3 +26,144 @@ body {
 body::-webkit-scrollbar {
   display: none; /* Hides scrollbar in Webkit browsers */
 }
+
+/* Headings */
+.markdown-question-text h1,
+.markdown-question-text h2,
+.markdown-question-text h3,
+.markdown-question-text h4,
+.markdown-question-text h5,
+.markdown-question-text h6 {
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  line-height: 1.25;
+}
+
+.markdown-question-text h1 {
+  font-size: 2em;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 0.3em;
+}
+
+.markdown-question-text h2 {
+  font-size: 1.75em;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.3em;
+}
+
+.markdown-question-text h3 {
+  font-size: 1.5em;
+}
+
+.markdown-question-text h4 {
+  font-size: 1.25em;
+}
+
+.markdown-question-text h5 {
+  font-size: 1em;
+}
+
+.markdown-question-text h6 {
+  font-size: 0.875em;
+  color: #555;
+}
+
+/* Paragraphs and Text */
+.markdown-question-text p {
+  margin: 0 0;
+}
+
+.markdown-question-text strong {
+  font-weight: bold;
+}
+
+.markdown-question-text em {
+  font-style: italic;
+}
+
+.markdown-question-text del {
+  text-decoration: line-through;
+}
+
+/* Lists */
+.markdown-question-text ul {
+  list-style-type: disc;
+  margin-left: 1.5em;
+  padding-left: 1em;
+}
+
+.markdown-question-text ol {
+  list-style-type: decimal;
+  margin-left: 1.5em;
+  padding-left: 1em;
+}
+
+.markdown-question-text li {
+  margin-bottom: 0.5em;
+}
+
+/* Blockquotes */
+.markdown-question-text blockquote {
+  border-left: 4px solid #ddd;
+  padding-left: 1em;
+  color: #555;
+  margin: 1em 0;
+  font-style: italic;
+}
+
+/* Code Blocks and Inline Code */
+.markdown-question-text pre {
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  overflow-x: auto;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+}
+
+.markdown-question-text code {
+  background-color: #f4f4f4;
+  border-radius: 3px;
+  padding: 2px 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+}
+
+/* Tables */
+.markdown-question-text table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.markdown-question-text th,
+.markdown-question-text td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.markdown-question-text th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+/* Links */
+.markdown-question-text a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.markdown-question-text a:hover {
+  text-decoration: underline;
+}
+
+/* Horizontal Rule */
+.markdown-question-text hr {
+  border: 0;
+  height: 1px;
+  background: #ddd;
+  margin: 1.5em 0;
+}

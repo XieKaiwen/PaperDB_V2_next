@@ -29,7 +29,7 @@ import { edu_level, school_type } from "@prisma/client";
 import { debounce } from "lodash";
 import QuestionInfoInput from "./QuestionInfoInput";
 import { Oval } from "react-loader-spinner";
-
+import { v4 as uuidv4 } from 'uuid';
 // Custom Components have been created for the following:
 // Select component with autocomplete (ComboBox) should be used for school, year and subject
 // Text component to be used for question number, number validation has to be done for question number
@@ -43,7 +43,6 @@ import { Oval } from "react-loader-spinner";
  * 4. If option currently selected for school/subject is not appropriate for the new education level, then formfield for school/subject will be reset. But no matter what, with a change in education level, the options for school/subject will be updated.
  * 5. If option currently selected for topic is not appropriate for the new subject, then formfield for topic will be reset.
  */
-// TODO: Change questionNumber to a select component, with default of 0
 // TODO: Optimise the form and reduce latency, right now it is horrendously optimised HAHAHHAHAH
 
 export default function AddQuestionForm() {
@@ -99,13 +98,34 @@ export default function AddQuestionForm() {
   });
   const { isSubmitting } = useFormState({ control });
 
-  const watchedFormValues = watch();
-  const {year, educationLevel, school, subject, topics, examType, questionType, questionNumber, questionPart} = watchedFormValues
+  // const watchedFormValues = watch();
+  // const {year, educationLevel, school, subject, topics, examType, questionType, questionNumber, questionPart} = watchedFormValues
   
-  useEffect(() => {
-    debounceUpdateFormData(watchedFormValues);
-  }, [watchedFormValues]);
+  // Changing to using useWatch because watch() causes a rerender of the form whenever there is a change in formValues, i do not want that
+  const watchedValues = useWatch({
+    control,
+    name: ["year", "educationLevel", "school", "subject", "topics", "examType", "questionType", "questionNumber", "questionPart"], // Fields to watch
+  });
+  // destructure watchedValues
+  const [ year, educationLevel, school, subject, topics, examType, questionType, questionNumber, questionPart ] = watchedValues;
+  
 
+  useEffect(() => {
+    debounceUpdateFormData({
+      year,
+      educationLevel,
+      school,
+      subject,
+      topics,
+      examType,
+      questionType,
+      questionNumber,
+      questionPart,
+    });
+  }, [year, educationLevel, school, subject, topics, examType, questionType, questionNumber, questionPart]);
+
+
+// FUNCTIONS FOR FILTERING FORM OPTIONS
   const subjectOptions: { value: string; label: string }[] = useMemo(() => {
     if (educationLevel) {
       const filteredSubjects = allSubjects.filter((subject) =>
@@ -215,27 +235,30 @@ export default function AddQuestionForm() {
     examTypeOptions
   ]);
 
-  function addTextArea() {
+  const addTextArea = useCallback(() => {
     append({
       questionIdx: "",
       questionSubIdx: "",
-      order: "",
+      order: "0",
       isText: true,
       text: "",
+      id: uuidv4(),
     });
-  }
-  function addImageInput() {
+  }, [append]);
+  
+  const addImageInput = useCallback(() => {
     append({
       questionIdx: "",
       questionSubIdx: "",
-      order: "",
+      order: "0",
       isText: false,
       image: new File([], ""),
+      id: uuidv4(),
     });
-  }
-  function deleteQuestionPart(index: number) {
+  }, [append]);
+  const deleteQuestionPart = useCallback((index: number)=>{
     remove(index);
-  }
+  }, [remove])
 
   async function onSubmit(values: z.infer<typeof questionPartSchema>) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
