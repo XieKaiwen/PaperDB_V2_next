@@ -151,7 +151,7 @@ export function processQuestionPartIntoQuestionContentJSON(
     }
 
     // Add to questionLeafs using a Set
-    if (!tempLeafSets[questionIdx]) {
+    if (questionIdx !== "root" && !tempLeafSets[questionIdx]) {
       tempLeafSets[questionIdx] = new Set<string>();
     }
     if (questionSubIdx !== "root") {

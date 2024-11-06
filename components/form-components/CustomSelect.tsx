@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
 import {
   Select,
   SelectContent,
@@ -44,13 +51,12 @@ export default function CustomSelect<T extends FieldValues>({
               {label && (
                 <FormLabel className="font-semibold text-sm">{label}</FormLabel>
               )}
-              {description && (
-                <FormDescription>{description}</FormDescription>
-              )}
+              {description && <FormDescription>{description}</FormDescription>}
             </div>
             <Select
               onValueChange={field.onChange}
-              defaultValue={field.value}
+              // defaultValue={field.value}
+              value={field.value}
               onOpenChange={handleOpenChange}
             >
               <FormControl>
@@ -76,7 +82,10 @@ export default function CustomSelect<T extends FieldValues>({
                 // Render only the matching option when not open
                 <SelectContent className={selectClassName}>
                   {selectedOption && (
-                    <SelectItem key={selectedOption.value} value={selectedOption.value}>
+                    <SelectItem
+                      key={selectedOption.value}
+                      value={selectedOption.value}
+                    >
                       {selectedOption.label}
                     </SelectItem>
                   )}

@@ -2,7 +2,7 @@ import {
   getAllSchools,
   getAllSubjects,
   getAllTopics,
-} from "@/src/actions/queryData.actions";
+} from "@/src/actions/dataFetching.actions";
 import {
   AddQuestionFormData,
   AddQuestionFormDataSubscriber,
@@ -39,7 +39,7 @@ function AddQuestionContextProvider({ children }: { children: ReactNode }) {
   // Fetch all the data once in the context so that its children, "AddQuestionForm" and "QuestionPreview" can access this data.
   const { data: allSubjects } = useSuspenseQuery({
     queryKey: ["subjects"],
-    queryFn: getAllSubjects,
+    queryFn: getAllSubjects
   });
 
   const { data: allTopics } = useSuspenseQuery({

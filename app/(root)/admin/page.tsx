@@ -2,7 +2,7 @@ import {
   getAllSchools,
   getAllSubjects,
   getAllTopics,
-} from "@/src/actions/queryData.actions";
+} from "@/src/actions/dataFetching.actions";
 import AddQuestionPage from "@/components/addQuestionPage/AddQuestionPage";
 import { getQueryClient } from "@/utils/react-query-client/client";
 import {
@@ -18,9 +18,21 @@ import React from "react";
 
 export default async function AdminPage() {
   const queryClient = getQueryClient();
+  // queryClient.prefetchQuery({
+  //   queryKey: ["subjects"],
+  //   queryFn: getAllSubjects,
+  // });
+  // queryClient.prefetchQuery({
+  //   queryKey: ["topics"],
+  //   queryFn: getAllTopics,
+  // });
+  // queryClient.prefetchQuery({
+  //   queryKey: ["schools"],
+  //   queryFn: getAllSchools,
+  // });
   queryClient.prefetchQuery({
     queryKey: ["subjects"],
-    queryFn: getAllSubjects,
+    queryFn: getAllSubjects
   });
   queryClient.prefetchQuery({
     queryKey: ["topics"],
