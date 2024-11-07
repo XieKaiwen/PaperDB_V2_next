@@ -25,7 +25,7 @@ const textQuestionPartSchema = z.object({
   ),
   isText: z.boolean(),
   text: z.string().min(1, { message: "Required, delete if not needed" }),
-  id: z.string().optional()
+  id: z.string()
 });
 
 const imageQuestionPartSchema = z.object({

@@ -27,13 +27,7 @@ export default async function RootLayout({
     }
   }
   const user = data.user.user_metadata;
-  // Reference leetcode UI
-  // TODO Create Navbar
-  // TODO Create a right sidebar (Similar to leetcode, a calender that tracks which days u have done questions, and some stats underneath)
-  // TODO Create a getLoggedIn server action to retrieve all information about the signed in user. First get the uuid through supabase getUser, then retrieve the rest of the information ourselves
-  // if(!user?.username){
-  //   user.username = "name"
-  // }
+
   return (
     <main className="font-open-sans">
       <NavBar user={user} />

@@ -5,14 +5,12 @@ import CustomComboBox from "@/components/form-components/CustomComboBox";
 import CustomPopoverMultipleCheckBox from "@/components/form-components/CustomPopoverMultipleCheckbox";
 import CustomInput from "@/components/form-components/CustomInput";
 import CustomRadio from "@/components/form-components/CustomRadio";
-import { FieldValues } from "react-hook-form";
+import { FieldValues, useFormContext } from "react-hook-form";
 
-export default function QuestionInfoInput<T extends FieldValues>({
-  control,
-  form,
+export default function QuestionInfoInput({
   optionsDict,
   className,
-}: QuestionInfoInputProps<T>) {
+}: QuestionInfoInputProps) {
   const {
     educationLevelOptions,
     schoolOptions,
@@ -22,8 +20,9 @@ export default function QuestionInfoInput<T extends FieldValues>({
     questionTypeOptions,
     examTypeOptions,
   } = optionsDict;
-  // TODO Change all placeholders to font-normal
-  // TODO Make app responsive by changing comboboxes to Drawer component when below certain breakpoint
+
+  const {control, setValue} = useFormContext<AddQuestionFormData>()
+  
   return (
     <div className={className}>
       <CustomSelect<AddQuestionFormData>
@@ -44,7 +43,7 @@ export default function QuestionInfoInput<T extends FieldValues>({
           commandEmptyText="No schools found"
           options={schoolOptions || []}
           label="School"
-          onSelectChange={form.setValue}
+          onSelectChange={setValue}
           className=""
         />
         <CustomComboBox<AddQuestionFormData>
@@ -55,7 +54,7 @@ export default function QuestionInfoInput<T extends FieldValues>({
           commandEmptyText="No subjects found"
           options={subjectOptions || []}
           label="Subject"
-          onSelectChange={form.setValue}
+          onSelectChange={setValue}
           className=""
         />
       </div>

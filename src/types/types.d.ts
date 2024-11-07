@@ -263,9 +263,7 @@ interface CustomPopoverMultipleCheckBoxProps<T extends FieldValues> {
   className?: string;
 }
 
-interface QuestionInfoInputProps<T extends FieldValues> {
-  control: Control<T>;
-  form: UseFormReturn<T>;
+interface QuestionInfoInputProps{
   optionsDict: { [key: string]: { value: string; label: string }[] };
   className?: string;
 }

@@ -5,6 +5,8 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  FieldValues,
+  Path,
   useFieldArray,
   useForm,
   useFormState,
@@ -30,6 +32,8 @@ import { debounce } from "lodash";
 import QuestionInfoInput from "./QuestionInfoInput";
 import { Oval } from "react-loader-spinner";
 import { v4 as uuidv4 } from "uuid";
+import AddQuestionQuestionPartStep from "./AddQuestionQuestionPartStep";
+import AddQuestionPaperMetadataStep from "./AddQuestionPaperMetadataStep";
 // Custom Components have been created for the following:
 // Select component with autocomplete (ComboBox) should be used for school, year and subject
 // Text component to be used for question number, number validation has to be done for question number
@@ -46,10 +50,41 @@ import { v4 as uuidv4 } from "uuid";
 // TODO: Optimise the form and reduce latency, right now it is horrendously optimised HAHAHHAHAH
 
 export default function AddQuestionForm() {
+  // SET FORM STEP
+  const [formStep, setFormStep] = useState<1 | 2 | 3>(1);
+  const fieldsEachStep: { [key: number]: Path<AddQuestionFormData>[] } = {
+    1: [
+      "year",
+      "educationLevel",
+      "school",
+      "subject",
+      "topics",
+      "examType",
+      "questionType",
+      "questionNumber",
+    ],
+    2: ["questionPart"],
+    3: [],
+  };
+  const step1Schema = questionPartSchema.pick({
+    year: true,
+    educationLevel: true,
+    school: true,
+    subject: true,
+    topics: true,
+    examType: true,
+    questionType: true,
+    questionNumber: true,
+  });
+  const step2Schema = questionPartSchema.pick({
+    questionPart: true,
+  });
+  
+
   // RETRIEVE CONTEXT VALUES
   const {
     formData: { update: debounceUpdateFormData },
-    data: { subjects: allSubjects, topics: allTopics, schools: allSchools },
+    // data: { subjects: allSubjects, topics: allTopics, schools: allSchools }, // Data should only be used in step 1, hence can delete later
   } = useAddQuestionContext();
 
   // SET UP FORM AND WATCHED VALUES
@@ -68,16 +103,9 @@ export default function AddQuestionForm() {
     },
   });
 
-  // default value for images should be new File([], "")
-  const { control, watch } = form;
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "questionPart",
-  });
+  // // default value for images should be new File([], "")
+  const { control, clearErrors, getValues, setError } = form;
   const { isSubmitting } = useFormState({ control });
-
-  // const watchedFormValues = watch();
-  // const {year, educationLevel, school, subject, topics, examType, questionType, questionNumber, questionPart} = watchedFormValues
 
   // Changing to using useWatch because watch() causes a rerender of the form whenever there is a change in formValues, i do not want that
   const watchedValues = useWatch({
@@ -131,146 +159,40 @@ export default function AddQuestionForm() {
     questionPart,
   ]);
 
-  // FUNCTIONS FOR FILTERING FORM OPTIONS
-  const subjectOptions: { value: string; label: string }[] = useMemo(() => {
-    if (educationLevel) {
-      const filteredSubjects = allSubjects.filter((subject) =>
-        subject.educationLevels.includes(educationLevel as edu_level)
-      );
+  function nextStepClick() {
+    clearErrors();
+    if (fieldsEachStep[formStep].length !== 0) {
+      const valuesArray = getValues(fieldsEachStep[formStep]) as FieldValues;
 
-      const optionList = generateOptionsFromJsonList(
-        filteredSubjects,
-        "id",
-        "subjectName"
-      );
-      optionList.sort((a, b) => a.label.localeCompare(b.label));
-      return optionList;
-    }
-    return [];
-  }, [allSubjects, educationLevel]);
-
-  // TODO: Need to improve short name for schools, too confusing. For example:
-  // Rosyth School and Red Swastika School are RS and RSS respectively. Very easily confused
-  const schoolOptions: { value: string; label: string }[] = useMemo(() => {
-    if (educationLevel) {
-      const filteredSchools = allSchools.filter((school) =>
-        schoolTypeMapToEduLevel[school.schoolType].includes(educationLevel)
-      );
-      const optionList = generateOptionsFromJsonList(
-        filteredSchools,
-        "id",
-        "schoolFullName"
-      );
-      optionList.sort((a, b) => a.label.localeCompare(b.label));
-      return optionList;
-    }
-    return [];
-  }, [allSchools, educationLevel]);
-
-  const topicsOptions: { value: string; label: string }[] = useMemo(() => {
-    if (!subject) {
-      return [];
-    }
-    // const listOfSubjectIds = subjectOptions.map((subject) => subject.value)
-    const filteredTopics = allTopics.filter((topic) => {
-      return (
-        topic.subjectId === subject &&
-        validateTopicWithinEducationLevel(topic.educationLevel, educationLevel)
-      );
-    });
-
-    const optionList = generateOptionsFromJsonList(
-      filteredTopics,
-      "id",
-      "topicName"
-    );
-    optionList.sort((a, b) => a.label.localeCompare(b.label));
-    return optionList;
-  }, [allTopics, subjectOptions, subject]);
-
-  const yearOptions = useMemo(() => {
-    return generateYearList();
-  }, []);
-  const examTypeOptions = useMemo(() => {
-    if (!educationLevel) return [];
-    const filteredExamTypes = examTypeEducationLevelMapping.filter((examType) =>
-      examType.educationLevel.includes(educationLevel as edu_level)
-    );
-    return generateOptionsFromJsonList(
-      filteredExamTypes,
-      "enumValue",
-      "examType"
-    );
-  }, [educationLevel]);
-  // Moving the resetting of fields to useEffect instead of using them in useMemo because, using them in useMemo will cause an update in Controller while causing a re-render of the form as well, which is illegal
-
-  useEffect(() => {
-    if (
-      !subjectOptions.find((subjectOption) => subject === subjectOption.value)
-    )
-      form.resetField("subject");
-  }, [subjectOptions]);
-  useEffect(() => {
-    if (!schoolOptions.find((schoolOption) => school === schoolOption.value))
-      form.resetField("school");
-  }, [schoolOptions]);
-  useEffect(() => {
-    topics.every((topic) => {
-      if (!topicsOptions.find((topicOption) => topicOption.value === topic)) {
-        form.resetField("topics");
-        return false;
+      // Transform array of values into an object with field names as keys
+      const valuesToValidate = Object.fromEntries(
+        fieldsEachStep[formStep].map((field, index) => [field, valuesArray[index]])
+      ) as FieldValues;
+      console.log(valuesToValidate);
+      
+      //  validate with zod
+      // Choose the schema based on the current step
+      const validationSchema = formStep === 1 ? step1Schema : step2Schema;
+      const validationResult = validationSchema.safeParse(valuesToValidate);
+      if(validationResult.success){
+        setFormStep((prev) => (prev + 1) as 1 | 2 | 3);
+      }else{
+        console.log(validationResult)
+        validationResult.error.errors.forEach((error) => {
+          const { message, path } = error;
+          setError(path[0] as Path<AddQuestionFormData>, {
+            message,
+          });
+        });
       }
-      return true;
-    });
-  }, [topicsOptions]);
+    } else {
+      setFormStep((prev) => (prev + 1) as 1 | 2 | 3);
+    }
+  }
 
-  const optionsDict = useMemo(() => {
-    return {
-      educationLevelOptions,
-      schoolOptions,
-      subjectOptions,
-      topicsOptions,
-      yearOptions,
-      questionTypeOptions,
-      examTypeOptions,
-    };
-  }, [
-    educationLevelOptions,
-    schoolOptions,
-    subjectOptions,
-    topicsOptions,
-    yearOptions,
-    questionTypeOptions,
-    examTypeOptions,
-  ]);
-
-  const addTextArea = useCallback(() => {
-    append({
-      questionIdx: "",
-      questionSubIdx: "",
-      order: "0",
-      isText: true,
-      text: "",
-      id: uuidv4(),
-    });
-  }, [append]);
-
-  const addImageInput = useCallback(() => {
-    append({
-      questionIdx: "",
-      questionSubIdx: "",
-      order: "0",
-      isText: false,
-      image: new File([], ""),
-      id: uuidv4(),
-    });
-  }, [append]);
-  const deleteQuestionPart = useCallback(
-    (index: number) => {
-      remove(index);
-    },
-    [remove]
-  );
+  function prevStepClick() {
+    setFormStep((prev) => (prev - 1) as 1 | 2 | 3);
+  }
 
   async function onSubmit(values: z.infer<typeof questionPartSchema>) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -283,63 +205,42 @@ export default function AddQuestionForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="p-2 w-full space-y-7"
       >
-        <QuestionInfoInput<AddQuestionFormData>
-          optionsDict={optionsDict}
-          control={control}
-          form={form}
-          className="space-y-4"
-        />
-        {fields.map((questionPart, index) => {
-          const { isText } = questionPart;
-          return (
-            <QuestionPartInput<AddQuestionFormData>
-              key={questionPart.id}
-              isText={isText}
-              control={control}
-              id={questionPart.id}
-              index={index}
-              deleteQuestionPart={deleteQuestionPart}
-            />
-          );
-        })}
-        <div className="space-y-2">
-          <div className="flex gap-4 w-full mt-2">
-            <Button
-              className="w-full"
-              disabled={fields.length >= MAX_QUESTION_PART_NUM}
-              type="button"
-              onClick={addTextArea}
-            >
-              Add Text
-            </Button>
-            <Button
-              className="w-full"
-              disabled={fields.length >= MAX_QUESTION_PART_NUM}
-              type="button"
-              onClick={addImageInput}
-            >
-              Add Image
-            </Button>
-          </div>
+        {formStep === 1 && <AddQuestionPaperMetadataStep />}
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <div className="flex gap-4">
-                <p>Loading</p>
-                <Oval
-                  visible={true}
-                  height="20"
-                  width="20"
-                  color="#a3c4ff"
-                  ariaLabel="oval-loading"
-                  wrapperStyle={{}}
-                  wrapperClass=""
-                />
-              </div>
-            ) : (
-              "Submit"
+        <div className="space-y-2">
+          {formStep === 2 && <AddQuestionQuestionPartStep />}
+          <div className="flex gap-4 w-full mt-2">
+            {formStep > 1 && (
+              <Button className="w-full" type="button" onClick={prevStepClick}>
+                Back
+              </Button>
             )}
-          </Button>
+            {formStep < 3 && (
+              <Button className="w-full" type="button" onClick={nextStepClick}>
+                Next
+              </Button>
+            )}
+            {formStep === 3 && (
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <div className="flex gap-4">
+                    <p>Loading</p>
+                    <Oval
+                      visible={true}
+                      height="20"
+                      width="20"
+                      color="#a3c4ff"
+                      ariaLabel="oval-loading"
+                      wrapperStyle={{}}
+                      wrapperClass=""
+                    />
+                  </div>
+                ) : (
+                  "Submit"
+                )}
+              </Button>
+            )}
+          </div>
         </div>
       </form>
     </Form>

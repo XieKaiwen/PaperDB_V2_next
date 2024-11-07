@@ -9,25 +9,6 @@ export function cn(...inputs: ClassValue[]) {
 export const parseStringify = (value: any) => JSON.parse(JSON.stringify(value));
 
 
-// TODO fix the parseMapString function because currently the output of it is wrong:
-/* 
-E.g.
-metadata string is 'map[educationLevel:P2 email:xiekaiwen3@gmail.com email_verified:false phoneNumber: 65 96305601 phone_verified:false sub:b3b4ac94-7e3a-4bf8-b198-349ea5ad6b95 username:Kaiwen]'
-but the metadataObject output is 
-{
-  educationLevel: 'P2',
-  email: 'xiekaiwen3@gmail.com',
-  email_verified: false,
-  phoneNumber: '65',
-  phone_verified: false,
-  sub: 'b3b4ac94-7e3a-4bf8-b198-349ea5ad6b95',
-  username: 'Kaiwen'
-}
-It doesnt deal with the spaces correctly
-
-Edit: Do not need this anymore because the response from verifyOtp already returns the correct metadata object
-*/
-
 export function getBaseUrl(request: NextRequest): string {
   // Check if we have a base URL defined in the environment
   const envBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
