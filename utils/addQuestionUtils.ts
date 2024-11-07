@@ -52,6 +52,23 @@ const imageQuestionPartSchema = z.object({
   id: z.string()
 });
 
+// For MCQ, there should only be a question at the root, hence no questionIdx and questionSubIdx
+// The only 2 keys there will be are the option and the correct answer
+export const MCQAnswerSchema = z.object({
+  options: z.array(z.string()).min(2, { message: "At least 2 options are required" }),
+  answer: z.string().min(1, { message: "Choose a correct answer" }),
+})
+
+// For OEQ, there should be an array of objects with questionIdx, questionSubIdx and the answer
+// The questionIdx and questionSubIdx is automatically set when rendering the answer step of the form, hence no need to validate them
+export const OEQAnswerSchema = z.array(z.object({
+  questionIdx: z.string(), 
+  questionSubIdx: z.string(),
+  answer: z.string().min(1, { message: "Answer cannot be empty" }),
+}))
+
+export const answerCombinedSchema = z.union([MCQAnswerSchema, OEQAnswerSchema]);
+
 export const contentTypeSchema = z.union([
   textQuestionPartSchema,
   imageQuestionPartSchema,
@@ -89,6 +106,7 @@ export const questionPartSchema = z.object({
     .max(MAX_QUESTION_PART_NUM, {
       message: `You can have at most ${MAX_QUESTION_PART_NUM} question part`,
     }),
+  questionAnswer: answerCombinedSchema
 });
 
 export function validateTopicWithinEducationLevel(

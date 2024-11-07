@@ -34,6 +34,7 @@ import { Oval } from "react-loader-spinner";
 import { v4 as uuidv4 } from "uuid";
 import AddQuestionQuestionPartStep from "./AddQuestionQuestionPartStep";
 import AddQuestionPaperMetadataStep from "./AddQuestionPaperMetadataStep";
+import AddQuestionAddAnswersStep from "./AddQuestionAddAnswersStep";
 // Custom Components have been created for the following:
 // Select component with autocomplete (ComboBox) should be used for school, year and subject
 // Text component to be used for question number, number validation has to be done for question number
@@ -100,6 +101,7 @@ export default function AddQuestionForm() {
       questionType: "",
       questionNumber: "",
       questionPart: [],
+      questionAnswer: undefined,
     },
   });
 
@@ -120,6 +122,7 @@ export default function AddQuestionForm() {
       "questionType",
       "questionNumber",
       "questionPart",
+      "questionAnswer",
     ], // Fields to watch
   });
   // destructure watchedValues
@@ -133,6 +136,7 @@ export default function AddQuestionForm() {
     questionType,
     questionNumber,
     questionPart,
+    questionAnswer,
   ] = watchedValues;
 
   useEffect(() => {
@@ -146,6 +150,7 @@ export default function AddQuestionForm() {
       questionType,
       questionNumber,
       questionPart,
+      questionAnswer,
     });
   }, [
     year,
@@ -157,6 +162,7 @@ export default function AddQuestionForm() {
     questionType,
     questionNumber,
     questionPart,
+    questionAnswer,
   ]);
 
   function nextStepClick() {
@@ -206,7 +212,7 @@ export default function AddQuestionForm() {
         className="p-2 w-full space-y-7"
       >
         {formStep === 1 && <AddQuestionPaperMetadataStep />}
-
+        {formStep === 3 && <AddQuestionAddAnswersStep />}
         <div className="space-y-2">
           {formStep === 2 && <AddQuestionQuestionPartStep />}
           <div className="flex gap-4 w-full mt-2">

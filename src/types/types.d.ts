@@ -25,6 +25,9 @@ declare type AddQuestionFormData = z.infer<typeof questionPartSchema>;
 declare type AddQuestionFormDataSubscriber = (
   updatedFormData: AddQuestionFormData
 ) => void;
+declare type AddQuestionQuestionContentJSONSubscriber = (
+  updatedQuestionContentJSON: ProcessedQuestionContentCombinedJSON
+) => void;
 
 declare type FormQuestionPartWithText = {
   questionIdx: string;

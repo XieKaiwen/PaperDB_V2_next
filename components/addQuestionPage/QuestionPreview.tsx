@@ -11,6 +11,7 @@ export default function QuestionPreview() {
   const {
     formData: { subscribe: subscribeToFormData },
     data: { schools: allSchools, subjects: allSubjects, topics: allTopics },
+    questionContentJSON: { update: updateQuestionContentJSON },
   } = useAddQuestionContext();
   const [formData, setFormData] = useState<AddQuestionFormData>({});
 
@@ -74,6 +75,11 @@ export default function QuestionPreview() {
     return processQuestionPartIntoQuestionContentJSON(questionPart); // questionLeafs should be null if there are no children from the root
   }, [questionPart]);
 
+  // UPDATE CONTEXT QUESTION CONTENT JSON 
+  useEffect(() => {
+    updateQuestionContentJSON(questionContentCombinedJSON);
+  }, [questionContentCombinedJSON])
+  
   // DECONSTRUCT THE QuestionContentCombinedJSON
   const {
     questionContent: { root: questionRoot, indexed: questionIndexedParts },

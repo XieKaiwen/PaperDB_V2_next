@@ -58,7 +58,6 @@ export default function QuestionInfoInput({
           className=""
         />
       </div>
-      {/* TODO make this a popover */}
       <div className="flex flex-1 flex-wrap gap-2 justify-between ">
         <CustomPopoverMultipleCheckBox<AddQuestionFormData>
           control={control}
