@@ -72,8 +72,8 @@ export default function QuestionPreview() {
 
   // CONSTRUCT THE QuestionContentCombinedJSON here
   const questionContentCombinedJSON = useMemo(() => {
-    return processQuestionPartIntoQuestionContentJSON(questionPart); // questionLeafs should be null if there are no children from the root
-  }, [questionPart]);
+    return processQuestionPartIntoQuestionContentJSON(questionPart, questionType); // questionLeafs should be null if there are no children from the root
+  }, [questionPart, questionType]);
 
   // UPDATE CONTEXT QUESTION CONTENT JSON 
   useEffect(() => {

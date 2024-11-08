@@ -6,7 +6,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 
 export default function AddQuestionAddAnswersStep() {
-    const {control, setValue} = useFormContext<AddQuestionFormData>()   
+    const {control, setValue, getValues} = useFormContext<AddQuestionFormData>()   
     const {formData: {subscribe: subscribeToFormData}, questionContentJSON:{subscribe: subscribeToQuestionContentJSON}} = useAddQuestionContext()
     const [questionContent, setQuestionContent] = useState<ProcessedQuestionContentCombinedJSON>({
         questionContent: {
@@ -50,11 +50,10 @@ export default function AddQuestionAddAnswersStep() {
      * 3. If it is an array, first filter through the current array and see if there is any objects to reuse, filter out the ones not useful and add in appropriate objects.
      * 4. Then setValue on the questionAnswer field.
      */
+    const inputtedQuestionAnswer = getValues("questionAnswer")
     
-      return () => {
-        
-      }
-    }, [])
+      
+    }, [questionType, questionLeafs])
     
 
   return (

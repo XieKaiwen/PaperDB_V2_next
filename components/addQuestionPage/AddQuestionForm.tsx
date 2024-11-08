@@ -1,13 +1,11 @@
 import {
-  questionPartSchema,
-  validateTopicWithinEducationLevel,
+  questionPartSchema
 } from "@/utils/addQuestionUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FieldValues,
   Path,
-  useFieldArray,
   useForm,
   useFormState,
   useWatch,
@@ -15,30 +13,12 @@ import {
 import { z } from "zod";
 import { Form } from "../ui/form";
 import { Button } from "../ui/button";
-import {
-  educationLevelOptions,
-  examTypeEducationLevelMapping,
-  MAX_QUESTION_PART_NUM,
-  MD_BREAKPOINT,
-  questionTypeOptions,
-  schoolTypeMapToEduLevel,
-} from "@/src/constants/constants";
 import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
 import { AddQuestionFormData } from "@/src/types/types";
-import QuestionPartInput from "./QuestionPartInput";
-import { generateOptionsFromJsonList, generateYearList } from "@/utils/utils";
-import { edu_level } from "@prisma/client";
-import { debounce } from "lodash";
-import QuestionInfoInput from "./QuestionInfoInput";
 import { Oval } from "react-loader-spinner";
-import { v4 as uuidv4 } from "uuid";
 import AddQuestionQuestionPartStep from "./AddQuestionQuestionPartStep";
 import AddQuestionPaperMetadataStep from "./AddQuestionPaperMetadataStep";
 import AddQuestionAddAnswersStep from "./AddQuestionAddAnswersStep";
-// Custom Components have been created for the following:
-// Select component with autocomplete (ComboBox) should be used for school, year and subject
-// Text component to be used for question number, number validation has to be done for question number
-// Radio group should be used for question type: MCQ or OEQ
 
 /**
  * Some guidelines on the availability of options for certain fields:
@@ -48,7 +28,6 @@ import AddQuestionAddAnswersStep from "./AddQuestionAddAnswersStep";
  * 4. If option currently selected for school/subject is not appropriate for the new education level, then formfield for school/subject will be reset. But no matter what, with a change in education level, the options for school/subject will be updated.
  * 5. If option currently selected for topic is not appropriate for the new subject, then formfield for topic will be reset.
  */
-// TODO: Optimise the form and reduce latency, right now it is horrendously optimised HAHAHHAHAH
 
 export default function AddQuestionForm() {
   // SET FORM STEP
