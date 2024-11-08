@@ -1,12 +1,12 @@
 import { useAddQuestionContext } from '@/src/hooks/useAddQuestionContext'
 import { AddQuestionFormData, ProcessedQuestionContentCombinedJSON } from '@/src/types/types'
-import { contentTypeSchema } from '@/utils/addQuestionUtils'
+import { contentTypeSchema, createQuestionAnswerValueAfterReset, createQuestionAnswerValueWithoutReset, questionAnswerRequiresReset } from '@/utils/addQuestionUtils'
 import React, { useEffect, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 
 export default function AddQuestionAddAnswersStep() {
-    const {control, setValue, getValues} = useFormContext<AddQuestionFormData>()   
+    const {control, setValue, getValues, resetField} = useFormContext<AddQuestionFormData>()   
     const {formData: {subscribe: subscribeToFormData}, questionContentJSON:{subscribe: subscribeToQuestionContentJSON}} = useAddQuestionContext()
     const [questionContent, setQuestionContent] = useState<ProcessedQuestionContentCombinedJSON>({
         questionContent: {
@@ -50,8 +50,17 @@ export default function AddQuestionAddAnswersStep() {
      * 3. If it is an array, first filter through the current array and see if there is any objects to reuse, filter out the ones not useful and add in appropriate objects.
      * 4. Then setValue on the questionAnswer field.
      */
-    const inputtedQuestionAnswer = getValues("questionAnswer")
-    
+     const questionAnswer = getValues('questionAnswer');
+    //  TODO: TO BE TESTED
+     const requireReset = questionAnswerRequiresReset(questionType, questionAnswer);
+     if (requireReset) {
+        resetField('questionAnswer', {defaultValue:[]})
+        const newQuestionAnswerValue = createQuestionAnswerValueAfterReset(questionType, questionLeafs);
+        setValue('questionAnswer', newQuestionAnswerValue);
+     }else{
+        const newQuestionAnswerValue = createQuestionAnswerValueWithoutReset(questionType, questionLeafs, questionAnswer);
+        setValue('questionAnswer', newQuestionAnswerValue);
+     }
       
     }, [questionType, questionLeafs])
     

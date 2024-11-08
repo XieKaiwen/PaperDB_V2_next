@@ -127,9 +127,10 @@ export function validateTopicWithinEducationLevel(
   return false;
 }
 
-// PROCESS questionPart[] INTO QuestionContentCombinedJSON (for QuestionPreview)
+// PROCESS questionPart INTO QuestionContentCombinedJSON (for QuestionPreview)
 export function processQuestionPartIntoQuestionContentJSON(
-  data: AddQuestionFormQuestionPart[], questionType:string
+  data: AddQuestionFormQuestionPart[],
+  questionType: string
 ) {
   const questionContentJSON: ProcessedQuestionContentCombinedJSON = {
     questionContent: {
@@ -236,4 +237,158 @@ export function processQuestionPartIntoQuestionContentJSON(
     ).sort((a, b) => convertRomanToInt(a) - convertRomanToInt(b));
   });
   return questionContentJSON;
+}
+
+// STRUCTURING questionAnswer BASED ON questionType and questionParts
+export function questionAnswerRequiresReset(
+  questionType: string,
+  questionAnswer: z.infer<typeof answerCombinedSchema>
+) {
+  // FIRST, DETERMINE IF questionAnswer REQUIRES A RESET
+  const firstObj = questionAnswer[0];
+  if (questionType === "MCQ") {
+    // IF questionType is MCQ, questionAnswer should be an array containing a singular object
+    // WITH THE KEYS `options` and `answer`
+    return !firstObj || !("options" in firstObj && "answer" in firstObj);
+  } else if (questionType === "OEQ") {
+    return (
+      !firstObj ||
+      !(
+        "questionIdx" in firstObj &&
+        "questionSubIdx" in firstObj &&
+        "answer" in firstObj
+      )
+    );
+  }
+  return false;
+}
+
+export function createQuestionAnswerValueAfterReset(
+  questionType: string,
+  questionLeafs: { [key: string]: string[] } | null
+) {
+  // IF REQUIRE RESET, RESET AND THEN CALL THIS FUNCTION
+  // THIS FUNCTION RETURNS THE VALUE FOR questionAnswer to be updated to
+
+  if (questionType === "MCQ") {
+    // FOR MCQ, JUST UPDATE IT TO ARRAY WITH THE BAREBONES OBJECT
+    return [{ options: [], answer: "" }];
+  } else if (questionType === "OEQ") {
+    const newQuestionAnswerValue = [];
+
+    if (!questionLeafs) {
+      // IF questionLeafs is NULL, it means that the question only has a root
+      newQuestionAnswerValue.push({
+        questionIdx: "root",
+        questionSubIdx: "root",
+        answer: "",
+      });
+    } else {
+      // CREATE ONE OBJECT FOR EACH questionLeaf in questionLeafs, in order, first by questionIdx, then by questionSubIdx
+      Object.keys(questionLeafs).forEach((key) => {
+        if (questionLeafs[key].length === 0) {
+          // IF THE ARRAY UNDER THE KEY IS EMPTY, IT MEANS ITS questionSubIdx is root, a-root
+          newQuestionAnswerValue.push({
+            questionIdx: key,
+            questionSubIdx: "root",
+            answer: "",
+          });
+        } else {
+          // ELSE, THERE IS NO ROOT AND ONLY HAVE THE OTHER SUBKEYS AS SUBINDEX
+          questionLeafs[key].forEach((subKey) => {
+            newQuestionAnswerValue.push({
+              questionIdx: key,
+              questionSubIdx: subKey,
+              answer: "",
+            });
+          });
+        }
+      });
+    }
+
+    return newQuestionAnswerValue;
+  }
+}
+
+// Type guard to check if an object is of type AnswerWithIndices
+function hasQuestionIndices(obj: any): obj is { questionIdx: string; questionSubIdx: string; answer: string } {
+  return typeof obj.questionIdx === "string" && typeof obj.questionSubIdx === "string";
+}
+
+
+export function createQuestionAnswerValueWithoutReset(
+  questionType: string,
+  questionLeafs: { [key: string]: string[] } | null,
+  questionAnswer: z.infer<typeof answerCombinedSchema>
+) {
+  if (questionType === "MCQ") {
+    // IF THERE IS NO RESET, IT MEANS QUESTION TYPE DID NOT CHANGE. 
+    // SINCE MCQ WILL ONLY EVER HAVE 1 ELEMENT IN questionAnswer ARRAY, JUST RETURN IT. NO CHANGE
+    return questionAnswer;
+  }else if(questionType === "OEQ"){
+    const newQuestionAnswerValue: { questionIdx: string; questionSubIdx: string; answer: string }[] = [];
+    questionAnswer = questionAnswer as { questionIdx: string; questionSubIdx: string; answer: string }[]
+    if(!questionLeafs){
+      // IF questionLeafs is NULL, we search for an object in questionAnswer that has "root", "root" for questionIdx and questionSubIdx
+      // IF FOUND, WE TAKE IT AS THE NEW QUESTION ANSWER VALUE
+      // IF NOT FOUND, WE CREATE A NEW OBJECT WITH "root", "root" for questionIdx and questionSubIdx
+      const foundObj  = questionAnswer.find(
+        (obj) => hasQuestionIndices(obj) && obj.questionIdx === "root" && obj.questionSubIdx === "root"
+      ) as { questionIdx: string; questionSubIdx: string; answer: string }|undefined;
+      if(foundObj){
+        // IF SUCH AN OBJECT IS FOUND, RETURN IT
+        return [foundObj];
+      }else{
+        // IF NO SUCH AN OBJECT IS FOUND, CREATE A NEW OBJECT WITH "root", "root" for questionIdx and questionSubIdx
+        return [{ questionIdx: "root", questionSubIdx: "root", answer: "" }];
+      }
+    }else{
+      // IF questionLeafs IS NOT NULL, WE CREATE AN OBJECT FOR EACH questionLeaf in questionLeafs, IN ORDER, FIRST BY questionIdx, THEN BY questionSubIdx
+      const hashMap = new Map()
+
+      Object.keys(questionLeafs).forEach((key) => {
+        if (questionLeafs[key].length === 0) {
+          // IF THE ARRAY UNDER THE KEY IS EMPTY, IT MEANS ITS questionSubIdx is root, a-root
+          // HENCE, WE WILL CREATE A KEY UNDER THE HASH MAP WITH {key}-root as the key and value of undefined
+          hashMap.set(`${key}-root`, undefined)
+        } else {
+          // ELSE, THERE IS NO ROOT AND ONLY HAVE THE OTHER SUBKEYS AS SUBINDEX
+          questionLeafs[key].forEach((subKey) => {
+            hashMap.set(`${key}-${subKey}`, undefined)
+          });
+        }
+      });
+
+      // NEXT, WE LOOP THROUGH questionANSWER AND WE CHECK IF THE KEY EXISTS IN THE HASH MAP, if it does, we replace the value with that object
+      questionAnswer.forEach((answer) => {
+        if(hashMap.has(`${answer.questionIdx}-${answer.questionSubIdx}`)){
+          hashMap.set(`${answer.questionIdx}-${answer.questionSubIdx}`, answer)
+        }
+      })
+      
+      // THEN LOOP THROUGH QUESTIONLEAFS AGAIN, THIS TIME, IF VALUE IS UNDEFINED, we create a value for it
+      // IF IT IS NOT UNDEFINED, THEN WE PUSH IT IN
+      Object.keys(questionLeafs).forEach((key) => {
+        if (questionLeafs[key].length === 0) {
+          // IF THE ARRAY UNDER THE KEY IS EMPTY, IT MEANS ITS questionSubIdx is root, a-root
+          if(hashMap.get(`${key}-root`)){
+            newQuestionAnswerValue.push(hashMap.get(`${key}-root`) as { questionIdx: string; questionSubIdx: string; answer: string })
+          }else{
+            newQuestionAnswerValue.push({ questionIdx: key, questionSubIdx: "root", answer: "" })
+          }
+        } else {
+          // ELSE, THERE IS NO ROOT AND ONLY HAVE THE OTHER SUBKEYS AS SUBINDEX
+          questionLeafs[key].forEach((subKey) => {
+            if(hashMap.get(`${key}-${subKey}`)){
+              newQuestionAnswerValue.push(hashMap.get(`${key}-${subKey}`) as { questionIdx: string; questionSubIdx: string; answer: string })
+            }else{
+              newQuestionAnswerValue.push({ questionIdx: key, questionSubIdx: subKey, answer: "" })
+            }
+          });
+        }
+      });
+
+      return newQuestionAnswerValue;
+    }
+  }
 }
