@@ -19,7 +19,7 @@ export default function AddQuestionPage() {
           </div>
         </div>
         <Separator orientation="vertical" className="mx-4 min-h-screen" />
-        <div id="question-preview" className="min-w-9/20 h-full">
+        <div id="question-preview" className="min-w-9/20 flex-1 h-full">
           <div className="p-4 max-h-screen overflow-y-auto min-h-0" style={{contain: 'layout'}}>
             <QuestionPreview/>
           </div>

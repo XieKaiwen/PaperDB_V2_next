@@ -17,6 +17,8 @@ export default function QuestionPreview() {
 
   useEffect(() => {
     const unsubscribeToFormData = subscribeToFormData((updatedFormData) => {
+      // console.log("updated form data state in QuestionPreview");
+
       setFormData(updatedFormData);
     });
 
@@ -50,7 +52,7 @@ export default function QuestionPreview() {
     questionNumber = "",
     questionPart = [],
   } = formData as AddQuestionFormData;
-  console.log(JSON.stringify(questionPart, null, 2));
+  console.log("questionPart:" + JSON.stringify(questionPart, null, 2));
   // CONSTRUCT THE QUESTION TITLE
   const questionTitle = constructQuestionTitle(
     chosenSchool,
@@ -72,123 +74,131 @@ export default function QuestionPreview() {
 
   // CONSTRUCT THE QuestionContentCombinedJSON here
   const questionContentCombinedJSON = useMemo(() => {
-    return processQuestionPartIntoQuestionContentJSON(questionPart, questionType); // questionLeafs should be null if there are no children from the root
+    console.log("Recalculating questionContentCombinedJSON in QuestionPreview");
+
+    return processQuestionPartIntoQuestionContentJSON(
+      questionPart,
+      questionType
+    ); // questionLeafs should be null if there are no children from the root
   }, [questionPart, questionType]);
 
-  // UPDATE CONTEXT QUESTION CONTENT JSON 
+  // UPDATE CONTEXT QUESTION CONTENT JSON
   useEffect(() => {
+    // console.log("Updating QuestionContent value in context in QuestionPreview");
     updateQuestionContentJSON(questionContentCombinedJSON);
-  }, [questionContentCombinedJSON])
-  
+  }, [questionContentCombinedJSON]);
+
   // DECONSTRUCT THE QuestionContentCombinedJSON
   const {
     questionContent: { root: questionRoot, indexed: questionIndexedParts },
     questionLeafs,
   } = questionContentCombinedJSON;
-  console.log(JSON.stringify(questionContentCombinedJSON, null, 2));
+  console.log(
+    "questionContentCombinedJSON: " +
+      JSON.stringify(questionContentCombinedJSON, null, 2)
+  );
   return (
     // TODO: Create a question title component
     <div className="w-full">
-      {/* <pre className="whitespace-pre-wrap break-words">
-        {JSON.stringify(formData, null, 2)}
-      </pre> */}
-      <div className="space-y-3">
-        <div className="flex flex-1 flex-col justify-center items-center font-merriweather font-bold">
-          <h2 className="text-lg">{questionTitle[0]}</h2>
-          <h3 className="text-base">{questionTitle[1]}</h3>
+      <div className="space-y-6">
+        <div className="space-y-2 w-full">
+          <div className="flex flex-1 flex-col justify-center items-center font-merriweather font-bold">
+            <h2 className="text-lg">{questionTitle[0]}</h2>
+            <h3 className="text-base">{questionTitle[1]}</h3>
+          </div>
+          <div className="flex flex-1 flex-col space-y-2 justify-center items-center text-sm font-semibold">
+            {chosenSubject && (
+              <p>
+                Subject:{" "}
+                <span className="font-normal">
+                  {
+                    allSubjects.find((subject) => subject.id === chosenSubject)
+                      ?.subjectName
+                  }
+                </span>
+              </p>
+            )}
+            {topicString && (
+              <div className="w-full lg:w-1/2 text-center space-y-1">
+                <p>Topics:</p>
+                <p className="font-normal">{topicString}</p>
+              </div>
+            )}
+            {questionNumber && (
+              <p>
+                Question Number:{" "}
+                <span className="font-normal">{questionNumber}</span>
+              </p>
+            )}
+          </div>
         </div>
-        <div className="flex flex-1 flex-col space-y-2 justify-center items-center text-sm font-semibold">
-          {/* Put subjects and topics here */}
-          {chosenSubject && (
-            <p>
-              Subject:{" "}
-              <span className="font-normal">
-                {
-                  allSubjects.find((subject) => subject.id === chosenSubject)
-                    ?.subjectName
-                }
-              </span>
-            </p>
+        <div className="space-y-1 w-full">
+          {/* DISPLAYING THE CONTENT FOR ROOT ELEMENT */}
+          {/* TODO: CREATING A COMPONENT QuestionSectionDisplay, and then use React memo on it */}
+          {questionRoot.length > 0 && (
+            <main className="flex flex-col gap-1 justify-center items-center">
+              {questionRoot.map((part: ProcessedQuestionPart, idx: number) => {
+                // Return the root elements here
+                const { isText, content, id } = part;
+                return (
+                  <QuestionSectionDisplay
+                    id={id}
+                    content={content}
+                    key={id}
+                    isText={isText}
+                  />
+                );
+              })}
+            </main>
           )}
-          {topicString && (
-            <div className="w-full lg:w-1/2 text-center space-y-1">
-              <p>Topics:</p>
-              <p className="font-normal">{topicString}</p>
+
+          {/* DISPLAYING THE INDEXED */}
+          {questionLeafs && (
+            <div className="flex flex-col gap-1">
+              {Object.keys(questionLeafs).map((key: string) => (
+                // {/* Display the main index */}
+                <div key={key} className="flex flex-1 gap-2">
+                  <span className="inline-block text-sm">({key})</span>
+                  <div key={key} className="flex flex-col gap-1">
+                    {/* Display the root content of the index  */}
+                    {questionIndexedParts[key]["root"] &&
+                      questionIndexedParts[key]["root"].map((part) => {
+                        const { isText, content, id } = part;
+                        return (
+                          <QuestionSectionDisplay
+                            id={id}
+                            content={content}
+                            key={id}
+                            isText={isText}
+                          />
+                        );
+                      })}
+                    {questionLeafs[key].map((subKey: string) => (
+                      <div key={subKey} className="flex items-start gap-2">
+                        <span className="inline-block text-sm">({subKey})</span>
+                        <div className="flex-1">
+                          {questionIndexedParts[key][subKey].map(
+                            (part: ProcessedQuestionPart, idx: number) => {
+                              const { isText, content, id } = part;
+                              return (
+                                <QuestionSectionDisplay
+                                  id={id}
+                                  content={content}
+                                  key={id}
+                                  isText={isText}
+                                />
+                              );
+                            }
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
-          {questionNumber && (
-            <p>
-              Question Number:{" "}
-              <span className="font-normal">{questionNumber}</span>
-            </p>
-          )}
         </div>
-
-        {/* DISPLAYING THE CONTENT FOR ROOT ELEMENT */}
-        {/* TODO: CREATING A COMPONENT QuestionSectionDisplay, and then use React memo on it */}
-        {questionRoot.length > 0 && (
-          <main className="flex flex-col gap-1 justify-center items-center">
-            {questionRoot.map((part: ProcessedQuestionPart, idx: number) => {
-              // Return the root elements here
-              const { isText, content, id } = part;
-              return (
-                <QuestionSectionDisplay
-                  id={id}
-                  content={content}
-                  key={id}
-                  isText={isText}
-                />
-              );
-            })}
-          </main>
-        )}
-
-        {/* DISPLAYING THE INDEXED */}
-        {questionLeafs && (
-          <div className="flex flex-col gap-2">
-            {Object.keys(questionLeafs).map((key: string) => (
-              // {/* Display the main index */}
-              <div key={key} className="flex flex-1 gap-2">
-                <span className="inline-block text-sm">({key})</span>
-                <div key={key} className="flex flex-col gap-1">
-                  {/* Display the root content of the index  */}
-                  {questionIndexedParts[key]["root"] &&
-                    questionIndexedParts[key]["root"].map((part) => {
-                      const { isText, content, id } = part;
-                      return (
-                        <QuestionSectionDisplay
-                          id={id}
-                          content={content}
-                          key={id}
-                          isText={isText}
-                        />
-                      );
-                    })}
-                  {questionLeafs[key].map((subKey: string) => (
-                    <div key={subKey} className="flex items-start gap-2">
-                      <span className="inline-block text-sm">({subKey})</span>
-                      <div className="flex-1">
-                        {questionIndexedParts[key][subKey].map(
-                          (part: ProcessedQuestionPart, idx: number) => {
-                            const { isText, content, id } = part;
-                            return (
-                              <QuestionSectionDisplay
-                                id={id}
-                                content={content}
-                                key={id}
-                                isText={isText}
-                              />
-                            );
-                          }
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

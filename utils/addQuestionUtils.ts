@@ -72,6 +72,7 @@ export const OEQAnswerSchema = z.array(
     questionIdx: z.string(),
     questionSubIdx: z.string(),
     answer: z.string().min(1, { message: "Answer cannot be empty" }),
+    id: z.string()
   })
 );
 
@@ -217,6 +218,8 @@ export function processQuestionPartIntoQuestionContentJSON(
       }
     );
   });
+  // console.log(JSON.stringify(tempLeafSets, null, 2));
+  
 
   if (Object.keys(tempLeafSets).length === 0 || questionType === "MCQ") {
     questionContentJSON.questionLeafs = null;
@@ -244,7 +247,10 @@ export function questionAnswerRequiresReset(
   questionType: string,
   questionAnswer: z.infer<typeof answerCombinedSchema>
 ) {
+  console.log("watchedQuestionAnswer:" +questionAnswer);
   // FIRST, DETERMINE IF questionAnswer REQUIRES A RESET
+  if (questionAnswer.length === 0) return true;
+  
   const firstObj = questionAnswer[0];
   if (questionType === "MCQ") {
     // IF questionType is MCQ, questionAnswer should be an array containing a singular object
@@ -327,7 +333,7 @@ export function createQuestionAnswerValueWithoutReset(
     return questionAnswer;
   }else if(questionType === "OEQ"){
     const newQuestionAnswerValue: { questionIdx: string; questionSubIdx: string; answer: string }[] = [];
-    questionAnswer = questionAnswer as { questionIdx: string; questionSubIdx: string; answer: string }[]
+    questionAnswer = questionAnswer as { questionIdx: string; questionSubIdx: string; answer: string; id:string }[]
     if(!questionLeafs){
       // IF questionLeafs is NULL, we search for an object in questionAnswer that has "root", "root" for questionIdx and questionSubIdx
       // IF FOUND, WE TAKE IT AS THE NEW QUESTION ANSWER VALUE

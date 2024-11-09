@@ -13,15 +13,18 @@ import { School, Subject, Topic } from "@prisma/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { debounce } from "lodash";
 import React, { createContext, ReactNode, useMemo, useRef } from "react";
+import { parseStringify } from '../../utils/utils';
 
 interface FormDataContext {
   update: (updatedFormData: AddQuestionFormData) => void;
   subscribe: (subscriber: AddQuestionFormDataSubscriber) => () => void;
+  retrieve: () => AddQuestionFormData;
 }
 
 interface QuestionContentJSONContext {
   update: (updatedQuestionContentJSON: ProcessedQuestionContentCombinedJSON) => void;
   subscribe: (subscriber: AddQuestionQuestionContentJSONSubscriber) => () => void;
+  retrieve: () => ProcessedQuestionContentCombinedJSON;
 }
 
 interface DataContext {
@@ -68,7 +71,7 @@ function AddQuestionContextProvider({ children }: { children: ReactNode }) {
       formDataSubscribers.current.forEach((subscriber) => {
         subscriber(updatedFormData);
       });
-    }, 1000) // Adjust the debounce delay (300ms in this case) as needed
+    }, 300) // Adjust the debounce delay (300ms in this case) as needed
   ).current;
 
   // Let the subscribeToFormData be a Ref as well to increase stability
@@ -80,6 +83,7 @@ function AddQuestionContextProvider({ children }: { children: ReactNode }) {
     }
   ).current;
 
+  const retrieveFormData = () => addQuestionFormData.current;
 
 
   // Track QuestionContentJSON for questionLeafs that is required in the 3rd step of the form
@@ -111,16 +115,19 @@ function AddQuestionContextProvider({ children }: { children: ReactNode }) {
       return () => questionContentJSONSubscribers.current.delete(subscriber);
     }
   ).current;
+  const retrieveQuestionContentJSON = () => questionContentJSON.current;
 
   const AddQuestionContextValue = useMemo(() => {
     return {
       formData: {
         update: debouncedUpdateFormData,
         subscribe: subscribeToFormData,
+        retrieve: retrieveFormData
       },
       questionContentJSON:{
         update: updateQuestionContentJSON,
-        subscribe: subscribeToQuestionContentJSON
+        subscribe: subscribeToQuestionContentJSON,
+        retrieve: retrieveQuestionContentJSON
       },
       data: {
         subjects: allSubjects,

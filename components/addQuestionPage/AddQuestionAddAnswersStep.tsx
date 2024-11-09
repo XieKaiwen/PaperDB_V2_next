@@ -1,45 +1,78 @@
-import { useAddQuestionContext } from '@/src/hooks/useAddQuestionContext'
-import { AddQuestionFormData, ProcessedQuestionContentCombinedJSON } from '@/src/types/types'
-import { contentTypeSchema, createQuestionAnswerValueAfterReset, createQuestionAnswerValueWithoutReset, questionAnswerRequiresReset } from '@/utils/addQuestionUtils'
-import React, { useEffect, useState } from 'react'
-import { useFormContext, useWatch } from 'react-hook-form'
-import { z } from 'zod'
+import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
+import {
+  AddQuestionFormData,
+  ProcessedQuestionContentCombinedJSON,
+} from "@/src/types/types";
+import {
+  contentTypeSchema,
+  createQuestionAnswerValueAfterReset,
+  createQuestionAnswerValueWithoutReset,
+  OEQAnswerSchema,
+  questionAnswerRequiresReset,
+} from "@/utils/addQuestionUtils";
+import React, { use, useEffect, useState } from "react";
+import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
+import { z } from "zod";
+import { answerCombinedSchema } from "../../utils/addQuestionUtils";
+import CustomTextArea from "../form-components/CustomTextArea";
 
 export default function AddQuestionAddAnswersStep() {
-    const {control, setValue, getValues, resetField} = useFormContext<AddQuestionFormData>()   
-    const {formData: {subscribe: subscribeToFormData}, questionContentJSON:{subscribe: subscribeToQuestionContentJSON}} = useAddQuestionContext()
-    const [questionContent, setQuestionContent] = useState<ProcessedQuestionContentCombinedJSON>({
-        questionContent: {
-          root: [],
-          indexed: {},
-        },
-        questionLeafs: {},
-    });
-    const [formData, setFormData] = useState<AddQuestionFormData>({});
+  /**
+   * TODO: Alter the component in the following ways:
+   * Since this component is conditionally rendered, we have to pass down props of questionType down
+   * from the parent form
+   * And we need to we need 2 useEffects, one to retrieve the questionContentJSON once when first mounted, with no dependencies
+   * Another to subscribe to the questionContentJSON whenever it changes
+   *
+   */
+  const { control, setValue, resetField } =
+    useFormContext<AddQuestionFormData>();
+  const {
+    questionContentJSON: {
+      subscribe: subscribeToQuestionContentJSON,
+      retrieve: retrieveQuestionContentJSON,
+    },
+  } = useAddQuestionContext();
+  const [questionContent, setQuestionContent] = useState<
+    ProcessedQuestionContentCombinedJSON | undefined
+  >(undefined);
+  // const [formData, setFormData] = useState<AddQuestionFormData>(undefined);
 
-    // SUBSCRIBE TO UPDATES WHEN COMPONENT MOUNTS
-    useEffect(() => {
-        const unsubscribeToFormData = subscribeToFormData((updatedFormData) => {
-          setFormData(updatedFormData);
-        });
+  const [watchedQuestionAnswer, watchedQuestionType] = useWatch({
+    control,
+    name: ["questionAnswer", "questionType"],
+  }) as [z.infer<typeof answerCombinedSchema>, string];
 
-        const unsubscribeToQuestionContentJSON = subscribeToQuestionContentJSON((updatedQuestionContentJSON) => {
-          setQuestionContent(updatedQuestionContentJSON);
-        })
-    
-        return () =>{
-            unsubscribeToFormData();
-            unsubscribeToQuestionContentJSON();
-        };
-    }, [setFormData, setQuestionContent]);
+  // RETRIEVE THE FORM DATA AND QUESTION CONTENT FROM CONTEXT WHEN MOUNT
+  useEffect(() => {
+    // setFormData(retrieveFormData());
+    setQuestionContent(retrieveQuestionContentJSON());
+    // console.log("called retrieveQuestionContentJSON on AddQuestionAddAnswersStep mount");
+  }, []);
 
-    // DESTRUCTURE FORMDATA AND QUESTION CONTENT TO ONLY KEEP RELEVANT PARTS
-    const {questionType} = formData
-    const {questionLeafs} = questionContent
+  // SUBSCRIBE TO UPDATES WHEN COMPONENT MOUNTS
+  useEffect(() => {
+    // const unsubscribeToFormData = subscribeToFormData((updatedFormData) => {
+    //   setFormData(updatedFormData);
+    // });
 
+    const unsubscribeToQuestionContentJSON = subscribeToQuestionContentJSON(
+      (updatedQuestionContentJSON) => {
+        setQuestionContent(updatedQuestionContentJSON);
+        // console.log("Receive updatedQuestionContentJSON in AddQuestionAddAnswersStep");
+      }
+    );
 
-    useEffect(() => {
-    // In this useEffect, we will track the questionType and questionPart through context. 
+    return () => {
+      unsubscribeToQuestionContentJSON();
+    };
+  }, [setQuestionContent]);
+
+  const questionLeafs = questionContent?.questionLeafs;
+  console.log("questionContent:" + JSON.stringify(questionContent, null, 2));
+
+  useEffect(() => {
+    // In this useEffect, we will track the questionType and questionPart through context.
     // Whenever it changes, we will alter the value in questionAnswer
     // If chosenQuestionType is MCQ:
     // 1. Check if value in questionAnswer is an object, if it isnt, make it an object with option and answer
@@ -50,22 +83,61 @@ export default function AddQuestionAddAnswersStep() {
      * 3. If it is an array, first filter through the current array and see if there is any objects to reuse, filter out the ones not useful and add in appropriate objects.
      * 4. Then setValue on the questionAnswer field.
      */
-     const questionAnswer = getValues('questionAnswer');
     //  TODO: TO BE TESTED
-     const requireReset = questionAnswerRequiresReset(questionType, questionAnswer);
-     if (requireReset) {
-        resetField('questionAnswer', {defaultValue:[]})
-        const newQuestionAnswerValue = createQuestionAnswerValueAfterReset(questionType, questionLeafs);
-        setValue('questionAnswer', newQuestionAnswerValue);
-     }else{
-        const newQuestionAnswerValue = createQuestionAnswerValueWithoutReset(questionType, questionLeafs, questionAnswer);
-        setValue('questionAnswer', newQuestionAnswerValue);
-     }
-      
-    }, [questionType, questionLeafs])
-    
+    if (!questionContent) {
+      return;
+    }
+
+    const requireReset = questionAnswerRequiresReset(
+      watchedQuestionType,
+      watchedQuestionAnswer
+    );
+    if (requireReset) {
+      resetField("questionAnswer", { defaultValue: [] });
+      const newQuestionAnswerValue = createQuestionAnswerValueAfterReset(
+        watchedQuestionType,
+        questionLeafs!
+      );
+      setValue("questionAnswer", newQuestionAnswerValue);
+    } else {
+      const newQuestionAnswerValue = createQuestionAnswerValueWithoutReset(
+        watchedQuestionType,
+        questionLeafs!,
+        watchedQuestionAnswer
+      );
+      setValue("questionAnswer", newQuestionAnswerValue);
+    }
+    // console.log("Call useEffect for updating questionAnswer");
+  }, [watchedQuestionType, questionLeafs]);
+  // console.log("questionAnswer:" + JSON.stringify(watchedQuestionAnswer, null, 2));
+
+  // USE useFieldArray to render the questionAnswer INPUTS
+  // NO NEED FOR append and remove, BECAUSE USER DOES NOT NEED TO ADD OR REMOVE ANSWERS
+  const { fields } = useFieldArray<AddQuestionFormData>({
+    control,
+    name: "questionAnswer",
+  }) as { fields: z.infer<typeof OEQAnswerSchema> };
+
+  // TODO: Use useFieldArray to append and remove options
 
   return (
-    <div>AddQuestionAddAnswersStep</div>
-  )
+    // <pre>{JSON.stringify(watchedQuestionAnswer, null, 2)}</pre>
+    <>
+      {watchedQuestionType === "OEQ" && (
+        <div className="w-full space-y-3">
+          {fields.map((answerPart, index) => {
+            const { questionIdx, questionSubIdx, answer } = answerPart;
+            return (
+              <CustomTextArea<AddQuestionFormData>
+                key={answerPart.id}
+                control={control}
+                name={`questionAnswer.${index}.answer`}
+                label={`Answer for ${questionIdx}-${questionSubIdx}`}
+              />
+            );
+          })}
+        </div>
+      )}
+    </>
+  );
 }

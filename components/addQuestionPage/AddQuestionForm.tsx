@@ -80,7 +80,7 @@ export default function AddQuestionForm() {
       questionType: "",
       questionNumber: "",
       questionPart: [],
-      questionAnswer: undefined,
+      questionAnswer: [],
     },
   });
 
@@ -113,10 +113,17 @@ export default function AddQuestionForm() {
     topics,
     examType,
     questionType,
-    questionNumber,
-    questionPart,
-    questionAnswer,
+    questionNumber
   ] = watchedValues;
+  // SEPARATE questionPart AND questionAnswer INTO SEPARATE useWatch, for more stable references
+  const questionPart = useWatch({
+    control,
+    name: "questionPart",
+  });
+  const questionAnswer = useWatch({
+    control,
+    name: "questionAnswer",
+  });
 
   useEffect(() => {
     debounceUpdateFormData({
@@ -165,7 +172,7 @@ export default function AddQuestionForm() {
         console.log(validationResult)
         validationResult.error.errors.forEach((error) => {
           const { message, path } = error;
-          setError(path[0] as Path<AddQuestionFormData>, {
+          setError(path.join(".") as Path<AddQuestionFormData>, {
             message,
           });
         });
