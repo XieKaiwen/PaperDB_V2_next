@@ -28,6 +28,11 @@ body::-webkit-scrollbar {
 }
 
 /* Headings */
+.markdown-question-text * {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
 .markdown-question-text h1,
 .markdown-question-text h2,
 .markdown-question-text h3,
@@ -166,4 +171,36 @@ body::-webkit-scrollbar {
   height: 1px;
   background: #ddd;
   margin: 1.5em 0;
+}
+
+@layer components {
+
+  .question-content-container {
+    @apply flex flex-col gap-6;
+  }
+
+  .question-section-content {
+    @apply flex flex-col flex-1 gap-1 items-center justify-center;
+  }
+
+  .question-leafs {
+    @apply flex flex-col gap-6;
+  }
+
+  .question-indexed-section {
+    @apply flex flex-1 gap-4;
+  }
+
+  .question-index-label,
+  .question-subindex-label {
+    @apply text-sm;
+  }
+
+  /* .question-index-root {
+    @apply flex flex-col gap-2;
+  } */
+
+  .question-subindexed-section {
+    @apply flex flex-col gap-3;
+  }
 }

@@ -5,12 +5,13 @@ import {
 } from "@/src/constants/constants";
 import {
   AddQuestionFormQuestionPart,
+  ProcessedQuestionAnswerJSON,
   ProcessedQuestionContentCombinedJSON,
   ProcessedQuestionPart,
 } from "@/src/types/types";
 import { exam_type } from "@prisma/client";
 import { z } from "zod";
-import { convertRomanToInt } from "./utils";
+import { convertRomanToInt, parseStringify } from "./utils";
 
 const textQuestionPartSchema = z.object({
   questionIdx: z.string().min(1, { message: "Choose an index" }),
@@ -60,7 +61,9 @@ export const MCQAnswerSchema = z
       options: z
         .array(z.string())
         .min(2, { message: "At least 2 options are required" }),
-      answer: z.string().min(1, { message: "Choose a correct answer" }),
+      answer: z.array(z.string()).min(1, {
+        message:"There must be at least 1 correct answer",
+      }),
     })
   )
   .max(1, { message: "MCQ should only have 1 answer input" });
@@ -278,7 +281,7 @@ export function createQuestionAnswerValueAfterReset(
 
   if (questionType === "MCQ") {
     // FOR MCQ, JUST UPDATE IT TO ARRAY WITH THE BAREBONES OBJECT
-    return [{ options: [], answer: "" }];
+    return [{ options: [], answer: [] }] as [{options: string[], answer: string[]}];
   } else if (questionType === "OEQ") {
     const newQuestionAnswerValue = [];
 
@@ -397,4 +400,55 @@ export function createQuestionAnswerValueWithoutReset(
       return newQuestionAnswerValue;
     }
   }
+}
+
+
+// FOR PROCESSING questionAnswer into questionAnswerJSON
+/**
+ * For OEQ:
+ * [
+  * {
+  *    questionIdx: string;
+  *    questionSubIdx: string;
+  *    answer: string;
+  * }
+ * ]
+ * should be turned into
+ * {
+ *  questionIdx: {
+ *   questionSubIdx: "answer"
+ *  }
+ * }
+ * IF questionLeafs is NULL, then the only combination possible is root-root
+ * 
+ * For MCQ: 
+ * [
+ *  {
+ *    options: []
+ *    answer: []
+ *  }
+ * ]
+ * 
+ * Just extract out the one object for answer object. It will be corresponding displayed at 
+ * the root of the question. 
+ */
+
+export function processMCQQuestionAnswerIntoJSON(questionAnswer: z.infer<typeof MCQAnswerSchema>){
+  if(questionAnswer.length===0){
+    return {}
+  }
+  return parseStringify(questionAnswer[0])
+}
+
+export function processOEQQuestionAnswerIntoJSON(questionAnswer: z.infer<typeof OEQAnswerSchema>) {
+  const processedQuestionAnswerJSON: ProcessedQuestionAnswerJSON = {}
+  
+  questionAnswer.forEach((answer) => {
+    if(!processedQuestionAnswerJSON[answer.questionIdx]){
+      processedQuestionAnswerJSON[answer.questionIdx] = {}
+    }
+    processedQuestionAnswerJSON[answer.questionIdx][answer.questionSubIdx] = answer.answer
+  })
+  
+  return processedQuestionAnswerJSON
 }

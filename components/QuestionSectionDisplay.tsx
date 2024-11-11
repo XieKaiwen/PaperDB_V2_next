@@ -40,10 +40,9 @@ const QuestionSectionDisplay = React.memo(function QuestionSectionDisplay({
 
     return (
       <div
-        className="w-full text-sm text-start whitespace-pre-wrap break-words markdown-question-text"
+        className="w-full text-sm text-start break-words markdown-question-text"
         dangerouslySetInnerHTML={{ __html: processedHTML }}
-      >
-      </div>
+      ></div>
     );
   } else {
     return (

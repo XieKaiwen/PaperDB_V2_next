@@ -17,14 +17,6 @@ import { answerCombinedSchema } from "../../utils/addQuestionUtils";
 import CustomTextArea from "../form-components/CustomTextArea";
 
 export default function AddQuestionAddAnswersStep() {
-  /**
-   * TODO: Alter the component in the following ways:
-   * Since this component is conditionally rendered, we have to pass down props of questionType down
-   * from the parent form
-   * And we need to we need 2 useEffects, one to retrieve the questionContentJSON once when first mounted, with no dependencies
-   * Another to subscribe to the questionContentJSON whenever it changes
-   *
-   */
   const { control, setValue, resetField } =
     useFormContext<AddQuestionFormData>();
   const {
@@ -132,7 +124,8 @@ export default function AddQuestionAddAnswersStep() {
                 key={answerPart.id}
                 control={control}
                 name={`questionAnswer.${index}.answer`}
-                label={`Answer for ${questionIdx}-${questionSubIdx}`}
+                label={`Answer for (${questionIdx})(${questionSubIdx})`}
+                placeholder="Enter the answer..."
               />
             );
           })}

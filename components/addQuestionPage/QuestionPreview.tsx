@@ -2,15 +2,19 @@ import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
 import { AddQuestionFormData, ProcessedQuestionPart } from "@/src/types/types";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { processQuestionPartIntoQuestionContentJSON } from "@/utils/addQuestionUtils";
+import {
+  processMCQQuestionAnswerIntoJSON,
+  processOEQQuestionAnswerIntoJSON,
+  processQuestionPartIntoQuestionContentJSON,
+} from "@/utils/addQuestionUtils";
 import QuestionSectionDisplay from "../QuestionSectionDisplay";
+import QuestionLeafAnswerDisplay from "../QuestionLeafAnswerDisplay";
 
 // TODO: Scrap the live preview and make it such that its a generated preview when clicking a button, to optimise the user experience, fix the "laggy input issue"
 
 export default function QuestionPreview() {
   const {
     formData: { subscribe: subscribeToFormData },
-    data: { schools: allSchools, subjects: allSubjects, topics: allTopics },
     questionContentJSON: { update: updateQuestionContentJSON },
   } = useAddQuestionContext();
   const [formData, setFormData] = useState<AddQuestionFormData>({});
@@ -25,21 +29,6 @@ export default function QuestionPreview() {
     return () => unsubscribeToFormData();
   }, [setFormData]);
 
-  // FUNCTION FOR CONSTRUCTING the question title: school name, year, education level and examType
-  function constructQuestionTitle(
-    schoolId: string,
-    year: string,
-    educationLevel: string,
-    examType: string
-  ) {
-    const schoolName =
-      allSchools.find((school) => school.id === schoolId)?.schoolFullName || "";
-    const yearName = year ? `(${year})` : "";
-
-    // return `${schoolName} ${yearName} ${educationLevel ? `- ${educationLevel}` : ""}`
-    return [`${schoolName} ${yearName}`, `${educationLevel} ${examType}`];
-  }
-
   // Deconstruct formData
   const {
     year = "",
@@ -51,30 +40,13 @@ export default function QuestionPreview() {
     questionType = "", // Do not need to display this
     questionNumber = "",
     questionPart = [],
+    questionAnswer = [],
   } = formData as AddQuestionFormData;
-  console.log("questionPart:" + JSON.stringify(questionPart, null, 2));
-  // CONSTRUCT THE QUESTION TITLE
-  const questionTitle = constructQuestionTitle(
-    chosenSchool,
-    year,
-    educationLevel,
-    examType || ""
-  );
-
-  // CREATE LIST OF TOPICS
-  const topicString = useMemo(() => {
-    const topicList: string[] = chosenTopics.map(
-      (topicId: string) =>
-        allTopics.find((topic) => topic.id === topicId)?.topicName
-    );
-    topicList.sort((a, b) => a.localeCompare(b));
-    return topicList.join(", ");
-  }, [chosenTopics]);
-  // Cannot have any return statements before hooks
+  console.log("questionPart:" + JSON.stringify(formData, null, 2));
 
   // CONSTRUCT THE QuestionContentCombinedJSON here
   const questionContentCombinedJSON = useMemo(() => {
-    console.log("Recalculating questionContentCombinedJSON in QuestionPreview");
+    // console.log("Recalculating questionContentCombinedJSON in QuestionPreview");
 
     return processQuestionPartIntoQuestionContentJSON(
       questionPart,
@@ -97,108 +69,253 @@ export default function QuestionPreview() {
     "questionContentCombinedJSON: " +
       JSON.stringify(questionContentCombinedJSON, null, 2)
   );
+
+  const questionAnswerJSON = useMemo(() => {
+    return questionType === "MCQ"
+      ? processMCQQuestionAnswerIntoJSON(questionAnswer)
+      : processOEQQuestionAnswerIntoJSON(questionAnswer);
+  }, [questionAnswer]);
+  console.log(
+    "questionAnswerJSON: " + JSON.stringify(questionAnswerJSON, null, 2)
+  );
+
+  // FUNCTION TO CHECK IF TO DISPLAY THE ANSWER PART:
+  // If questionType is OEQ, we need to check the appropriate keys exists on the JSON
+  // If questionType is MCQ, we need to check if options and answer exists on the JSON
+
+  function checkIfToDisplayAnswerPart(
+    questionType: string,
+    index: string,
+    subIndex: string
+  ) {
+    if (questionType === "MCQ") {
+      return (
+        questionAnswerJSON.options !== undefined &&
+        questionAnswerJSON.answer !== undefined
+      );
+    } else if (questionType === "OEQ") {
+      return (
+        questionAnswerJSON[index] !== undefined &&
+        questionAnswerJSON[index][subIndex] !== undefined
+      );
+    }
+    return false; // Return false for any other questionType
+  }
+
   return (
     // TODO: Create a question title component
     <div className="w-full">
-      <div className="space-y-6">
-        <div className="space-y-2 w-full">
-          <div className="flex flex-1 flex-col justify-center items-center font-merriweather font-bold">
-            <h2 className="text-lg">{questionTitle[0]}</h2>
-            <h3 className="text-base">{questionTitle[1]}</h3>
-          </div>
-          <div className="flex flex-1 flex-col space-y-2 justify-center items-center text-sm font-semibold">
-            {chosenSubject && (
-              <p>
-                Subject:{" "}
-                <span className="font-normal">
-                  {
-                    allSubjects.find((subject) => subject.id === chosenSubject)
-                      ?.subjectName
-                  }
-                </span>
-              </p>
-            )}
-            {topicString && (
-              <div className="w-full lg:w-1/2 text-center space-y-1">
-                <p>Topics:</p>
-                <p className="font-normal">{topicString}</p>
-              </div>
-            )}
-            {questionNumber && (
-              <p>
-                Question Number:{" "}
-                <span className="font-normal">{questionNumber}</span>
-              </p>
-            )}
-          </div>
-        </div>
-        <div className="space-y-1 w-full">
-          {/* DISPLAYING THE CONTENT FOR ROOT ELEMENT */}
-          {/* TODO: CREATING A COMPONENT QuestionSectionDisplay, and then use React memo on it */}
+      <main className="space-y-10">
+        <QuestionMetaDataDisplay
+          chosenSchool={chosenSchool}
+          chosenTopics={chosenTopics}
+          chosenSubject={chosenSubject}
+          year={year}
+          educationLevel={educationLevel}
+          examType={examType}
+          questionNumber={questionNumber}
+          questionType={questionType}
+        />
+        <div className="question-content-container">
           {questionRoot.length > 0 && (
-            <main className="flex flex-col gap-1 justify-center items-center">
-              {questionRoot.map((part: ProcessedQuestionPart, idx: number) => {
-                // Return the root elements here
-                const { isText, content, id } = part;
-                return (
-                  <QuestionSectionDisplay
-                    id={id}
-                    content={content}
-                    key={id}
-                    isText={isText}
-                  />
-                );
-              })}
-            </main>
+            <div className="flex flex-col gap-2">
+              <main className="question-section-content">
+                {questionRoot.map(
+                  (part: ProcessedQuestionPart, idx: number) => {
+                    // Return the root elements here
+                    const { isText, content, id } = part;
+                    return (
+                      <QuestionSectionDisplay
+                        id={id}
+                        content={content}
+                        key={id}
+                        isText={isText}
+                      />
+                    );
+                  }
+                )}
+              </main>
+              {/* MCQ Answers should only be displayed under the root because MCQ only has a root section */}
+
+              {questionType === "OEQ" &&
+                checkIfToDisplayAnswerPart("OEQ", "root", "root") && (
+                  <QuestionLeafAnswerDisplay questionType="OEQ" content={questionAnswerJSON["root"]["root"]}  />
+                )}
+            </div>
           )}
 
           {/* DISPLAYING THE INDEXED */}
+          {/* gap-6 between each indexed part */}
           {questionLeafs && (
-            <div className="flex flex-col gap-1">
+            <div className="question-leafs"> 
               {Object.keys(questionLeafs).map((key: string) => (
                 // {/* Display the main index */}
-                <div key={key} className="flex flex-1 gap-2">
-                  <span className="inline-block text-sm">({key})</span>
-                  <div key={key} className="flex flex-col gap-1">
-                    {/* Display the root content of the index  */}
-                    {questionIndexedParts[key]["root"] &&
-                      questionIndexedParts[key]["root"].map((part) => {
-                        const { isText, content, id } = part;
-                        return (
-                          <QuestionSectionDisplay
-                            id={id}
-                            content={content}
-                            key={id}
-                            isText={isText}
-                          />
-                        );
-                      })}
-                    {questionLeafs[key].map((subKey: string) => (
-                      <div key={subKey} className="flex items-start gap-2">
-                        <span className="inline-block text-sm">({subKey})</span>
-                        <div className="flex-1">
-                          {questionIndexedParts[key][subKey].map(
-                            (part: ProcessedQuestionPart, idx: number) => {
-                              const { isText, content, id } = part;
-                              return (
-                                <QuestionSectionDisplay
-                                  id={id}
-                                  content={content}
-                                  key={id}
-                                  isText={isText}
-                                />
-                              );
-                            }
-                          )}
-                        </div>
+                <div key={key} className="question-indexed-section">
+                  <span className="question-index-label">({key})</span>
+
+                  {questionIndexedParts[key]["root"] && (
+                    <div className="question-index-root flex flex-col gap-2">
+                      {/* Display the root content of the index  */}
+                      <div key={key} className="question-section-content">
+                        {questionIndexedParts[key]["root"].map((part) => {
+                          const { isText, content, id } = part;
+                          return (
+                            <QuestionSectionDisplay
+                              id={id}
+                              content={content}
+                              key={id}
+                              isText={isText}
+                            />
+                          );
+                        })}
                       </div>
-                    ))}
-                  </div>
+                      {questionType === "OEQ" &&
+                        checkIfToDisplayAnswerPart("OEQ", key, "root") && (
+                          <QuestionLeafAnswerDisplay questionType="OEQ" content={questionAnswerJSON[key]["root"]}  />
+                        )}
+                    </div>
+                  )}
+
+                  {/* Display the sub-index content for indexed questions */}
+                  {questionLeafs[key].length > 0 && (
+                    <div className="question-subindexed-section">
+                      {" "}
+                      {questionLeafs[key].map((subKey: string) => (
+                        <div
+                          key={subKey}
+                          className="question-indexed-part flex flex-col gap-2"
+                        >
+                          <div className="flex items-start gap-2">
+                            <span className="question-subindex-label">
+                              ({subKey})
+                            </span>
+                            <div className="question-section-content">
+                              {questionIndexedParts[key][subKey].map(
+                                (part: ProcessedQuestionPart, idx: number) => {
+                                  const { isText, content, id } = part;
+                                  return (
+                                    <QuestionSectionDisplay
+                                      id={id}
+                                      content={content}
+                                      key={id}
+                                      isText={isText}
+                                    />
+                                  );
+                                }
+                              )}
+                            </div>
+                          </div>
+                          {/* OEQ format of displaying the answer */}
+                          {questionType === "OEQ" &&
+                            checkIfToDisplayAnswerPart("OEQ", key, subKey) && (
+                              <QuestionLeafAnswerDisplay questionType="OEQ" content={questionAnswerJSON[key][subKey]}  />
+                            )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           )}
         </div>
+      </main>
+    </div>
+  );
+}
+
+interface QuestionMetaDataDisplay {
+  chosenSchool: string;
+  chosenTopics: string[];
+  chosenSubject: string;
+  year: string;
+  educationLevel: string;
+  examType: string;
+  questionNumber: string;
+  questionType: string;
+}
+
+function QuestionMetaDataDisplay({
+  chosenSchool,
+  chosenTopics,
+  chosenSubject,
+  year,
+  educationLevel,
+  examType,
+  questionNumber,
+  questionType,
+}: QuestionMetaDataDisplay) {
+  const {
+    data: { schools: allSchools, topics: allTopics, subjects: allSubjects },
+  } = useAddQuestionContext();
+  function constructQuestionTitle(
+    schoolId: string,
+    year: string,
+    educationLevel: string,
+    examType: string
+  ) {
+    const schoolName =
+      allSchools.find((school) => school.id === schoolId)?.schoolFullName || "";
+    const yearName = year ? `(${year})` : "";
+
+    // return `${schoolName} ${yearName} ${educationLevel ? `- ${educationLevel}` : ""}`
+    return [`${schoolName} ${yearName}`, `${educationLevel} ${examType}`];
+  }
+
+  const questionTitle = constructQuestionTitle(
+    chosenSchool,
+    year,
+    educationLevel,
+    examType || ""
+  );
+
+  // CREATE LIST OF TOPICS
+  const topicString = useMemo(() => {
+    const topicList: string[] = chosenTopics.map(
+      (topicId: string) =>
+        allTopics.find((topic) => topic.id === topicId)!?.topicName
+    );
+    topicList.sort((a, b) => a.localeCompare(b));
+    return topicList.join(", ");
+  }, [chosenTopics]);
+
+  return (
+    <div className="space-y-2 w-full">
+      <div className="flex flex-1 flex-col justify-center items-center font-merriweather font-bold">
+        <h2 className="text-lg">{questionTitle[0]}</h2>
+        <h3 className="text-base">{questionTitle[1]}</h3>
+      </div>
+      <div className="flex flex-1 flex-col space-y-1 justify-center items-center text-sm font-semibold">
+        {chosenSubject && (
+          <p>
+            Subject:{" "}
+            <span className="font-normal">
+              {
+                allSubjects.find((subject) => subject.id === chosenSubject)
+                  ?.subjectName
+              }
+            </span>
+          </p>
+        )}
+        {topicString && (
+          <div className="w-full lg:w-1/2 text-center space-y-1">
+            <p>Topics:</p>
+            <p className="font-normal">
+              <em>{topicString}</em>
+            </p>
+          </div>
+        )}
+        {questionNumber && (
+          <p>
+            Question Number:{" "}
+            <span className="font-normal">{questionNumber}</span>
+          </p>
+        )}
+        {questionType && (
+          <p>
+            Question Type: <span className="font-normal">{questionType}</span>
+          </p>
+        )}
       </div>
     </div>
   );
