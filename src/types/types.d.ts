@@ -103,11 +103,16 @@ type ProcessedQuestionContentCombinedJSON = {
   questionLeafs: { [key: string]: string[] } | null;
 };
 
-type ProcessedQuestionAnswerJSON = {
+type ProcessedOEQQuestionAnswerJSON = {
   [key:string]:{
-    [subkey:string]: string
+    [subkey:string]:{ 
+      answer: string|File,
+      isText: boolean
+    }
   }
 }
+
+type AddQuestionAnswerItem = { questionIdx: string; questionSubIdx: string; answer: string; isText: true; id: string } | { id: string; questionIdx: string; questionSubIdx: string; answer: File; isText: false } 
 
 declare interface AuthFormProps {
   type: "sign-up" | "login";

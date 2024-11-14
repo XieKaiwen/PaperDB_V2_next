@@ -4,20 +4,21 @@ import {
   ProcessedQuestionContentCombinedJSON,
 } from "@/src/types/types";
 import {
-  contentTypeSchema,
   createQuestionAnswerValueAfterReset,
   createQuestionAnswerValueWithoutReset,
   OEQAnswerSchema,
   questionAnswerRequiresReset,
 } from "@/utils/addQuestionUtils";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { answerCombinedSchema } from "../../utils/addQuestionUtils";
 import CustomTextArea from "../form-components/CustomTextArea";
+import CustomFileInput from "../form-components/CustomFileInput";
+import { Switch } from "@/components/ui/switch";
 
 export default function AddQuestionAddAnswersStep() {
-  const { control, setValue, resetField } =
+  const { control, setValue, resetField, getValues } =
     useFormContext<AddQuestionFormData>();
   const {
     questionContentJSON: {
@@ -64,18 +65,6 @@ export default function AddQuestionAddAnswersStep() {
   console.log("questionContent:" + JSON.stringify(questionContent, null, 2));
 
   useEffect(() => {
-    // In this useEffect, we will track the questionType and questionPart through context.
-    // Whenever it changes, we will alter the value in questionAnswer
-    // If chosenQuestionType is MCQ:
-    // 1. Check if value in questionAnswer is an object, if it isnt, make it an object with option and answer
-    /**
-     * If chosenQuestionType is OEQ:
-     * 1. Check if value in questionAnswer is an array, if it isnt, make it an array and then perform the following steps
-     * 2. Go through the questionLeafs and create the relevant objects in the array with the corresponding questionIdx and questionSubIdx
-     * 3. If it is an array, first filter through the current array and see if there is any objects to reuse, filter out the ones not useful and add in appropriate objects.
-     * 4. Then setValue on the questionAnswer field.
-     */
-    //  TODO: TO BE TESTED
     if (!questionContent) {
       return;
     }
@@ -105,28 +94,64 @@ export default function AddQuestionAddAnswersStep() {
 
   // USE useFieldArray to render the questionAnswer INPUTS
   // NO NEED FOR append and remove, BECAUSE USER DOES NOT NEED TO ADD OR REMOVE ANSWERS
-  const { fields } = useFieldArray<AddQuestionFormData>({
+  const { fields, update  } = useFieldArray<AddQuestionFormData>({
     control,
     name: "questionAnswer",
-  }) as { fields: z.infer<typeof OEQAnswerSchema> };
+  });
 
-  // TODO: Use useFieldArray to append and remove options
+  function toggleFileClick(index: number) {
+    const answerItem = getValues(`questionAnswer.${index}`);
+  
+    // Create a new object to avoid mutating the existing answerItem
+    const updatedAnswerItem = {
+      ...answerItem,
+      isText: !answerItem.isText,
+      answer: answerItem.isText ? new File([], "") : "", // Toggle between File and string
+    };
+  
+    // Use the update function from useFieldArray to ensure sync
+    update(index, updatedAnswerItem);
+  }
+
+  // TODO: Use useFieldArray to append and remove options for MCQ
 
   return (
     // <pre>{JSON.stringify(watchedQuestionAnswer, null, 2)}</pre>
     <>
+      {watchedQuestionType === "MCQ" && (
+        <div>{JSON.stringify(watchedQuestionAnswer, null, 2)}</div>
+      )}
+
       {watchedQuestionType === "OEQ" && (
         <div className="w-full space-y-3">
           {fields.map((answerPart, index) => {
-            const { questionIdx, questionSubIdx, answer } = answerPart;
+            const { questionIdx, questionSubIdx, isText, answer } = answerPart;
             return (
-              <CustomTextArea<AddQuestionFormData>
-                key={answerPart.id}
-                control={control}
-                name={`questionAnswer.${index}.answer`}
-                label={`Answer for (${questionIdx})(${questionSubIdx})`}
-                placeholder="Enter the answer..."
-              />
+              <div key={answerPart.id}>
+                {isText ? (
+                  <CustomTextArea<AddQuestionFormData>
+                    control={control}
+                    name={`questionAnswer.${index}.answer`}
+                    label={`Answer for (${questionIdx})(${questionSubIdx})`}
+                    placeholder="Enter the answer..."
+                    
+                  />
+                ) : (
+                  <CustomFileInput<AddQuestionFormData>
+                    control={control}
+                    name={`questionAnswer.${index}.answer`}
+                    label={`Answer for (${questionIdx})(${questionSubIdx})`}
+                    key={answerPart.id}
+                  />
+                )}
+                <div className="flex gap-2 mt-3">
+                  Toggle File:
+                  <Switch
+                      checked={!isText}
+                      onCheckedChange={() => toggleFileClick(index)}
+                  />
+                </div>
+              </div>
             );
           })}
         </div>

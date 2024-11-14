@@ -1,5 +1,5 @@
 import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
-import { AddQuestionFormData, ProcessedQuestionPart } from "@/src/types/types";
+import { AddQuestionFormData, ProcessedOEQQuestionAnswerJSON, ProcessedQuestionPart } from "@/src/types/types";
 
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -94,9 +94,10 @@ export default function QuestionPreview() {
         questionAnswerJSON.answer !== undefined
       );
     } else if (questionType === "OEQ") {
+      const tempQuestionAnswerJSON = questionAnswerJSON as ProcessedOEQQuestionAnswerJSON
       return (
-        questionAnswerJSON[index] !== undefined &&
-        questionAnswerJSON[index][subIndex] !== undefined
+        tempQuestionAnswerJSON[index] !== undefined &&
+        tempQuestionAnswerJSON[index][subIndex] !== undefined
       );
     }
     return false; // Return false for any other questionType
@@ -139,7 +140,7 @@ export default function QuestionPreview() {
 
               {questionType === "OEQ" &&
                 checkIfToDisplayAnswerPart("OEQ", "root", "root") && (
-                  <QuestionLeafAnswerDisplay questionType="OEQ" content={questionAnswerJSON["root"]["root"]}  />
+                  <QuestionLeafAnswerDisplay questionType="OEQ" content={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)["root"]["root"]["answer"]} isText={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)["root"]["root"]["isText"]}  />
                 )}
             </div>
           )}
@@ -171,7 +172,7 @@ export default function QuestionPreview() {
                       </div>
                       {questionType === "OEQ" &&
                         checkIfToDisplayAnswerPart("OEQ", key, "root") && (
-                          <QuestionLeafAnswerDisplay questionType="OEQ" content={questionAnswerJSON[key]["root"]}  />
+                          <QuestionLeafAnswerDisplay questionType="OEQ" content={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)[key]["root"]["answer"]} isText={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)[key]["root"]["isText"]} />
                         )}
                     </div>
                   )}
@@ -208,7 +209,7 @@ export default function QuestionPreview() {
                           {/* OEQ format of displaying the answer */}
                           {questionType === "OEQ" &&
                             checkIfToDisplayAnswerPart("OEQ", key, subKey) && (
-                              <QuestionLeafAnswerDisplay questionType="OEQ" content={questionAnswerJSON[key][subKey]}  />
+                              <QuestionLeafAnswerDisplay questionType="OEQ" content={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)[key][subKey]["answer"]} isText={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)[key][subKey]["isText"]} />
                             )}
                         </div>
                       ))}

@@ -4,14 +4,16 @@ import {
   MIN_QUESTION_PART_NUM,
 } from "@/src/constants/constants";
 import {
+  AddQuestionAnswerItem,
   AddQuestionFormQuestionPart,
-  ProcessedQuestionAnswerJSON,
+  ProcessedOEQQuestionAnswerJSON,
   ProcessedQuestionContentCombinedJSON,
   ProcessedQuestionPart,
 } from "@/src/types/types";
 import { exam_type } from "@prisma/client";
 import { z } from "zod";
 import { convertRomanToInt, parseStringify } from "./utils";
+import {v4 as uuidv4 } from "uuid";
 
 const textQuestionPartSchema = z.object({
   questionIdx: z.string().min(1, { message: "Choose an index" }),
@@ -74,9 +76,22 @@ export const OEQAnswerSchema = z.array(
   z.object({
     questionIdx: z.string(),
     questionSubIdx: z.string(),
-    answer: z.string().min(1, { message: "Answer cannot be empty" }),
-    id: z.string()
-  })
+    answer: z.union([
+      z.string().min(1, { message: "Answer cannot be empty" }),
+      z.instanceof(File).refine(
+        (file) => ["image/jpeg", "image/png"].includes(file.type),
+        { message: "File must be a JPEG or PNG image" }
+      )
+    ]),
+    id: z.string(),
+    isText: z.boolean()
+  }).refine(
+    (data) => (data.isText ? typeof data.answer === "string" : data.answer instanceof File),
+    {
+      message: "Answer must be a string if isText is true, or a JPEG/PNG file if isText is false",
+      path: ["answer"],
+    }
+  )
 );
 
 export const answerCombinedSchema = z.union([MCQAnswerSchema, OEQAnswerSchema]);
@@ -291,6 +306,8 @@ export function createQuestionAnswerValueAfterReset(
         questionIdx: "root",
         questionSubIdx: "root",
         answer: "",
+        id: uuidv4(),
+        isText: true
       });
     } else {
       // CREATE ONE OBJECT FOR EACH questionLeaf in questionLeafs, in order, first by questionIdx, then by questionSubIdx
@@ -301,6 +318,8 @@ export function createQuestionAnswerValueAfterReset(
             questionIdx: key,
             questionSubIdx: "root",
             answer: "",
+            id: uuidv4(),
+            isText: true
           });
         } else {
           // ELSE, THERE IS NO ROOT AND ONLY HAVE THE OTHER SUBKEYS AS SUBINDEX
@@ -309,6 +328,8 @@ export function createQuestionAnswerValueAfterReset(
               questionIdx: key,
               questionSubIdx: subKey,
               answer: "",
+              id: uuidv4(),
+              isText: true
             });
           });
         }
@@ -335,21 +356,22 @@ export function createQuestionAnswerValueWithoutReset(
     // SINCE MCQ WILL ONLY EVER HAVE 1 ELEMENT IN questionAnswer ARRAY, JUST RETURN IT. NO CHANGE
     return questionAnswer;
   }else if(questionType === "OEQ"){
-    const newQuestionAnswerValue: { questionIdx: string; questionSubIdx: string; answer: string }[] = [];
-    questionAnswer = questionAnswer as { questionIdx: string; questionSubIdx: string; answer: string; id:string }[]
+    const newQuestionAnswerValue: z.infer<typeof OEQAnswerSchema> = [];
+    questionAnswer = questionAnswer as z.infer<typeof OEQAnswerSchema>
     if(!questionLeafs){
       // IF questionLeafs is NULL, we search for an object in questionAnswer that has "root", "root" for questionIdx and questionSubIdx
       // IF FOUND, WE TAKE IT AS THE NEW QUESTION ANSWER VALUE
       // IF NOT FOUND, WE CREATE A NEW OBJECT WITH "root", "root" for questionIdx and questionSubIdx
       const foundObj  = questionAnswer.find(
         (obj) => hasQuestionIndices(obj) && obj.questionIdx === "root" && obj.questionSubIdx === "root"
-      ) as { questionIdx: string; questionSubIdx: string; answer: string }|undefined;
+      ) as { questionIdx: string; questionSubIdx: string; answer: string|File }|undefined;
+
       if(foundObj){
         // IF SUCH AN OBJECT IS FOUND, RETURN IT
         return [foundObj];
       }else{
         // IF NO SUCH AN OBJECT IS FOUND, CREATE A NEW OBJECT WITH "root", "root" for questionIdx and questionSubIdx
-        return [{ questionIdx: "root", questionSubIdx: "root", answer: "" }];
+        return [{ questionIdx: "root", questionSubIdx: "root", answer: "", id: uuidv4(), isText: true }] as z.infer<typeof OEQAnswerSchema>;
       }
     }else{
       // IF questionLeafs IS NOT NULL, WE CREATE AN OBJECT FOR EACH questionLeaf in questionLeafs, IN ORDER, FIRST BY questionIdx, THEN BY questionSubIdx
@@ -381,17 +403,17 @@ export function createQuestionAnswerValueWithoutReset(
         if (questionLeafs[key].length === 0) {
           // IF THE ARRAY UNDER THE KEY IS EMPTY, IT MEANS ITS questionSubIdx is root, a-root
           if(hashMap.get(`${key}-root`)){
-            newQuestionAnswerValue.push(hashMap.get(`${key}-root`) as { questionIdx: string; questionSubIdx: string; answer: string })
+            newQuestionAnswerValue.push(hashMap.get(`${key}-root`) as AddQuestionAnswerItem)
           }else{
-            newQuestionAnswerValue.push({ questionIdx: key, questionSubIdx: "root", answer: "" })
+            newQuestionAnswerValue.push({ questionIdx: key, questionSubIdx: "root", isText: true, answer: "", id: uuidv4() })
           }
         } else {
           // ELSE, THERE IS NO ROOT AND ONLY HAVE THE OTHER SUBKEYS AS SUBINDEX
           questionLeafs[key].forEach((subKey) => {
             if(hashMap.get(`${key}-${subKey}`)){
-              newQuestionAnswerValue.push(hashMap.get(`${key}-${subKey}`) as { questionIdx: string; questionSubIdx: string; answer: string })
+              newQuestionAnswerValue.push(hashMap.get(`${key}-${subKey}`) as AddQuestionAnswerItem)
             }else{
-              newQuestionAnswerValue.push({ questionIdx: key, questionSubIdx: subKey, answer: "" })
+              newQuestionAnswerValue.push({ questionIdx: key, questionSubIdx: subKey, isText: true, answer: "", id: uuidv4() })
             }
           });
         }
@@ -435,19 +457,22 @@ export function createQuestionAnswerValueWithoutReset(
 
 export function processMCQQuestionAnswerIntoJSON(questionAnswer: z.infer<typeof MCQAnswerSchema>){
   if(questionAnswer.length===0){
-    return {}
+    return {options: [], answer: []}
   }
-  return parseStringify(questionAnswer[0])
+  return parseStringify(questionAnswer[0]) as {options: string[], answer: string[]}
 }
 
 export function processOEQQuestionAnswerIntoJSON(questionAnswer: z.infer<typeof OEQAnswerSchema>) {
-  const processedQuestionAnswerJSON: ProcessedQuestionAnswerJSON = {}
+  const processedQuestionAnswerJSON: ProcessedOEQQuestionAnswerJSON = {}
   
   questionAnswer.forEach((answer) => {
     if(!processedQuestionAnswerJSON[answer.questionIdx]){
       processedQuestionAnswerJSON[answer.questionIdx] = {}
     }
-    processedQuestionAnswerJSON[answer.questionIdx][answer.questionSubIdx] = answer.answer
+    processedQuestionAnswerJSON[answer.questionIdx][answer.questionSubIdx] = {
+      answer: answer.answer,
+      isText: answer.isText
+    }
   })
   
   return processedQuestionAnswerJSON
