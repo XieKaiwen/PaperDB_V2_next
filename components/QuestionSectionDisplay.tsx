@@ -6,6 +6,7 @@ import { removeImagesFromHtml } from "@/utils/utils";
 
 interface QuestionSectionDisplayProps {
   id: string;
+  type?: "normal" | "answer";
   isText: boolean;
   content: string | File;
   width?: number;
@@ -14,12 +15,14 @@ interface QuestionSectionDisplayProps {
 
 const QuestionSectionDisplay = React.memo(function QuestionSectionDisplay({
   id,
+  type = "normal",
   isText,
   content,
   width = 400,
   height = 400,
 }: QuestionSectionDisplayProps) {
 
+  const additionalStyle = type === "normal" ? {} : {border: "5px solid red"}
 
   if (isText) {
 
@@ -42,16 +45,19 @@ const QuestionSectionDisplay = React.memo(function QuestionSectionDisplay({
       <div
         className="w-full text-sm text-start break-words markdown-question-text"
         dangerouslySetInnerHTML={{ __html: processedHTML }}
+        style={additionalStyle}
       ></div>
     );
   } else {
     return (
-      <ImageReader
-        content={content as File}
-        width={width}
-        height={height}
-        key={id}
-      />
+      <div style={additionalStyle}>
+        <ImageReader
+          content={content as File}
+          width={width}
+          height={height}
+          key={id}
+        />
+      </div>
     );
   }
 });

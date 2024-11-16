@@ -26,5 +26,5 @@ export default function ImageReader({content, width, height} : ImageReaderProps)
       return <Image src={placeholderImage} alt="loading image..." width={width} height={height}/>; // You can add a placeholder or spinner here if needed
     }
   
-    return <Image src={imageUrl} alt="Question Image" width={width} height={height}/>;
+    return <Image src={imageUrl} alt="question image" width={width} height={height}/>;
 }

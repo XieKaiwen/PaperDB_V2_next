@@ -40,13 +40,19 @@ const QuestionLeafAnswerDisplay = React.memo(function QuestionSectionDisplay({
 
       return (
         <div
-          className="w-full text-sm text-start break-words markdown-question-text text-red-700"
+          className="w-full p-2 text-sm text-start break-words markdown-question-text text-red-700 border-2 border-red-500"
           dangerouslySetInnerHTML={{ __html: processedHTML }}
         ></div>
       );
     } else {
       return (
-        <ImageReader content={content as File} width={width} height={height} />
+        <div className="border-4 border-red-500">
+          <ImageReader
+            content={content as File}
+            width={width}
+            height={height}
+          />
+        </div>
       );
     }
   } else if (questionType === "MCQ") {
