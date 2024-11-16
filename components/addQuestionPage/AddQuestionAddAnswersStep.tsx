@@ -27,11 +27,10 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  useDraggable,
   DragEndEvent,
-  DragStartEvent,
-  DragOverlay,
 } from "@dnd-kit/core";
+import crossDeleteIcon from "@/src/assets/cross-delete-icon.svg";
+import dragHandleIcon from "@/src/assets/drag-handle.svg";
 import {
   arrayMove,
   SortableContext,
@@ -39,6 +38,7 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import Image from "next/image";
 
 export default function AddQuestionAddAnswersStep() {
   const { control, setValue, resetField, getValues } =
@@ -184,9 +184,24 @@ export default function AddQuestionAddAnswersStep() {
 }
 
 function AddMCQAnswerInput() {
+  const { control, setValue, resetField, getValues } =
+    useFormContext<AddQuestionFormData>();
+
   // THIS COMPONENT IS ONLY MOUNTED WHEN questionType === MCQ, hence
-  const [options, setOptions] = useState<string[]>([]);
-  const [correctAnswers, setCorrectAnswers] = useState<string[]>([]); // This will be a list of options that are correct answers, will be converted into indexes that will be sorted, to keep them in order
+  const [options, setOptions] = useState<string[]>(() => {
+    const formMCQAnswer = getValues("questionAnswer")[0];
+    if (formMCQAnswer.options !== undefined) {
+      return formMCQAnswer.options;
+    }
+    return [];
+  });
+  const [correctAnswers, setCorrectAnswers] = useState<string[]>(() => {
+    const formMCQAnswer = getValues("questionAnswer")[0];
+    if (formMCQAnswer.answer !== undefined) {
+      return formMCQAnswer.answer;
+    }
+    return [];
+  }); // This will be a list of options that are correct answers, will be converted into indexes that will be sorted, to keep them in order
   const [curInput, setCurInput] = useState<string>("");
 
   // Set up dndKit
@@ -210,7 +225,46 @@ function AddMCQAnswerInput() {
         return arrayMove(options, oldIndex, newIndex);
       });
     }
-    setActiveId(null);
+  }
+
+  // SAVE OPTIONS AND ANSWERS INTO questionAnswers
+  function handleSaveClick() {
+    // Step 1: Find the indexes of correctAnswers in options
+    const indexes = correctAnswers
+      .map((answer) => options.indexOf(answer)) // Find the index of each correctAnswer
+      .filter((index) => index !== -1); // Filter out any answers not found in options
+
+    // Step 2: Sort the indexes
+    const sortedIndexes = indexes.toSorted((a, b) => a - b);
+
+    // Step 3: Map the sorted indexes back to the corresponding values in options
+    const sortedCorrectAnswers = sortedIndexes.map((index) => options[index]);
+    setValue("questionAnswer", [
+      { options: options, answer: sortedCorrectAnswers },
+    ]);
+  }
+
+  // HANDLING DELETION OF OPTIONS
+  function handleDeleteOption(index: number) {
+    console.log("Deleting option at index:", index);
+
+    const optionDeleted = options[index];
+
+    setOptions((prev) => {
+      const newOptions = prev.filter((_, i) => i !== index);
+      console.log("Updated options:", newOptions);
+      return newOptions;
+    });
+
+    if (correctAnswers.includes(optionDeleted)) {
+      setCorrectAnswers((prev) => {
+        const updatedCorrectAnswers = prev.filter(
+          (answer) => answer !== optionDeleted
+        );
+        console.log("Updated correctAnswers:", updatedCorrectAnswers);
+        return updatedCorrectAnswers;
+      });
+    }
   }
 
   return (
@@ -223,6 +277,7 @@ function AddMCQAnswerInput() {
           placeholder="Enter an option"
         />
         <Button
+          className="bg-lavender-300 hover:bg-lavender-400 text-gray-700"
           onClick={() => {
             if (curInput.trim() === "") {
               alert("Option cannot be empty"); // Optional: Prevent adding empty strings
@@ -250,13 +305,21 @@ function AddMCQAnswerInput() {
           {options.map((option, index) => (
             <SortableMCQAddAnswerOptionItem
               key={option}
-              option={option}
               index={index}
               id={option}
+              onDelete={handleDeleteOption}
             />
           ))}
         </SortableContext>
       </DndContext>
+
+      <Button
+        type="button"
+        className="bg-lavender-300 hover:bg-lavender-400 text-gray-700"
+        onClick={handleSaveClick}
+      >
+        Save
+      </Button>
     </>
   );
 }
@@ -266,30 +329,55 @@ interface MCQAddAnswerOptionItemProps {
   option: string;
   index: number;
   style?: React.CSSProperties;
+  onDelete: (index: number) => void;
 }
 const MCQAddAnswerOptionItem = forwardRef<
   HTMLDivElement,
   MCQAddAnswerOptionItemProps
->(function MCQAddAnswerOptionItem({ option, index, ...props }, ref) {
+>(function MCQAddAnswerOptionItem(
+  { option, index, style, onDelete, ...props },
+  ref
+) {
   return (
     <div
       ref={ref}
-      {...props}
-      className="p-2 bg-white rounded-lg shadow-md border-gray-300 border-2 w-full md:w-1/2"
+      style={style}
+      className="p-2 bg-white rounded-lg shadow-md border-gray-300 border-2 w-full md:w-1/2 flex"
     >
-      <p>{option}</p>
+      <p className="mr-auto" {...props}>{option}</p>
+      <Button
+        className=""
+        type="button"
+        variant="destructive"
+        size="sm"
+        onClick={() => {
+          console.log("Button clicked, index:", index);
+          onDelete(index);
+        }}
+      >
+        <Image src={crossDeleteIcon} alt="delete icon" width={10} height={10} />
+      </Button>
+      <Image
+        src={dragHandleIcon}
+        alt="drag handle icon"
+        width={30}
+        height={30}
+        className="ml-2"
+        {...props}
+      />
     </div>
   );
 });
 
 interface SortableMCQAddAnswerOptionItemProps {
-  option: string;
+  onDelete: (index: number) => void;
   index: number;
   id: string;
 }
 function SortableMCQAddAnswerOptionItem({
   index,
   id,
+  onDelete,
 }: SortableMCQAddAnswerOptionItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: id });
@@ -298,10 +386,12 @@ function SortableMCQAddAnswerOptionItem({
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
   return (
     <MCQAddAnswerOptionItem
       option={id}
       index={index}
+      onDelete={onDelete}
       ref={setNodeRef}
       {...attributes}
       {...listeners}

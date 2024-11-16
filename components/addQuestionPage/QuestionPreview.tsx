@@ -40,7 +40,7 @@ export default function QuestionPreview() {
     questionType = "", // Do not need to display this
     questionNumber = "",
     questionPart = [],
-    questionAnswer = [],
+    questionAnswer = [{}],
   } = formData as AddQuestionFormData;
   console.log("questionPart:" + JSON.stringify(formData, null, 2));
 

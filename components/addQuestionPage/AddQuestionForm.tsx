@@ -80,7 +80,7 @@ export default function AddQuestionForm() {
       questionType: "",
       questionNumber: "",
       questionPart: [],
-      questionAnswer: [],
+      questionAnswer: [{}],
     },
   });
 
