@@ -282,8 +282,3 @@ interface QuestionInfoInputProps{
   className?: string;
 }
 
-interface ImageReaderProps {
-  content: File,
-  width: number,
-  height: number
-}

@@ -88,7 +88,7 @@ export default function AddQuestionPaperMetadataStep() {
 
     const optionList = generateOptionsFromJsonList(
       filteredTopics,
-      "id",
+      "topicName",
       "topicName"
     );
     optionList.sort((a, b) => a.label.localeCompare(b.label));

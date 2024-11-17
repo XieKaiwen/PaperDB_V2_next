@@ -40,7 +40,7 @@ export default function QuestionPreview() {
     questionType = "", // Do not need to display this
     questionNumber = "",
     questionPart = [],
-    questionAnswer = [{}],
+    questionAnswer = [],
   } = formData as AddQuestionFormData;
   console.log("questionPart:" + JSON.stringify(formData, null, 2));
 
@@ -76,8 +76,8 @@ export default function QuestionPreview() {
       : processOEQQuestionAnswerIntoJSON(questionAnswer);
   }, [questionAnswer]);
   console.log(
-    "questionAnswerJSON: " + JSON.stringify(questionAnswerJSON, null, 2)
-  );
+    "questionAnswerJSON: ",questionAnswerJSON)
+
 
   // FUNCTION TO CHECK IF TO DISPLAY THE ANSWER PART:
   // If questionType is OEQ, we need to check the appropriate keys exists on the JSON
@@ -137,7 +137,11 @@ export default function QuestionPreview() {
                 )}
               </main>
               {/* MCQ Answers should only be displayed under the root because MCQ only has a root section */}
-
+              {questionType === "MCQ" &&
+                checkIfToDisplayAnswerPart("MCQ", "root", "root") && (
+                  <QuestionLeafAnswerDisplay questionType="MCQ" content={questionAnswerJSON as {options: string[], answer: string[]}} />
+                )
+              }
               {questionType === "OEQ" &&
                 checkIfToDisplayAnswerPart("OEQ", "root", "root") && (
                   <QuestionLeafAnswerDisplay questionType="OEQ" content={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)["root"]["root"]["answer"]} isText={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)["root"]["root"]["isText"]}  />
@@ -272,12 +276,15 @@ function QuestionMetaDataDisplay({
 
   // CREATE LIST OF TOPICS
   const topicString = useMemo(() => {
-    const topicList: string[] = chosenTopics.map(
-      (topicId: string) =>
-        allTopics.find((topic) => topic.id === topicId)!?.topicName
-    );
-    topicList.sort((a, b) => a.localeCompare(b));
-    return topicList.join(", ");
+    // const topicList: string[] = chosenTopics.map(
+    //   (topicId: string) =>
+    //     allTopics.find((topic) => topic.id === topicId)!?.topicName
+    // );
+    // topicList.sort((a, b) => a.localeCompare(b));
+    // return topicList.join(", ");
+
+    const sortedChosenTopics = chosenTopics.sort((a, b) => a.localeCompare(b));
+    return sortedChosenTopics.join(", ");
   }, [chosenTopics]);
 
   return (

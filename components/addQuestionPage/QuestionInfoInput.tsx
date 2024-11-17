@@ -5,7 +5,7 @@ import CustomComboBox from "@/components/form-components/CustomComboBox";
 import CustomPopoverMultipleCheckBox from "@/components/form-components/CustomPopoverMultipleCheckbox";
 import CustomInput from "@/components/form-components/CustomInput";
 import CustomRadio from "@/components/form-components/CustomRadio";
-import { FieldValues, useFormContext } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
 export default function QuestionInfoInput({
   optionsDict,

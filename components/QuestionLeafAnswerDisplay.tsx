@@ -7,7 +7,7 @@ import { removeImagesFromHtml } from "@/utils/utils";
 interface QuestionLeafAnswerDisplayProps {
   questionType: string;
   isText?: boolean;
-  content: string | File | string[];
+  content: string | File | { options: string[]; answer: string[] };
   width?: number;
   height?: number;
 }
@@ -46,23 +46,33 @@ const QuestionLeafAnswerDisplay = React.memo(function QuestionSectionDisplay({
       );
     } else {
       return (
-        <div className="border-4 border-red-500">
-          <ImageReader
-            content={content as File}
-            width={width}
-            height={height}
-          />
-        </div>
+        <ImageReader
+          content={content as File}
+          width={width}
+          height={height}
+          className="border-4 border-red-500"
+        />
       );
     }
   } else if (questionType === "MCQ") {
     // Only display the correct answer here
-    const correctAnswersList = content as string[];
+    const correctAnswersList = (
+      content as { options: string[]; answer: string[] }
+    ).answer as string[];
     const correctAnswerString = correctAnswersList.join(", ");
+
+    const optionsList = (content as { options: string[]; answer: string[] })
+      .options as string[];
+    const optionsString = optionsList.join(", ");
     return (
-      <p className="w-full text-sm text-start break-words markdown-question-text text-red-700">
-        Answer: {correctAnswerString}
-      </p>
+      <>
+        <p className="w-full text-sm text-start break-words markdown-question-text text-red-700 border-2 border-red-500">
+          Options: {optionsString}
+        </p>
+        <p className="w-full text-sm text-start break-words markdown-question-text text-red-700 border-2 border-red-500">
+          Answer: {correctAnswerString}
+        </p>
+      </>
     );
   }
 });

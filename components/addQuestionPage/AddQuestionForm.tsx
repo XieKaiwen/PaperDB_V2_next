@@ -80,7 +80,7 @@ export default function AddQuestionForm() {
       questionType: "",
       questionNumber: "",
       questionPart: [],
-      questionAnswer: [{}],
+      questionAnswer: [],
     },
   });
 
@@ -150,6 +150,19 @@ export default function AddQuestionForm() {
     questionPart,
     questionAnswer,
   ]);
+  // console.log("Current form data",{
+  //   year,
+  //   educationLevel,
+  //   school,
+  //   subject,
+  //   topics,
+  //   examType,
+  //   questionType,
+  //   questionNumber,
+  //   questionPart,
+  //   questionAnswer,
+  // });
+  
 
   function nextStepClick() {
     clearErrors();
@@ -188,7 +201,7 @@ export default function AddQuestionForm() {
 
   async function onSubmit(values: z.infer<typeof questionPartSchema>) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log(values);
+    console.log("Submitted: ", values);
   }
 
   return (

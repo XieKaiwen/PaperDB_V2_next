@@ -9,7 +9,7 @@ import {
   OEQAnswerSchema,
   questionAnswerRequiresReset,
 } from "@/utils/addQuestionUtils";
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, ReactElement, useEffect, useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { answerCombinedSchema } from "../../utils/addQuestionUtils";
@@ -39,6 +39,9 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import Image from "next/image";
+import { FormField, FormMessage } from "../ui/form";
+import { Checkbox } from "../ui/checkbox";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 export default function AddQuestionAddAnswersStep() {
   const { control, setValue, resetField, getValues } =
@@ -85,18 +88,21 @@ export default function AddQuestionAddAnswersStep() {
   }, [setQuestionContent]);
 
   const questionLeafs = questionContent?.questionLeafs;
-  console.log("questionContent:" + JSON.stringify(questionContent, null, 2));
+  // console.log("questionContent:", questionContent);
 
   useEffect(() => {
     if (!questionContent) {
       return;
     }
+    console.log("watchedQuestionAnswer:", watchedQuestionAnswer);
 
     const requireReset = questionAnswerRequiresReset(
       watchedQuestionType,
       watchedQuestionAnswer
     );
     if (requireReset) {
+      console.log("update questionAnswer with reset");
+
       resetField("questionAnswer", { defaultValue: [] });
       const newQuestionAnswerValue = createQuestionAnswerValueAfterReset(
         watchedQuestionType,
@@ -104,6 +110,7 @@ export default function AddQuestionAddAnswersStep() {
       );
       setValue("questionAnswer", newQuestionAnswerValue);
     } else {
+      console.log("update questionAnswer without reset");
       const newQuestionAnswerValue = createQuestionAnswerValueWithoutReset(
         watchedQuestionType,
         questionLeafs!,
@@ -190,14 +197,18 @@ function AddMCQAnswerInput() {
   // THIS COMPONENT IS ONLY MOUNTED WHEN questionType === MCQ, hence
   const [options, setOptions] = useState<string[]>(() => {
     const formMCQAnswer = getValues("questionAnswer")[0];
-    if (formMCQAnswer.options !== undefined) {
+    if (formMCQAnswer && formMCQAnswer.options !== undefined) {
       return formMCQAnswer.options;
     }
     return [];
   });
   const [correctAnswers, setCorrectAnswers] = useState<string[]>(() => {
     const formMCQAnswer = getValues("questionAnswer")[0];
-    if (formMCQAnswer.answer !== undefined) {
+    if (
+      formMCQAnswer &&
+      formMCQAnswer.answer !== undefined &&
+      Array.isArray(formMCQAnswer.answer)
+    ) {
       return formMCQAnswer.answer;
     }
     return [];
@@ -268,7 +279,7 @@ function AddMCQAnswerInput() {
   }
 
   return (
-    <>
+    <main className="w-full space-y-3">
       <div className="flex gap-3">
         <Input
           className=""
@@ -308,10 +319,42 @@ function AddMCQAnswerInput() {
               index={index}
               id={option}
               onDelete={handleDeleteOption}
+              checked={correctAnswers.includes(option)}
+              onCheckedChange={(checked) => {
+                return checked
+                ? setCorrectAnswers((prev) => [...prev, option])
+                : setCorrectAnswers((prev) => prev.filter((a) => a !== option));
+              }}
             />
           ))}
         </SortableContext>
       </DndContext>
+      <div>
+        <FormField
+          control={control}
+          name="questionAnswer.0.options"
+          render={({ fieldState }): ReactElement => {
+            // Only render if fieldState exists and has an error
+            if (!fieldState?.error?.message) {
+              return <></>;
+            }
+
+            return <FormMessage>{fieldState.error.message}</FormMessage>;
+          }}
+        />
+        <FormField
+          control={control}
+          name="questionAnswer.0.answer"
+          render={({ fieldState }): ReactElement => {
+            // Only render if fieldState exists and has an error
+            if (!fieldState?.error?.message) {
+              return <></>;
+            }
+
+            return <FormMessage>{fieldState.error.message}</FormMessage>;
+          }}
+        />
+      </div>
 
       <Button
         type="button"
@@ -320,7 +363,7 @@ function AddMCQAnswerInput() {
       >
         Save
       </Button>
-    </>
+    </main>
   );
 }
 
@@ -329,22 +372,33 @@ interface MCQAddAnswerOptionItemProps {
   option: string;
   index: number;
   style?: React.CSSProperties;
+  checked: boolean;
+  onCheckedChange: (checked: CheckedState) => void
   onDelete: (index: number) => void;
 }
 const MCQAddAnswerOptionItem = forwardRef<
   HTMLDivElement,
   MCQAddAnswerOptionItemProps
 >(function MCQAddAnswerOptionItem(
-  { option, index, style, onDelete, ...props },
+  { option, index, style, checked, onCheckedChange, onDelete, ...props },
   ref
 ) {
   return (
     <div
       ref={ref}
       style={style}
-      className="p-2 bg-white rounded-lg shadow-md border-gray-300 border-2 w-full md:w-1/2 flex"
+      className="p-2 bg-white rounded-lg shadow-md border-gray-300 border-2 w-full md:w-1/2 flex gap-2"
     >
-      <p className="mr-auto" {...props}>{option}</p>
+      <div>
+        <Checkbox className="" 
+          checked={checked}
+          onCheckedChange={(checked: CheckedState) => onCheckedChange(checked)}
+        />
+      </div>
+
+      <p className="mr-auto" {...props}>
+        {option}
+      </p>
       <Button
         className=""
         type="button"
@@ -362,7 +416,7 @@ const MCQAddAnswerOptionItem = forwardRef<
         alt="drag handle icon"
         width={30}
         height={30}
-        className="ml-2"
+        className=""
         {...props}
       />
     </div>
@@ -373,11 +427,15 @@ interface SortableMCQAddAnswerOptionItemProps {
   onDelete: (index: number) => void;
   index: number;
   id: string;
+  checked: boolean;
+  onCheckedChange: (checked: CheckedState) => void
 }
 function SortableMCQAddAnswerOptionItem({
   index,
   id,
   onDelete,
+  checked,
+  onCheckedChange
 }: SortableMCQAddAnswerOptionItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: id });
@@ -391,6 +449,8 @@ function SortableMCQAddAnswerOptionItem({
     <MCQAddAnswerOptionItem
       option={id}
       index={index}
+      checked={checked}
+      onCheckedChange={onCheckedChange}
       onDelete={onDelete}
       ref={setNodeRef}
       {...attributes}

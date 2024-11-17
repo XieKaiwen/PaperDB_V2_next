@@ -1,9 +1,14 @@
-import { ImageReaderProps } from '@/src/types/types';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react'
 import placeholderImage from '@/src/assets/image-placeholder.png';
 
-export default function ImageReader({content, width, height} : ImageReaderProps) {
+interface ImageReaderProps {
+  content: File,
+  width: number,
+  height: number,
+  className?: string;
+}
+export default function ImageReader({content, width, height, className=""} : ImageReaderProps) {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     useEffect(() => {
@@ -23,8 +28,8 @@ export default function ImageReader({content, width, height} : ImageReaderProps)
     }, [content]);
   
     if (!imageUrl) {
-      return <Image src={placeholderImage} alt="loading image..." width={width} height={height}/>; // You can add a placeholder or spinner here if needed
+      return <Image className={className} src={placeholderImage} alt="loading image..." width={width} height={height}/>; // You can add a placeholder or spinner here if needed
     }
   
-    return <Image src={imageUrl} alt="question image" width={width} height={height}/>;
+    return <Image className={className} src={imageUrl} alt="question image" width={width} height={height}/>;
 }

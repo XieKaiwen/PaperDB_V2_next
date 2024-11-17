@@ -1,12 +1,13 @@
 import { AddQuestionFormData } from "@/src/types/types";
 import { contentTypeSchema } from "@/utils/addQuestionUtils";
-import React, { useCallback } from "react";
+import React, { ReactElement, useCallback } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import QuestionPartInput from "./QuestionPartInput";
 import { Button } from "../ui/button";
 import { MAX_QUESTION_PART_NUM } from "@/src/constants/constants";
+import { FormField, FormMessage } from "../ui/form";
 export default function AddQuestionQuestionPartStep() {
   // INITIATE FIELDS ARRAY
   const { control } = useFormContext<AddQuestionFormData>();
@@ -59,6 +60,18 @@ export default function AddQuestionQuestionPartStep() {
           );
         }
       )}
+    <FormField
+      control={control}
+      name="questionPart"
+      render={({ fieldState }): ReactElement => {
+        // Only render if fieldState exists and has an error
+        if (!fieldState?.error?.message) {
+          return <></>
+        }
+        
+        return <FormMessage>{fieldState.error.message}</FormMessage>
+      }}
+    />
       <div className="flex gap-4 w-full mt-2">
         <Button
           className="w-full  bg-lavender-300 hover:bg-lavender-400 text-gray-700"

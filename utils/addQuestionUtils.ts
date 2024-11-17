@@ -265,15 +265,19 @@ export function questionAnswerRequiresReset(
   questionType: string,
   questionAnswer: z.infer<typeof answerCombinedSchema>
 ) {
-  console.log("watchedQuestionAnswer:" +questionAnswer);
+  // console.log("watchedQuestionAnswer:",questionAnswer);
+  // console.log("watchedQuestionType:" + questionType);
   // FIRST, DETERMINE IF questionAnswer REQUIRES A RESET
   if (questionAnswer.length === 0) return true;
   
   const firstObj = questionAnswer[0];
+  console.log(firstObj);
   if (questionType === "MCQ") {
     // IF questionType is MCQ, questionAnswer should be an array containing a singular object
     // WITH THE KEYS `options` and `answer`
-    return !firstObj || !("options" in firstObj && "answer" in firstObj);
+    // console.log("here", (!firstObj || !("options" in firstObj && "answer" in firstObj)));
+    
+    return !firstObj || !("options" in firstObj && "answer" in firstObj) || !(firstObj.options !== undefined && firstObj.answer !== undefined);
   } else if (questionType === "OEQ") {
     return (
       !firstObj ||
