@@ -148,9 +148,9 @@ export default function AddQuestionAddAnswersStep() {
   return (
     // <pre>{JSON.stringify(watchedQuestionAnswer, null, 2)}</pre>
     <>
-      {watchedQuestionType === "MCQ" && (
+      {/* {watchedQuestionType === "MCQ" && (
         <div>{JSON.stringify(watchedQuestionAnswer, null, 2)}</div>
-      )}
+      )} */}
       {watchedQuestionType === "MCQ" && <AddMCQAnswerInput />}
 
       {watchedQuestionType === "OEQ" && (

@@ -7,7 +7,7 @@ import {
 import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
 import { validateTopicWithinEducationLevel } from "@/utils/addQuestionUtils";
 import { generateOptionsFromJsonList, generateYearList } from "@/utils/utils";
-import { edu_level } from "@prisma/client";
+import { edu_level, exam_type } from "@prisma/client";
 import React, { useEffect, useMemo } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import QuestionInfoInput from "./QuestionInfoInput";
@@ -28,14 +28,15 @@ export default function AddQuestionPaperMetadataStep() {
   // Watch educationLevel, subject and topics
   const watchedValues = useWatch({
     control,
-    name: ["educationLevel", "school", "subject", "topics"], // Fields to watch
+    name: ["educationLevel", "school", "subject", "topics", "examType"], // Fields to watch
   });
 
-  const [educationLevel, school, subject, topics] = watchedValues as [
+  const [educationLevel, school, subject, topics, examType] = watchedValues as [
     edu_level,
     string,
     string,
-    string[]
+    string[],
+    exam_type
   ];
 
   // FUNCTIONS FOR FILTERING FORM OPTIONS
@@ -130,6 +131,10 @@ export default function AddQuestionPaperMetadataStep() {
       return true;
     });
   }, [topicsOptions]);
+  useEffect(() => {
+    if (!examTypeOptions.find((type) => examType === type.value))
+      resetField("examType");
+  }, [examTypeOptions]);
 
   const optionsDict = useMemo(() => {
     return {

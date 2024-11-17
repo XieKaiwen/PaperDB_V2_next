@@ -42,7 +42,7 @@ export default function QuestionPreview() {
     questionPart = [],
     questionAnswer = [],
   } = formData as AddQuestionFormData;
-  console.log("questionPart:" + JSON.stringify(formData, null, 2));
+  console.log("questionPart:",formData);
 
   // CONSTRUCT THE QuestionContentCombinedJSON here
   const questionContentCombinedJSON = useMemo(() => {

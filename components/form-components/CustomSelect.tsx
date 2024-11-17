@@ -61,7 +61,9 @@ export default function CustomSelect<T extends FieldValues>({
             >
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder={placeholder} />
+                  <SelectValue placeholder={placeholder}>
+                    {selectedOption ? selectedOption.label :placeholder}
+                  </SelectValue>
                 </SelectTrigger>
               </FormControl>
               {isOpen ? (

@@ -66,10 +66,10 @@ const QuestionLeafAnswerDisplay = React.memo(function QuestionSectionDisplay({
     const optionsString = optionsList.join(", ");
     return (
       <>
-        <p className="w-full text-sm text-start break-words markdown-question-text text-red-700 border-2 border-red-500">
+        <p className="w-full text-sm text-start break-words markdown-question-text text-red-700 border-2 border-red-500 p-2">
           Options: {optionsString}
         </p>
-        <p className="w-full text-sm text-start break-words markdown-question-text text-red-700 border-2 border-red-500">
+        <p className="w-full text-sm text-start break-words markdown-question-text text-red-700 border-2 border-red-500 p-2">
           Answer: {correctAnswerString}
         </p>
       </>
