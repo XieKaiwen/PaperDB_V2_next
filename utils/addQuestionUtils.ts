@@ -5,6 +5,7 @@ import {
 } from "@/src/constants/constants";
 import {
   AddQuestionAnswerItem,
+  AddQuestionFormData,
   AddQuestionFormQuestionPart,
   ProcessedOEQQuestionAnswerJSON,
   ProcessedQuestionContentCombinedJSON,
@@ -14,6 +15,21 @@ import { exam_type } from "@prisma/client";
 import { z } from "zod";
 import { convertRomanToInt, parseStringify } from "./utils";
 import {v4 as uuidv4 } from "uuid";
+
+
+export const defaultValues: AddQuestionFormData = {
+  year: "",
+  educationLevel: "",
+  school: "",
+  subject: "",
+  topics: [],
+  examType: undefined,
+  questionType: "",
+  questionNumber: "",
+  questionPart: [],
+  questionAnswer: [],
+}
+
 
 const textQuestionPartSchema = z.object({
   questionIdx: z.string().min(1, { message: "Choose an index" }),

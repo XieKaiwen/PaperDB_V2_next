@@ -3,8 +3,7 @@ import fs from 'fs';
 import { parse } from 'csv-parse/sync';
 import path from 'path';
 
-const DATA_FOLDER_ROUTE = "../src/data/"
-
+const DATA_FOLDER_ROUTE = path.join(__dirname, "../src/data/"); // Use __dirname to get the absolute path
 
 interface CsvData {
   [key: string]: string;
@@ -36,7 +35,6 @@ const tableConfigs: TableConfig[] = [
       educationLevels: JSON.parse(data.educationLevels.replace(/""/g, '"')),
     }),
   },
-  // Add more table configs here as needed
   {
     fileName: 'sample_topic.csv',
     model: prisma.topic,
@@ -50,7 +48,7 @@ const tableConfigs: TableConfig[] = [
 ];
 
 function readCsvFile(filePath: string): CsvData[] {
-  const fileContent = fs.readFileSync(DATA_FOLDER_ROUTE + filePath, 'utf-8');
+  const fileContent = fs.readFileSync(filePath, 'utf-8');
   return parse(fileContent, {
     columns: true,
     skip_empty_lines: true,
@@ -58,7 +56,7 @@ function readCsvFile(filePath: string): CsvData[] {
 }
 
 async function seedTable(config: TableConfig) {
-  const filePath = path.join(__dirname, config.fileName);
+  const filePath = path.join(DATA_FOLDER_ROUTE, config.fileName); // Correct the path here
   const data = readCsvFile(filePath);
 
   for (const item of data) {
@@ -69,25 +67,10 @@ async function seedTable(config: TableConfig) {
   console.log(`${config.model.name} seeded successfully`);
 }
 
-// async function seedSampleTopics() {
-//   const subjects = await prisma.subject.findMany();
-//   for (const subject of subjects) {
-//     await prisma.topic.create({
-//       data: {
-//         subjectId: subject.id,
-//         topicName: `Sample Topic for ${subject.subjectName}`,
-//       },
-//     });
-//   }
-//   console.log('Sample topics added successfully');
-// }
-
 async function main() {
   for (const config of tableConfigs) {
     await seedTable(config);
   }
-
-//   await seedSampleTopics();
 }
 
 main()

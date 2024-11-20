@@ -1,67 +1,67 @@
 id,schoolType,schoolFullName,schoolShortName
-00ff3028-0683-48a7-8c6d-f7fd12262735,Secondary,Hwa Chong Institution,HCI
-0968762f-6478-4ff8-ab09-76c87c9566b7,Secondary,Nanyang Girls' High School,NYGH
-11c40f18-bcf2-4822-bdf3-0102946b58b4,Secondary,Crescent Girls' School,CGS
-13d0238d-3d04-45f5-8303-53562abc12a3,Secondary,St. Andrew's Secondary School,SASS
-188c65c4-dba1-42a6-82c8-83feb7a51bb6,Primary,Methodist Girls' School (Primary),MGS(P)
-19a8e95d-07c3-42a1-adcd-455cc31d95f4,Primary,Holy Innocents' Primary School,HIPS
-1ae10da5-8bd1-4f40-ae8b-5c91e7842fcd,Primary,Pei Hwa Presbyterian Primary School,PHPPS
-1ed7bab2-c454-4f5e-8882-e58a4b904f29,Primary,Red Swastika School,RSS
-29873967-203b-49ad-bb85-4b4740b100ed,Secondary,Chung Cheng High School (Main),CCHM
+00ff3028-0683-48a7-8c6d-f7fd12262735,SECONDARY,Hwa Chong Institution,HCI
+0968762f-6478-4ff8-ab09-76c87c9566b7,SECONDARY,Nanyang Girls' High School,NYGH
+11c40f18-bcf2-4822-bdf3-0102946b58b4,SECONDARY,Crescent Girls' School,CGS
+13d0238d-3d04-45f5-8303-53562abc12a3,SECONDARY,St. Andrew's Secondary School,SASS
+188c65c4-dba1-42a6-82c8-83feb7a51bb6,PRIMARY,Methodist Girls' School (Primary),MGS(P)
+19a8e95d-07c3-42a1-adcd-455cc31d95f4,PRIMARY,Holy Innocents' Primary School,HIPS
+1ae10da5-8bd1-4f40-ae8b-5c91e7842fcd,PRIMARY,Pei Hwa Presbyterian Primary School,PHPPS
+1ed7bab2-c454-4f5e-8882-e58a4b904f29,PRIMARY,Red Swastika School,RSS
+29873967-203b-49ad-bb85-4b4740b100ed,SECONDARY,Chung Cheng High School (Main),CCHM
 2b56d137-7e69-4b66-a65c-ec43b5d2e0e6,JC,Millennia Institute,MI
-2e011aaa-8854-4c90-b967-04d1b1b3b964,Primary,Nan Chiau Primary School,NCPS
-3373c74c-b730-4f0b-ab45-1eb1d5ec8761,Secondary,Raffles Institution,RI
-353b3fd5-18da-41f9-9738-202cf862eda7,Primary,Pei Chun Public School,PCPS
+2e011aaa-8854-4c90-b967-04d1b1b3b964,PRIMARY,Nan Chiau Primary School,NCPS
+3373c74c-b730-4f0b-ab45-1eb1d5ec8761,SECONDARY,Raffles Institution,RI
+353b3fd5-18da-41f9-9738-202cf862eda7,PRIMARY,Pei Chun Public School,PCPS
 36959538-e7df-4100-bca1-8e91a3e1a836,JC,Anglo-Chinese Junior College,ACJC
 3c206ade-998f-4654-adb4-78f9aac1e198,JC,Raffles Institution,RI
-41bd9cc3-3ae3-413a-a52f-e121c0a305b2,Primary,Tao Nan School,TNS
-42b30897-9504-4e79-a47b-ea4a08a12f13,Secondary,National Junior College,NJC
+41bd9cc3-3ae3-413a-a52f-e121c0a305b2,PRIMARY,Tao Nan School,TNS
+42b30897-9504-4e79-a47b-ea4a08a12f13,SECONDARY,National Junior College,NJC
 43b0f08b-0728-49c0-bb8e-df352f401dc3,JC,Yishun Innova Junior College,YIJC
-47cbae62-6de5-4c84-9567-f81f845ad35f,Secondary,Nan Hua High School,NHHS
-48ffa770-2988-438f-88ff-f876c7c48f39,Primary,Maha Bodhi School,MBS
-4df1b694-85b9-4c9d-a7ff-f3eed0697ec2,Primary,CHIJ St. Nicholas Girls' School (Primary),SNGS(P)
-528f27a5-f90f-404d-8350-a041381fc56a,Primary,Maris Stella High School (Primary),MSHS(P)
-54961c8e-0e18-49ee-88be-6dfc1793568d,Secondary,Catholic High School (Secondary),CHS(S)
+47cbae62-6de5-4c84-9567-f81f845ad35f,SECONDARY,Nan Hua High School,NHHS
+48ffa770-2988-438f-88ff-f876c7c48f39,PRIMARY,Maha Bodhi School,MBS
+4df1b694-85b9-4c9d-a7ff-f3eed0697ec2,PRIMARY,CHIJ St. Nicholas Girls' School (Primary),SNGS(P)
+528f27a5-f90f-404d-8350-a041381fc56a,PRIMARY,Maris Stella High School (Primary),MSHS(P)
+54961c8e-0e18-49ee-88be-6dfc1793568d,SECONDARY,Catholic High School (Secondary),CHS(S)
 5639e407-096b-443c-913a-d0137399ea4f,JC,Jurong Pioneer Junior College,JPJC
-56db3c5d-b481-4c63-bc80-d73f77142bf9,Secondary,Anglo-Chinese School,ACS
-5a8a87f4-4140-4e05-b301-8f36b18564f6,Secondary,Nan Chiau High School,NCHS
-5b256ced-56c0-44f1-ad2d-aaca4246ff6f,Primary,Henry Park Primary School,HPPS
+56db3c5d-b481-4c63-bc80-d73f77142bf9,SECONDARY,Anglo-Chinese School,ACS
+5a8a87f4-4140-4e05-b301-8f36b18564f6,SECONDARY,Nan Chiau High School,NCHS
+5b256ced-56c0-44f1-ad2d-aaca4246ff6f,PRIMARY,Henry Park Primary School,HPPS
 5d182d88-cf0a-4c99-8860-67cf62dfe886,JC,St. Andrew’s Junior College,SAJC
-60899b94-bede-4ace-aeef-5e2b1e6e0c2e,Secondary,CHIJ Secondary School,CSS
-60b91f29-ab23-4473-993a-59b87be4cf53,Secondary,Singapore Chinese Girls' School (Secondary),SCGS(S)
+60899b94-bede-4ace-aeef-5e2b1e6e0c2e,SECONDARY,CHIJ Secondary School,CSS
+60b91f29-ab23-4473-993a-59b87be4cf53,SECONDARY,Singapore Chinese Girls' School (Secondary),SCGS(S)
 64454762-0d41-4866-9719-86b0b7532dcc,JC,Catholic Junior College,CJC
-647c9b9b-7e6c-4f1c-aff6-5861c475121b,Secondary,Kuo Chuan Presbyterian Secondary School,KCPSS
+647c9b9b-7e6c-4f1c-aff6-5861c475121b,SECONDARY,Kuo Chuan Presbyterian Secondary School,KCPSS
 6b7ba133-3a99-4fe1-a2f3-7503d5782ae9,JC,Dunman High School,DHS
 78b88538-870d-4418-a46e-1c5e1500a755,JC,Victoria Junior College,VJC
 7ddaefa9-35ef-4b0f-8ca3-ccdd8e39d781,JC,Temasek Junior College,TJC
 8014d8fd-ec25-4b58-94d9-c306f4ab0220,JC,St. Joseph’s Institution,SJI
-809bb0fe-c98e-4165-98ec-6c8a0becdc0a,Secondary,CHIJ St. Nicholas Girls' School (Secondary),SNGS(S)
-880963f6-7838-4774-8b44-d735e4b2818f,Secondary,St. Joseph's Institution,SJI
-8b128582-0aea-4773-be05-b1848794cc49,Secondary,Cedar Girls' Secondary School,CGSS
+809bb0fe-c98e-4165-98ec-6c8a0becdc0a,SECONDARY,CHIJ St. Nicholas Girls' School (Secondary),SNGS(S)
+880963f6-7838-4774-8b44-d735e4b2818f,SECONDARY,St. Joseph's Institution,SJI
+8b128582-0aea-4773-be05-b1848794cc49,SECONDARY,Cedar Girls' Secondary School,CGSS
 8c14ea75-5f7d-438b-b551-2d527e5be1ba,JC,Nanyang Junior College,NYJC
-8e756e58-580c-447c-b7ff-2783c1dd1378,Secondary,Fairfield Methodist School (Secondary),FMSS
-91378cf3-d692-4c86-88bd-437a155d806a,Secondary,Anglo-Chinese School (Independent),ACS(I)
-933fd996-5003-483b-9772-ffced05830da,Secondary,Anderson Secondary School,ASS
-93f7b49e-db89-4f83-a50c-a4fb85fae38c,Primary,Nanyang Primary School,NYPS
-a1e1be41-51f6-4779-9d38-fe1134f3d00d,Primary,Anglo-Chinese School (Primary),ACS(P)
-a66cfcfd-e8de-41ff-8da2-7a6f6e6b3462,Secondary,Victoria School,VS
-a88ae3ee-20a4-4a67-b4ce-3f325275e418,Secondary,Raffles Girls' School,RGS
+8e756e58-580c-447c-b7ff-2783c1dd1378,SECONDARY,Fairfield Methodist School (Secondary),FMSS
+91378cf3-d692-4c86-88bd-437a155d806a,SECONDARY,Anglo-Chinese School (Independent),ACS(I)
+933fd996-5003-483b-9772-ffced05830da,SECONDARY,Anderson Secondary School,ASS
+93f7b49e-db89-4f83-a50c-a4fb85fae38c,PRIMARY,Nanyang Primary School,NYPS
+a1e1be41-51f6-4779-9d38-fe1134f3d00d,PRIMARY,Anglo-Chinese School (Primary),ACS(P)
+a66cfcfd-e8de-41ff-8da2-7a6f6e6b3462,SECONDARY,Victoria School,VS
+a88ae3ee-20a4-4a67-b4ce-3f325275e418,SECONDARY,Raffles Girls' School,RGS
 a926828f-9dfb-4d64-96b4-6d85757c1049,JC,River Valley High School (Junior College),RVHS(JC)
-a9d3932d-6807-41d8-b563-a6652cfd2068,Secondary,River Valley High School,RVHS
+a9d3932d-6807-41d8-b563-a6652cfd2068,SECONDARY,River Valley High School,RVHS
 aae40f9c-51cb-4ecf-b6ea-e4a5044c6106,JC,Anderson Serangoon Junior College,ASRJC
-ad5ff72d-9df2-43e9-86ca-98e76e8bc9b9,Primary,Nan Hua Primary School,NHPS
+ad5ff72d-9df2-43e9-86ca-98e76e8bc9b9,PRIMARY,Nan Hua Primary School,NHPS
 b2424e37-c5a9-4f36-8235-100493b68f60,JC,Hwa Chong Institution,HCI
-b496db30-6fbb-4e4c-813e-698368cb9c90,Primary,Raffles Girls' Primary School,RGPS
-ba7cb5ce-13f6-4818-811c-ffe715632f15,Primary,Rosyth School,RS
-bed2347f-d273-455e-958d-35576a282cef,Primary,Temasek Primary School,TSPS
-bf8430fe-176e-48b7-8148-5230d2f66efc,Secondary,Methodist Girls' School (Secondary),MGS(S)
+b496db30-6fbb-4e4c-813e-698368cb9c90,PRIMARY,Raffles Girls' Primary School,RGPS
+ba7cb5ce-13f6-4818-811c-ffe715632f15,PRIMARY,Rosyth School,RS
+bed2347f-d273-455e-958d-35576a282cef,PRIMARY,Temasek Primary School,TSPS
+bf8430fe-176e-48b7-8148-5230d2f66efc,SECONDARY,Methodist Girls' School (Secondary),MGS(S)
 c95d33e8-e761-4ce9-8fc0-8a0f432333cb,JC,National Junior College,NJC
 cafd4474-824a-4923-9d5c-6f5ae1c1a054,JC,Tampines Meridian Junior College,TMJC
 ce113e74-8f57-4607-b9fa-ddc000ec80a1,JC,Temasek Junior College,TJC
-d11c1d7a-7687-44f1-8aa2-8b61dbedba5f,Primary,Singapore Chinese Girls' School (Primary),SCGS(P)
+d11c1d7a-7687-44f1-8aa2-8b61dbedba5f,PRIMARY,Singapore Chinese Girls' School (Primary),SCGS(P)
 dc463bd0-ca42-4512-9b37-a948f94d8d94,JC,Anglo-Chinese School (Independent),ACS(I)
-df17f14c-251c-43d4-a7d1-156cfb090350,Primary,Catholic High School (Primary),CHS(P)
-ee0ed137-a14f-4530-a8df-123cd0dd4f03,Secondary,Bukit Panjang Govt. High School,BPGHS
+df17f14c-251c-43d4-a7d1-156cfb090350,PRIMARY,Catholic High School (Primary),CHS(P)
+ee0ed137-a14f-4530-a8df-123cd0dd4f03,SECONDARY,Bukit Panjang Govt. High School,BPGHS
 f17aa21e-1bf8-4b21-81af-00bfa07ebbbb,JC,Eunoia Junior College,EJC
-f27188e5-b103-4238-9bb1-36be1fcbd889,Secondary,Dunman High School,DHS
-f6005f9c-c137-4c5f-b8e3-8f0ce5f76547,Primary,Ai Tong School,ATS
+f27188e5-b103-4238-9bb1-36be1fcbd889,SECONDARY,Dunman High School,DHS
+f6005f9c-c137-4c5f-b8e3-8f0ce5f76547,PRIMARY,Ai Tong School,ATS

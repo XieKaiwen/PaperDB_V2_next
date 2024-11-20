@@ -84,7 +84,7 @@ export const questionTypeOptions = [
   { value: "OEQ", label: "OEQ" },
 ]
 
-export const examTypeEducationLevelMapping : {examType: string; enumValue: exam_type;educationLevel: edu_level[]}[] = [
+export const examTypeEducationLevelMapping: { examType: string; enumValue: exam_type; educationLevel: edu_level[] }[] = [
   {
     examType: 'CA1',
     enumValue: 'CA1',
@@ -121,31 +121,32 @@ export const examTypeEducationLevelMapping : {examType: string; enumValue: exam_
     educationLevel: ['S1', 'S2', 'S3', 'S4']
   },
   {
-    examType: 'O-level',
-    enumValue: 'O_level',
+    examType: 'O Level',
+    enumValue: 'O_LEVEL', // Match enum value from exam_type
     educationLevel: ['S4'] // Typically for Secondary 4 students
   },
   {
     examType: 'Common test',
-    enumValue: 'Common_test',
+    enumValue: 'COMMON_TEST', // Match enum value from exam_type
     educationLevel: ['S1', 'S2', 'S3', 'S4']
   },
   {
     examType: 'Block test',
-    enumValue: 'Block_test',
+    enumValue: 'BLOCK_TEST', // Match enum value from exam_type
     educationLevel: ['S1', 'S2', 'S3', 'S4']
   },
   {
     examType: 'Prelim/Promo',
-    enumValue: 'Prelim_Promo',
+    enumValue: 'PRELIM', // Match enum value from exam_type
     educationLevel: ['J1', 'J2'] // For Junior College students
   },
   {
     examType: 'A-level',
-    enumValue: 'A_level',
+    enumValue: 'A_LEVEL', // Match enum value from exam_type
     educationLevel: ['J2'] // Typically for Junior College 2 students
   }
 ];
+
 
 // Breakpoint constants
 export const SM_BREAKPOINT = 640

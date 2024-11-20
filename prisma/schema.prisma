@@ -18,17 +18,16 @@ model Paper {
   examType                exam_type
   visible                 Boolean                   @default(true)
   year                    String
-  MCQQuestion             MCQQuestion[]
-  OEQQuestion             OEQQuestion[]
   School                  School                    @relation(fields: [schoolId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   Subject                 Subject                   @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   UserPaperProgressStatus UserPaperProgressStatus[]
+  Question                Question[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model School {
   id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  schoolType      school_type
+  schoolType      SchoolType
   schoolFullName  String
   schoolShortName String
   Paper           Paper[]
@@ -36,13 +35,12 @@ model School {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Subject {
-  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  subjectName     String        @unique
+  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subjectName     String      @unique
   educationLevels edu_level[]
-  MCQQuestion     MCQQuestion[]
-  OEQQuestion     OEQQuestion[]
   Paper           Paper[]
   Topic           Topic[]
+  Question        Question[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -61,12 +59,10 @@ model User {
   email                   String                    @unique
   dateJoined              DateTime                  @default(now()) @db.Timestamptz(6)
   educationLevel          edu_level
-  role                    user_role                 @default(user)
+  role                    UserRole                 @default(USER)
   phoneNumber             String
   username                String
   UserLog                 UserLog[]
-  UserMCQAnswer           UserMCQAnswer[]
-  UserOEQAnswer           UserOEQAnswer[]
   UserPaperProgressStatus UserPaperProgressStatus[]
 }
 
@@ -79,68 +75,53 @@ model UserLog {
   User       User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model MCQQuestion {
-  id                  String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  paperId             String          @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  subjectId           String          @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  topicId             String[]        @db.Uuid
-  questionInformation Json
-  questionNum         Int             @db.SmallInt
-  fullMark            Int             @db.SmallInt
-  difficulty          difficulty
-  percentageCorrect   Float?
-  Paper               Paper           @relation(fields: [paperId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  Subject             Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  UserMCQAnswer       UserMCQAnswer[]
+model Question {
+  id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  paperId         String     @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subjectId       String     @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  topics          String[]   
+  fullMark        Int        @db.SmallInt // total marks for the question
+  markScheme      Json // marks for each section
+  difficulty      Difficulty
+  passingRate     Float?
+  questionLeafs   Json?
+  questionContent Json
+  questionAnswer  Json
+  Paper           Paper      @relation(fields: [paperId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Subject         Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model OEQQuestion {
-  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  subjectId     String          @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  paperId       String          @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  questionNum   Int             @db.SmallInt
-  questionInfo  Json
-  fullMark      Int             @db.SmallInt
-  difficulty    difficulty
-  passingRate   Float?
-  Paper         Paper?          @relation(fields: [paperId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  Subject       Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  UserOEQAnswer UserOEQAnswer[]
-}
+// model UserMCQAnswer {
+//   id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+//   userId        String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+//   MCQId         String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+//   userAnswer    String
+//   obtainedMarks Int         @db.SmallInt
+//   MCQQuestion   MCQQuestion @relation(fields: [MCQId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+//   User          User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+// }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model UserMCQAnswer {
-  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId        String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  MCQId         String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userAnswer    String
-  obtainedMarks Int         @db.SmallInt
-  MCQQuestion   MCQQuestion @relation(fields: [MCQId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  User          User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model UserOEQAnswer {
-  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId        String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  OEQId         String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  index         String?
-  subIndex      String?
-  userAnswer    String
-  obtainedMarks Float?      @default(0) @db.Real
-  marked        Boolean     @default(false)
-  OEQQuestion   OEQQuestion @relation(fields: [OEQId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  User          User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-}
+// /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// model UserOEQAnswer {
+//   id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+//   userId        String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+//   OEQId         String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+//   index         String?
+//   subIndex      String?
+//   userAnswer    String
+//   obtainedMarks Float?      @default(0) @db.Real
+//   marked        Boolean     @default(false)
+//   OEQQuestion   OEQQuestion @relation(fields: [OEQId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+//   User          User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+// }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model UserPaperProgressStatus {
   id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId         String          @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   paperId        String          @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  progressStatus progress_status @default(In_Progress)
+  progressStatus ProgressStatus  @default(IN_PROGRESS)
   currentScore   Float           @default(0) @db.Real
   Paper          Paper           @relation(fields: [paperId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   User           User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -169,33 +150,34 @@ enum exam_type {
   PSLE
   WA
   SA
-  O_level      @map("O-level")
-  Common_test  @map("Common test")
-  Block_test   @map("Block test")
-  Prelim_Promo @map("Prelim/Promo")
-  A_level      @map("A-level")
-  Other
+  O_LEVEL      @map("O Level")
+  COMMON_TEST  @map("Common Test")
+  BLOCK_TEST   @map("Block Test")
+  PRELIM       @map("Preliminary Exam")
+  PROMO        @map("Promotional Exam")
+  A_LEVEL      @map("A Level")
+  OTHER        @map("Other")
 }
 
-enum school_type {
-  Primary
-  Secondary
+enum SchoolType {
+  PRIMARY
+  SECONDARY
   JC
 }
 
-enum difficulty {
-  Easy
-  Medium
-  Hard
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
 }
 
-enum progress_status {
-  In_Progress @map("In Progress")
-  Submitted
-  Marked
+enum ProgressStatus {
+  IN_PROGRESS @map("In Progress")
+  SUBMITTED @map("submitted")
+  MARKED @map("marked")
 }
 
-enum user_role {
-  user
-  admin
+enum UserRole {
+  USER
+  ADMIN
 }
