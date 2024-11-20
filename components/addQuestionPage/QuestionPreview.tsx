@@ -1,5 +1,9 @@
 import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
-import { AddQuestionFormData, ProcessedOEQQuestionAnswerJSON, ProcessedQuestionPart } from "@/src/types/types";
+import {
+  AddQuestionFormData,
+  ProcessedOEQQuestionAnswerJSON,
+  ProcessedQuestionPart,
+} from "@/src/types/types";
 
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -42,7 +46,7 @@ export default function QuestionPreview() {
     questionPart = [],
     questionAnswer = [],
   } = formData as AddQuestionFormData;
-  console.log("questionPart:",formData);
+  console.log("questionPart:", formData);
 
   // CONSTRUCT THE QuestionContentCombinedJSON here
   const questionContentCombinedJSON = useMemo(() => {
@@ -75,9 +79,7 @@ export default function QuestionPreview() {
       ? processMCQQuestionAnswerIntoJSON(questionAnswer)
       : processOEQQuestionAnswerIntoJSON(questionAnswer);
   }, [questionAnswer]);
-  console.log(
-    "questionAnswerJSON: ",questionAnswerJSON)
-
+  console.log("questionAnswerJSON: ", questionAnswerJSON);
 
   // FUNCTION TO CHECK IF TO DISPLAY THE ANSWER PART:
   // If questionType is OEQ, we need to check the appropriate keys exists on the JSON
@@ -94,7 +96,8 @@ export default function QuestionPreview() {
         questionAnswerJSON.answer !== undefined
       );
     } else if (questionType === "OEQ") {
-      const tempQuestionAnswerJSON = questionAnswerJSON as ProcessedOEQQuestionAnswerJSON
+      const tempQuestionAnswerJSON =
+        questionAnswerJSON as ProcessedOEQQuestionAnswerJSON;
       return (
         tempQuestionAnswerJSON[index] !== undefined &&
         tempQuestionAnswerJSON[index][subIndex] !== undefined
@@ -139,12 +142,31 @@ export default function QuestionPreview() {
               {/* MCQ Answers should only be displayed under the root because MCQ only has a root section */}
               {questionType === "MCQ" &&
                 checkIfToDisplayAnswerPart("MCQ", "root", "root") && (
-                  <QuestionLeafAnswerDisplay questionType="MCQ" content={questionAnswerJSON as {options: string[], answer: string[]}} />
-                )
-              }
+                  <QuestionLeafAnswerDisplay
+                    questionType="MCQ"
+                    content={
+                      questionAnswerJSON as {
+                        options: string[];
+                        answer: string[];
+                      }
+                    }
+                  />
+                )}
               {questionType === "OEQ" &&
                 checkIfToDisplayAnswerPart("OEQ", "root", "root") && (
-                  <QuestionLeafAnswerDisplay questionType="OEQ" content={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)["root"]["root"]["answer"]} isText={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)["root"]["root"]["isText"]}  />
+                  <QuestionLeafAnswerDisplay
+                    questionType="OEQ"
+                    content={
+                      (questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)[
+                        "root"
+                      ]["root"]["answer"]
+                    }
+                    isText={
+                      (questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)[
+                        "root"
+                      ]["root"]["isText"]
+                    }
+                  />
                 )}
             </div>
           )}
@@ -152,73 +174,105 @@ export default function QuestionPreview() {
           {/* DISPLAYING THE INDEXED */}
           {/* gap-6 between each indexed part */}
           {questionLeafs && (
-            <div className="question-leafs"> 
+            <div className="question-leafs">
               {Object.keys(questionLeafs).map((key: string) => (
                 // {/* Display the main index */}
                 <div key={key} className="question-indexed-section">
                   <span className="question-index-label">({key})</span>
-
-                  {questionIndexedParts[key]["root"] && (
-                    <div className="question-index-root flex flex-col gap-2">
-                      {/* Display the root content of the index  */}
-                      <div key={key} className="question-section-content">
-                        {questionIndexedParts[key]["root"].map((part) => {
-                          const { isText, content, id } = part;
-                          return (
-                            <QuestionSectionDisplay
-                              id={id}
-                              content={content}
-                              key={id}
-                              isText={isText}
-                            />
-                          );
-                        })}
-                      </div>
-                      {questionType === "OEQ" &&
-                        checkIfToDisplayAnswerPart("OEQ", key, "root") && (
-                          <QuestionLeafAnswerDisplay questionType="OEQ" content={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)[key]["root"]["answer"]} isText={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)[key]["root"]["isText"]} />
-                        )}
-                    </div>
-                  )}
-
-                  {/* Display the sub-index content for indexed questions */}
-                  {questionLeafs[key].length > 0 && (
-                    <div className="question-subindexed-section">
-                      {" "}
-                      {questionLeafs[key].map((subKey: string) => (
-                        <div
-                          key={subKey}
-                          className="question-indexed-part flex flex-col gap-2"
-                        >
-                          <div className="flex items-start gap-2">
-                            <span className="question-subindex-label">
-                              ({subKey})
-                            </span>
-                            <div className="question-section-content">
-                              {questionIndexedParts[key][subKey].map(
-                                (part: ProcessedQuestionPart, idx: number) => {
-                                  const { isText, content, id } = part;
-                                  return (
-                                    <QuestionSectionDisplay
-                                      id={id}
-                                      content={content}
-                                      key={id}
-                                      isText={isText}
-                                    />
-                                  );
-                                }
-                              )}
-                            </div>
-                          </div>
-                          {/* OEQ format of displaying the answer */}
-                          {questionType === "OEQ" &&
-                            checkIfToDisplayAnswerPart("OEQ", key, subKey) && (
-                              <QuestionLeafAnswerDisplay questionType="OEQ" content={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)[key][subKey]["answer"]} isText={(questionAnswerJSON as ProcessedOEQQuestionAnswerJSON)[key][subKey]["isText"]} />
-                            )}
+                  <div className="question-indexed-section-content">
+                    {questionIndexedParts[key]["root"] && (
+                      <div className="question-index-root flex flex-col gap-2">
+                        {/* Display the root content of the index  */}
+                        <div key={key} className="question-section-content">
+                          {questionIndexedParts[key]["root"].map((part) => {
+                            const { isText, content, id } = part;
+                            return (
+                              <QuestionSectionDisplay
+                                id={id}
+                                content={content}
+                                key={id}
+                                isText={isText}
+                              />
+                            );
+                          })}
                         </div>
-                      ))}
-                    </div>
-                  )}
+                        {questionType === "OEQ" &&
+                          checkIfToDisplayAnswerPart("OEQ", key, "root") && (
+                            <QuestionLeafAnswerDisplay
+                              questionType="OEQ"
+                              content={
+                                (
+                                  questionAnswerJSON as ProcessedOEQQuestionAnswerJSON
+                                )[key]["root"]["answer"]
+                              }
+                              isText={
+                                (
+                                  questionAnswerJSON as ProcessedOEQQuestionAnswerJSON
+                                )[key]["root"]["isText"]
+                              }
+                            />
+                          )}
+                      </div>
+                    )}
+
+                    {/* Display the sub-index content for indexed questions */}
+                    {questionLeafs[key].length > 0 && (
+                      <div className="question-subindexed-section">
+                        {" "}
+                        {questionLeafs[key].map((subKey: string) => (
+                          <div
+                            key={subKey}
+                            className="question-indexed-part flex flex-col gap-2"
+                          >
+                            <div className="flex items-start gap-2">
+                              <span className="question-subindex-label">
+                                ({subKey})
+                              </span>
+                              <div className="question-section-content">
+                                {questionIndexedParts[key][subKey].map(
+                                  (
+                                    part: ProcessedQuestionPart,
+                                    idx: number
+                                  ) => {
+                                    const { isText, content, id } = part;
+                                    return (
+                                      <QuestionSectionDisplay
+                                        id={id}
+                                        content={content}
+                                        key={id}
+                                        isText={isText}
+                                      />
+                                    );
+                                  }
+                                )}
+                              </div>
+                            </div>
+                            {/* OEQ format of displaying the answer */}
+                            {questionType === "OEQ" &&
+                              checkIfToDisplayAnswerPart(
+                                "OEQ",
+                                key,
+                                subKey
+                              ) && (
+                                <QuestionLeafAnswerDisplay
+                                  questionType="OEQ"
+                                  content={
+                                    (
+                                      questionAnswerJSON as ProcessedOEQQuestionAnswerJSON
+                                    )[key][subKey]["answer"]
+                                  }
+                                  isText={
+                                    (
+                                      questionAnswerJSON as ProcessedOEQQuestionAnswerJSON
+                                    )[key][subKey]["isText"]
+                                  }
+                                />
+                              )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

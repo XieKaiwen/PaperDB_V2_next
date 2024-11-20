@@ -26,7 +26,7 @@ model Paper {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model School {
-  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   schoolType      SchoolType
   schoolFullName  String
   schoolShortName String
@@ -59,7 +59,7 @@ model User {
   email                   String                    @unique
   dateJoined              DateTime                  @default(now()) @db.Timestamptz(6)
   educationLevel          edu_level
-  role                    UserRole                 @default(USER)
+  role                    UserRole                  @default(USER)
   phoneNumber             String
   username                String
   UserLog                 UserLog[]
@@ -79,10 +79,10 @@ model Question {
   id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   paperId         String     @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   subjectId       String     @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  topics          String[]   
+  topics          String[]
   fullMark        Int        @db.SmallInt // total marks for the question
-  markScheme      Json // marks for each section
-  difficulty      Difficulty
+  markScheme      Json? // marks for each section
+  difficulty      Difficulty?
   passingRate     Float?
   questionLeafs   Json?
   questionContent Json
@@ -118,13 +118,13 @@ model Question {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model UserPaperProgressStatus {
-  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId         String          @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  paperId        String          @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  progressStatus ProgressStatus  @default(IN_PROGRESS)
-  currentScore   Float           @default(0) @db.Real
-  Paper          Paper           @relation(fields: [paperId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  User           User            @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String         @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  paperId        String         @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  progressStatus ProgressStatus @default(IN_PROGRESS)
+  currentScore   Float          @default(0) @db.Real
+  Paper          Paper          @relation(fields: [paperId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User           User           @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 enum edu_level {
@@ -150,13 +150,13 @@ enum exam_type {
   PSLE
   WA
   SA
-  O_LEVEL      @map("O Level")
-  COMMON_TEST  @map("Common Test")
-  BLOCK_TEST   @map("Block Test")
-  PRELIM       @map("Preliminary Exam")
-  PROMO        @map("Promotional Exam")
-  A_LEVEL      @map("A Level")
-  OTHER        @map("Other")
+  O_LEVEL     @map("O Level")
+  COMMON_TEST @map("Common Test")
+  BLOCK_TEST  @map("Block Test")
+  PRELIM      @map("Preliminary Exam")
+  PROMO       @map("Promotional Exam")
+  A_LEVEL     @map("A Level")
+  OTHER       @map("Other")
 }
 
 enum SchoolType {
@@ -173,8 +173,8 @@ enum Difficulty {
 
 enum ProgressStatus {
   IN_PROGRESS @map("In Progress")
-  SUBMITTED @map("submitted")
-  MARKED @map("marked")
+  SUBMITTED   @map("submitted")
+  MARKED      @map("marked")
 }
 
 enum UserRole {

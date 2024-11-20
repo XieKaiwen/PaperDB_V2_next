@@ -191,6 +191,10 @@ body::-webkit-scrollbar {
     @apply flex flex-1 gap-4;
   }
 
+  .question-indexed-section-content{
+    @apply flex flex-col gap-2
+  }
+
   .question-index-label,
   .question-subindex-label {
     @apply text-sm;

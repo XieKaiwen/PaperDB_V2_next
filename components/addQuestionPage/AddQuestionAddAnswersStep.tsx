@@ -6,7 +6,6 @@ import {
 import {
   createQuestionAnswerValueAfterReset,
   createQuestionAnswerValueWithoutReset,
-  OEQAnswerSchema,
   questionAnswerRequiresReset,
 } from "@/utils/addQuestionUtils";
 import React, { forwardRef, ReactElement, useEffect, useState } from "react";
@@ -42,6 +41,7 @@ import Image from "next/image";
 import { FormField, FormMessage } from "../ui/form";
 import { Checkbox } from "../ui/checkbox";
 import { CheckedState } from "@radix-ui/react-checkbox";
+import CustomInput from "../form-components/CustomInput";
 
 export default function AddQuestionAddAnswersStep() {
   const { control, setValue, resetField, getValues } =
@@ -154,32 +154,35 @@ export default function AddQuestionAddAnswersStep() {
       {watchedQuestionType === "MCQ" && <AddMCQAnswerInput />}
 
       {watchedQuestionType === "OEQ" && (
-        <div className="w-full space-y-3">
+        <div className="w-full space-y-4">
           {fields.map((answerPart, index) => {
             const { questionIdx, questionSubIdx, isText, answer } = answerPart;
             return (
               <div key={answerPart.id}>
-                {isText ? (
-                  <CustomTextArea<AddQuestionFormData>
-                    control={control}
-                    name={`questionAnswer.${index}.answer`}
-                    label={`Answer for (${questionIdx})(${questionSubIdx})`}
-                    placeholder="Enter the answer..."
-                  />
-                ) : (
-                  <CustomFileInput<AddQuestionFormData>
-                    control={control}
-                    name={`questionAnswer.${index}.answer`}
-                    label={`Answer for (${questionIdx})(${questionSubIdx})`}
-                    key={answerPart.id}
-                  />
-                )}
-                <div className="flex gap-2 mt-3">
-                  Toggle File:
-                  <Switch
-                    checked={!isText}
-                    onCheckedChange={() => toggleFileClick(index)}
-                  />
+                <CustomInput<AddQuestionFormData> label={`Marks for (${questionIdx})(${questionSubIdx})`} control={control} name={`questionAnswer.${index}.mark`} placeholder="Enter marks..."/>
+                <div>
+                  {isText ? (
+                    <CustomTextArea<AddQuestionFormData>
+                      control={control}
+                      name={`questionAnswer.${index}.answer`}
+                      label={`Answer for (${questionIdx})(${questionSubIdx})`}
+                      placeholder="Enter the answer..."
+                    />
+                  ) : (
+                    <CustomFileInput<AddQuestionFormData>
+                      control={control}
+                      name={`questionAnswer.${index}.answer`}
+                      label={`Answer for (${questionIdx})(${questionSubIdx})`}
+                      key={answerPart.id}
+                    />
+                  )}
+                  <div className="flex gap-2 mt-3 text-sm">
+                    Toggle File:
+                    <Switch
+                      checked={!isText}
+                      onCheckedChange={() => toggleFileClick(index)}
+                    />
+                  </div>
                 </div>
               </div>
             );
@@ -250,9 +253,8 @@ function AddMCQAnswerInput() {
 
     // Step 3: Map the sorted indexes back to the corresponding values in options
     const sortedCorrectAnswers = sortedIndexes.map((index) => options[index]);
-    setValue("questionAnswer", [
-      { options: options, answer: sortedCorrectAnswers },
-    ]);
+    setValue("questionAnswer.0.answer", sortedCorrectAnswers);
+    setValue("questionAnswer.0.options", options);
   }
 
   // HANDLING DELETION OF OPTIONS
@@ -280,6 +282,12 @@ function AddMCQAnswerInput() {
 
   return (
     <main className="w-full space-y-3">
+      <CustomInput<AddQuestionFormData>
+        control={control}
+        name="questionAnswer.0.mark"
+        placeholder="Enter mark for question..."
+        label="Question mark"
+      />
       <div className="flex gap-3">
         <Input
           className=""
@@ -322,8 +330,10 @@ function AddMCQAnswerInput() {
               checked={correctAnswers.includes(option)}
               onCheckedChange={(checked) => {
                 return checked
-                ? setCorrectAnswers((prev) => [...prev, option])
-                : setCorrectAnswers((prev) => prev.filter((a) => a !== option));
+                  ? setCorrectAnswers((prev) => [...prev, option])
+                  : setCorrectAnswers((prev) =>
+                      prev.filter((a) => a !== option)
+                    );
               }}
             />
           ))}
@@ -373,7 +383,7 @@ interface MCQAddAnswerOptionItemProps {
   index: number;
   style?: React.CSSProperties;
   checked: boolean;
-  onCheckedChange: (checked: CheckedState) => void
+  onCheckedChange: (checked: CheckedState) => void;
   onDelete: (index: number) => void;
 }
 const MCQAddAnswerOptionItem = forwardRef<
@@ -390,7 +400,8 @@ const MCQAddAnswerOptionItem = forwardRef<
       className="p-2 bg-white rounded-lg shadow-md border-gray-300 border-2 w-full md:w-1/2 flex gap-2"
     >
       <div>
-        <Checkbox className="" 
+        <Checkbox
+          className=""
           checked={checked}
           onCheckedChange={(checked: CheckedState) => onCheckedChange(checked)}
         />
@@ -428,14 +439,14 @@ interface SortableMCQAddAnswerOptionItemProps {
   index: number;
   id: string;
   checked: boolean;
-  onCheckedChange: (checked: CheckedState) => void
+  onCheckedChange: (checked: CheckedState) => void;
 }
 function SortableMCQAddAnswerOptionItem({
   index,
   id,
   onDelete,
   checked,
-  onCheckedChange
+  onCheckedChange,
 }: SortableMCQAddAnswerOptionItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: id });

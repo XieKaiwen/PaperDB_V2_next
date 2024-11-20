@@ -34,14 +34,8 @@ export const defaultValues: AddQuestionFormData = {
 const textQuestionPartSchema = z.object({
   questionIdx: z.string().min(1, { message: "Choose an index" }),
   questionSubIdx: z.string().min(1, { message: "Choose an sub index" }),
-  order: z.string().refine(
-    (val) => {
-      const parsedInt = parseInt(val);
-      if (isNaN(parsedInt)) return false;
-      return true;
-    },
-    { message: "Please enter a valid number" }
-  ),
+  order: z.string().refine(val => !isNaN(Number(val)), { message: "Must be a valid number" }) // Check if it's a valid number
+  .transform(val => Number(val)), // Transform the string into a number
   isText: z.boolean(),
   text: z.string().min(1, { message: "Required, delete if not needed" }),
   id: z.string(),
@@ -82,6 +76,10 @@ export const MCQAnswerSchema = z
       answer: z.array(z.string()).min(1, {
         message:"There must be at least 1 correct answer",
       }),
+      mark: z
+      .string() // The input is a string
+      .refine(val => !isNaN(Number(val)), { message: "Must be a valid number" }) // Validate that it's a valid number
+      .refine(val => Number(val) !== 0, { message: "Cannot be 0" })
     })
   )
   .max(1, { message: "MCQ should only have 1 answer input" });
@@ -100,7 +98,11 @@ export const OEQAnswerSchema = z.array(
       )
     ]),
     id: z.string(),
-    isText: z.boolean()
+    isText: z.boolean(),
+    mark: z
+    .string() // The input is a string
+    .refine(val => !isNaN(Number(val)), { message: "Must be a valid number" }) // Validate that it's a valid number
+    .refine(val => Number(val) !== 0, { message: "Cannot be 0" })
   }).refine(
     (data) => (data.isText ? typeof data.answer === "string" : data.answer instanceof File),
     {
@@ -316,9 +318,9 @@ export function createQuestionAnswerValueAfterReset(
 
   if (questionType === "MCQ") {
     // FOR MCQ, JUST UPDATE IT TO ARRAY WITH THE BAREBONES OBJECT
-    return [{ options: [], answer: [] }] as [{options: string[], answer: string[]}];
+    return [{ options: [], answer: [], mark: "0" }] as z.infer<typeof MCQAnswerSchema>;
   } else if (questionType === "OEQ") {
-    const newQuestionAnswerValue = [];
+    const newQuestionAnswerValue: z.infer<typeof OEQAnswerSchema> = [];
 
     if (!questionLeafs) {
       // IF questionLeafs is NULL, it means that the question only has a root
@@ -327,7 +329,8 @@ export function createQuestionAnswerValueAfterReset(
         questionSubIdx: "root",
         answer: "",
         id: uuidv4(),
-        isText: true
+        isText: true,
+        mark: "0"
       });
     } else {
       // CREATE ONE OBJECT FOR EACH questionLeaf in questionLeafs, in order, first by questionIdx, then by questionSubIdx
@@ -339,7 +342,8 @@ export function createQuestionAnswerValueAfterReset(
             questionSubIdx: "root",
             answer: "",
             id: uuidv4(),
-            isText: true
+            isText: true,
+            mark: "0"
           });
         } else {
           // ELSE, THERE IS NO ROOT AND ONLY HAVE THE OTHER SUBKEYS AS SUBINDEX
@@ -349,7 +353,8 @@ export function createQuestionAnswerValueAfterReset(
               questionSubIdx: subKey,
               answer: "",
               id: uuidv4(),
-              isText: true
+              isText: true,
+              mark: "0"
             });
           });
         }
@@ -391,7 +396,7 @@ export function createQuestionAnswerValueWithoutReset(
         return [foundObj];
       }else{
         // IF NO SUCH AN OBJECT IS FOUND, CREATE A NEW OBJECT WITH "root", "root" for questionIdx and questionSubIdx
-        return [{ questionIdx: "root", questionSubIdx: "root", answer: "", id: uuidv4(), isText: true }] as z.infer<typeof OEQAnswerSchema>;
+        return [{ questionIdx: "root", questionSubIdx: "root", answer: "", id: uuidv4(), isText: true, mark:"0" }] as z.infer<typeof OEQAnswerSchema>;
       }
     }else{
       // IF questionLeafs IS NOT NULL, WE CREATE AN OBJECT FOR EACH questionLeaf in questionLeafs, IN ORDER, FIRST BY questionIdx, THEN BY questionSubIdx
@@ -425,7 +430,7 @@ export function createQuestionAnswerValueWithoutReset(
           if(hashMap.get(`${key}-root`)){
             newQuestionAnswerValue.push(hashMap.get(`${key}-root`) as AddQuestionAnswerItem)
           }else{
-            newQuestionAnswerValue.push({ questionIdx: key, questionSubIdx: "root", isText: true, answer: "", id: uuidv4() })
+            newQuestionAnswerValue.push({ questionIdx: key, questionSubIdx: "root", isText: true, answer: "", id: uuidv4(), mark:"0" })
           }
         } else {
           // ELSE, THERE IS NO ROOT AND ONLY HAVE THE OTHER SUBKEYS AS SUBINDEX
@@ -433,7 +438,7 @@ export function createQuestionAnswerValueWithoutReset(
             if(hashMap.get(`${key}-${subKey}`)){
               newQuestionAnswerValue.push(hashMap.get(`${key}-${subKey}`) as AddQuestionAnswerItem)
             }else{
-              newQuestionAnswerValue.push({ questionIdx: key, questionSubIdx: subKey, isText: true, answer: "", id: uuidv4() })
+              newQuestionAnswerValue.push({ questionIdx: key, questionSubIdx: subKey, isText: true, answer: "", id: uuidv4(), mark:"0" })
             }
           });
         }
@@ -477,9 +482,9 @@ export function createQuestionAnswerValueWithoutReset(
 
 export function processMCQQuestionAnswerIntoJSON(questionAnswer: z.infer<typeof MCQAnswerSchema>){
   if(questionAnswer.length===0){
-    return {options: [], answer: []}
+    return {options: [], answer: [], mark: "0"}
   }
-  return parseStringify(questionAnswer[0]) as {options: string[], answer: string[]}
+  return parseStringify(questionAnswer[0]) as {options: string[], answer: string[], mark: string;}
 }
 
 export function processOEQQuestionAnswerIntoJSON(questionAnswer: z.infer<typeof OEQAnswerSchema>) {
@@ -491,7 +496,8 @@ export function processOEQQuestionAnswerIntoJSON(questionAnswer: z.infer<typeof 
     }
     processedQuestionAnswerJSON[answer.questionIdx][answer.questionSubIdx] = {
       answer: answer.answer,
-      isText: answer.isText
+      isText: answer.isText,
+      mark: answer.mark
     }
   })
   
