@@ -250,9 +250,82 @@ Steps to converting `questionPart` to `questionContent`:
 
 2. Sort the array values in the object according to the _order_ value in ascending order. Then **remove the order values from the object**.
 
+#### Finalised `questionContent` for database
+
+HOWEVER, the questionContent above will not be the finalised JSON that we will add into the database. The finalised JSON added to the database will have 1 huge difference: in the finalised JSON, instead of only having a single `content`. The finalised JSON will take the value in `content` and save it accordingly after processes into 1 of 2 attributes: `text` and `imgUrl`, depending on `isText`.
+
+Hence, the final `questionContent` JSON will look something like:
+
+```javascript
+{
+  "root": [
+    {
+      "isText": true,
+      "text": "Choose from the following compounds to answer the questions.",
+      "id": "86f3742d-bb04-433b-a542-3cf72340741c"
+    },
+    {
+      "isText": true,
+      "text": "Each compound may be used once, more than once or not at all",
+      "id": "499ad7b9-d1d0-4ac7-bbdd-026107ad3234"
+    },
+    {
+      "isText": true,
+      "text": "state which compound",
+      "id": "e60288ca-9b83-4944-82b6-84406f1d71c6"
+    }
+  ],
+  "indexed": {
+    "a": {
+      "root": [
+        {
+          "isText": false,
+          "imgUrl": [_imageUrl_],
+          "id": "6639ccc9-390f-49a4-9a3f-72259a1d7ce2"
+        }
+      ]
+    },
+    "b": {
+      "root": [
+        {
+          "isText": true,
+          "text": "reacts with warm aqueous sodium hydroxide...\n",
+          "id": "61004ff0-c2a6-4ca4-9017-a901ee809e39"
+        }
+      ]
+    },
+    "c": {
+      "root": [
+        {
+          "isText": true,
+          "text": "contains an anion with a charge of -3",
+          "id": "ff8c3daa-3ad8-40aa-a239-32217dff9b87"
+        }
+      ]
+    },
+    "d": {
+      "i": [
+        {
+          "isText": false,
+          "imgUrl": [_imageUrl_],
+          "id": "20fc344a-0cf5-436e-87e1-685301335056"
+        }
+      ],
+      "ii": [
+        {
+          "isText": true,
+          "text": "is used to test for a reducing agent",
+          "id": "6f608f94-253f-424c-b2a5-6e20bd79c31f"
+        }
+      ]
+    }
+  }
+}
+```
+
 ### `questionAnswer`
 
-In the form, the value for `questionAnswer` field will be one of 2 forms depending on if it is MCQ or OEQ questionType. Hence, I will be spliting this section into 2 sub-sections
+In the form, the value for `questionAnswer` field will be one of 2 forms depending on if it is MCQ or OEQ `questionType`. Hence, I will be spliting this section into 2 sub-sections
 
 #### MCQ
 
@@ -373,48 +446,89 @@ And in QuestionPreview, this entire array is processed into the following JSON:
         "root": {
             "answer": {},
             "isText": false,
-            "mark": 1
+            "mark": "1"
         }
     },
     "b": {
         "root": {
             "answer": "ANSWER",
             "isText": true,
-            "mark": 2
+            "mark": "2"
         }
     },
     "c": {
         "root": {
             "answer": "ANSWER",
             "isText": true,
-            "mark": 2
+            "mark": "2"
         }
     },
     "d": {
         "i": {
             "answer": "ANSWER",
             "isText": true,
-            "mark": 3
+            "mark": "3"
         },
         "ii": {
             "answer": "ANSWER",
             "isText": true,
-            "mark": 4
+            "mark": "4"
         }
     }
 }
 ```
-^ So as it can be seen, it will be processed into a similar structure as `questionContent`, where the object will have the `questionIdx` and `questionSubIdx` of the each `questionLeaf` (In this case, this is for the same `questionLeaf` as the one in the JSON above) as *key* and *subKey* 
 
-The `keys` and `subkeys` in this object does not need to be in order because when displaying the question, it is highly likely that we only need the questionLeafs to access the answer values. BUT it is still desirable to *keep them in order* because of **possible future extensibility**
+^ So as it can be seen, it will be processed into a similar structure as `questionContent`, where the object will have the `questionIdx` and `questionSubIdx` of the each `questionLeaf` (In this case, this is for the same `questionLeaf` as the one in the JSON above) as _key_ and _subKey_
 
-When adding into the database, the `mark` attributes should be parsed into an integer
+The `keys` and `subkeys` in this object does not need to be in order because when displaying the question, it is highly likely that we only need the questionLeafs to access the answer values. BUT it is still desirable to _keep them in order_ because of **possible future extensibility**
+
+##### Finalised `questionAnswer` JSON for database
+
+When adding into the database, the `mark` attributes should be parsed into an integer. The image file should also be stored in supabase storage and a link to the images should be stored in the JSON, in a `imgUrl` attribute. Hence, the final version of the JSON should look like this:
+
+```javascript
+{
+    "a": {
+        "root": {
+            "imgUrl": [image_Url] ,
+            "isText": false,
+            "mark": "1"
+        }
+    },
+    "b": {
+        "root": {
+            "text": "ANSWER",
+            "isText": true,
+            "mark": "2"
+        }
+    },
+    "c": {
+        "root": {
+            "text": "ANSWER",
+            "isText": true,
+            "mark": "2"
+        }
+    },
+    "d": {
+        "i": {
+            "text": "ANSWER",
+            "isText": true,
+            "mark": "3"
+        },
+        "ii": {
+            "text": "ANSWER",
+            "isText": true,
+            "mark": "4"
+        }
+    }
+}
+```
 
 ### Mark Scheme
 
 In the Question table in the database, there is a markScheme field and it is to store the marks allocated to each of the question Leaf.
 
-Hence for __OEQ__, using the above example it should look like this:
+Hence for **OEQ**, using the above example it should look like this:
 
 ```javascript
 {
@@ -423,7 +537,7 @@ Hence for __OEQ__, using the above example it should look like this:
     },
     "b": {
         "root": 2
-        
+
     },
     "c": {
         "root": 3
@@ -434,6 +548,30 @@ Hence for __OEQ__, using the above example it should look like this:
     }
 }
 ```
-^ the mark value should already be parsed into an __integer__
 
-Foe __MCQ__, since there should be no indexed parts in an MCQ, `markScheme` will be `null`. Marks given to students will be calculated in a different way
+^ the mark value should already be parsed into an **integer**
+
+For **MCQ**, since there should be no indexed parts in an MCQ, `markScheme` will be `null`. Marks given to students will be calculated in a different way
+
+
+## Naming convention for image files in storage
+
+The name for image files should include most of the **paper metadata** as well, for *"foldering" and better identification* of the images. 
+
+List of paper metadata collected:
+1. year
+2. educationLevel
+3. school
+4. subject
+5. examType 
+
+We will arrange the paper metadata in the image name in increasing specificity.
+
+Also, since both `questionContent` and `questionAnswer` can include images, we will also further separate the image names by adding paths __content__ and __answer__.
+
+To distinguish images within the same JSON, there will also be a `imageCount` variable being tracked when adding the images into the database. E.g. 0, 1, 2, 3, 4, 5...
+
+Furthermore, to prevent being targetted by malicious actors, we will be **adding a `uuid` number to the name** of the image file as well. In the future, rate limiting techniques will also be explored. 
+
+Now, we put everything together:
+image file path: _[*year*]/[*educationLevel*]/[*school*]/[*subject*]/[*examType*]/[*content/answer*]/image_[*imageCount*]_[*uuid*]_

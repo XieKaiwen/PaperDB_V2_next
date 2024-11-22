@@ -79,6 +79,8 @@ model Question {
   id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   paperId         String     @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   subjectId       String     @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  questionType    QuestionType
+  isMulti         Boolean?
   topics          String[]
   fullMark        Int        @db.SmallInt // total marks for the question
   markScheme      Json? // marks for each section
@@ -140,6 +142,11 @@ enum edu_level {
   S4
   J1
   J2
+}
+
+enum QuestionType {
+  MCQ
+  OEQ
 }
 
 enum exam_type {
