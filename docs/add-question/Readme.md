@@ -569,9 +569,7 @@ We will arrange the paper metadata in the image name in increasing specificity.
 
 Also, since both `questionContent` and `questionAnswer` can include images, we will also further separate the image names by adding paths __content__ and __answer__.
 
-To distinguish images within the same JSON, there will also be a `imageCount` variable being tracked when adding the images into the database. E.g. 0, 1, 2, 3, 4, 5...
-
 Furthermore, to prevent being targetted by malicious actors, we will be **adding a `uuid` number to the name** of the image file as well. In the future, rate limiting techniques will also be explored. 
 
 Now, we put everything together:
-image file path: _[*year*]/[*educationLevel*]/[*school*]/[*subject*]/[*examType*]/[*content/answer*]/image_[*imageCount*]_[*uuid*]_
+image file path: __[*year*]/[*educationLevel*]/[*school*]/[*subject*]/[*examType*]/[*content/answer*]/[index]/[sub-index]/image_[*uuid*]__

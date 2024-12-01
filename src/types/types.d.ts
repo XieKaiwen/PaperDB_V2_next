@@ -1,9 +1,10 @@
-import { questionPartSchema } from "@/utils/addQuestionUtils";
+import { contentTypeSchema, imageQuestionPartSchema, questionPartSchema, textQuestionPartSchema } from "@/utils/addQuestionUtils";
 import { authFormSchema } from "@/utils/authFormUtils";
 import { UserMetadata } from "@supabase/supabase-js";
 import { FieldValues } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Prisma, Subject } from "@prisma/client";
+import { z } from "zod";
 
 // Group type and interface together
 declare type GetLoggedInResponse = {
@@ -84,19 +85,21 @@ declare type AddQuestionFormQuestionPart = {
 type ProcessedQuestionPart = {
   isText: true;
   content: string;
+  order?: number;
   id: string;
 } | {
   isText: false;
   content: File;
+  order?: number;
   id: string;
 };
 
 type ProcessedQuestionContentCombinedJSON = {
   questionContent: {
-    root: ProcessedQuestionContent[];
+    root: ProcessedQuestionPart[];
     indexed: {
       [key: string]: {
-        [subKey: string]: ProcessedQuestionContent[];
+        [subKey: string]: ProcessedQuestionPart[];
       };
     };
   };
@@ -116,6 +119,157 @@ type ProcessedOEQQuestionAnswerJSON = {
 }
 
 type AddQuestionAnswerItem = { questionIdx: string; questionSubIdx: string; answer: string; isText: true; id: string, mark: string } | { id: string; questionIdx: string; questionSubIdx: string; answer: File; isText: false, mark:string } 
+//#####################################################################################
+// This are the types used for preprocessing and finalising the questionContent, questionLeafs and questionAnswer
+interface BaseQuestionIndex{
+  questionIdx: string;
+  questionSubIdx: string;
+}
+interface BaseQuestionAttributes{
+  id: string
+  order: string
+}
+
+
+interface BaseQuestionPart extends BaseQuestionIndex, BaseQuestionAttributes{}
+interface BaseTextAttributes {
+  isText: true;
+  text: string
+}
+interface BaseImageAttributes {
+  isText: false;
+  image: string
+}
+
+interface QuestionPartOrderInt extends Omit<BaseQuestionPart, 'order'> {
+  order: number;
+}
+interface BaseQuestionPartWithoutOrder extends Omit<BaseQuestionPart, 'order'> {}
+
+interface BaseTextQuestionPart extends BaseQuestionPart, BaseTextAttributes {
+}
+interface BaseImageQuestionPart extends BaseQuestionPart, BaseImageAttributes {
+}
+
+type QuestionPart = BaseTextQuestionPart | BaseImageQuestionPart
+
+// These are all with questionIdx and subIdx
+interface TextQuestionPartOrderInt extends QuestionPartOrderInt, BaseTextAttributes {
+}
+
+interface ImageQuestionPartOrderInt extends QuestionPartOrderInt, BaseImageAttributes{
+}
+
+type QuestionPartWithOrderInt = TextQuestionPartOrderInt | ImageQuestionPartOrderInt  
+type QuestionPartWithOrderIntArray = QuestionPartWithOrderInt[]
+
+// Create ones that does not have questionIdx and questionSubIdx
+interface TextQuestionPartOrderIntWithoutIdx extends Omit<QuestionPartOrderInt, 'questionIdx'|'questionSubIdx'>, BaseTextAttributes {
+}
+
+interface ImageQuestionPartOrderIntWithoutIdx extends Omit<QuestionPartOrderInt, 'questionIdx'|'questionSubIdx'>, BaseImageAttributes{
+}
+
+type QuestionPartWithOrderIntWithoutIdx = TextQuestionPartOrderIntWithoutIdx | ImageQuestionPartOrderIntWithoutIdx  
+type QuestionPartWithOrderIntWithoutIdxArray = QuestionPartWithOrderIntWithoutIdx[]
+
+
+interface FinalisedTextQuestionPart extends Omit<TextQuestionPartOrderIntWithoutIdx, 'order'>{}
+
+interface FinalisedImageQuestionPart extends Omit<ImageQuestionPartOrderIntWithoutIdx, 'order'>{}
+
+type FinalisedQuestionPart = FinalisedTextQuestionPart | FinalisedImageQuestionPart
+type FinalisedQuestionPartArray = FinalisedQuestionPart[]
+
+type QuestionContentWithOrder = {
+  root: QuestionPartWithOrderIntWithoutIdxArray;
+  indexed: {
+    [key: string]: {
+      [subKey: string]: QuestionPartWithOrderIntWithoutIdxArray;
+    };
+  }
+}
+
+type FinalisedQuestionLeafs = {
+  [key: string]: string[]
+} | null
+
+type FinalisedQuestionContent = {
+  root: FinalisedQuestionPartArray;
+  indexed: {
+    [key: string]: {
+      [subKey: string]: FinalisedQuestionPartArray;
+    };
+  }
+}
+
+// Below are the types used for preprocessing and finalising the questionAnswer and markScheme
+interface BaseOEQAnswerAttributes {
+  questionIdx: string;
+  questionSubIdx: string;
+  mark: string
+}
+
+interface OEQImageAttributes {
+  isText: false;
+  image: string;
+}
+interface OEQTextAttributes {
+  isText: true;
+  text: string;
+}
+
+interface OEQImageAnswerItem extends BaseOEQAnswerAttributes, OEQImageAttributes {}
+interface OEQTextAnswerItem extends BaseOEQAnswerAttributes, OEQTextAttributes {}
+
+type OEQAnswerItemCombined = OEQImageAnswerItem | OEQTextAnswerItem
+
+interface MCQAnswerItem {
+  options: string[],
+  answer: string[],
+  mark: string
+}
+type MCQAnswerItemArray = MCQAnswerItem[]
+
+type OEQAnswerArray = OEQAnswerItemCombined[]
+
+type QuestionAnswerArray = OEQAnswerArray | MCQAnswerItemArray
+
+interface FinalisedOEQImageAnswerItem extends Omit<OEQImageAnswerItem, 'questionIdx'|'questionSubIdx'> {
+  mark:number
+}
+interface FinalisedOEQTextAnswerItem extends Omit<OEQTextAnswerItem, 'questionIdx'|'questionSubIdx'> {
+  mark:number
+}
+
+type FinalisedOEQAnswerItem = FinalisedOEQImageAnswerItem | FinalisedOEQTextAnswerItem
+
+type FinalisedMultiMCQQuestionAnswer = {
+  options: string[],
+  answer: string[],
+} 
+type FinalisedNonMultiMCQQuestionAnswer = {
+  options: string[],
+  answer: string,
+}
+
+type FinalisedOEQQuestionAnswer = {
+  [key:string]:{
+    [subkey:string]: FinalisedOEQAnswerItem
+  }
+}
+
+type FinalisedQuestionAnswer = FinalisedMultiMCQQuestionAnswer | FinalisedNonMultiMCQQuestionAnswer | FinalisedOEQQuestionAnswer
+
+type FinalisedMarkScheme = {
+  [key:string]:{
+    [subkey:string]: number // mark
+  }
+} | null
+
+//#####################################################################################
+
+
 
 declare interface AuthFormProps {
   type: "sign-up" | "login";

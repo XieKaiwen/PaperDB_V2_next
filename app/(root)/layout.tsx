@@ -1,4 +1,5 @@
 import NavBar from "@/components/NavBar";
+import { Toaster } from "@/components/ui/toaster";
 import { debugStyle } from "@/src/constants/constants";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
@@ -32,6 +33,7 @@ export default async function RootLayout({
     <main className="font-open-sans">
       <NavBar user={user} />
       <div className="mt-16 p-6 pb-0">{children}</div>
+      <Toaster />
     </main>
   );
 }

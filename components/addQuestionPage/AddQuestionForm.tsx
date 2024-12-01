@@ -1,4 +1,8 @@
-import { questionPartSchema, defaultValues as addQuestionFormDefaultValues } from "@/utils/addQuestionUtils";
+import {
+  questionPartSchema,
+  defaultValues as addQuestionFormDefaultValues,
+  uploadImagesForQuestionPartsAndAnswer,
+} from "@/utils/addQuestionUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
 import {
@@ -25,6 +29,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+import { useMutation } from "@tanstack/react-query";
+import { createClient } from "@/utils/supabase/client";
+import {
+  checkIfQuestionNumberExists,
+  createQuestionWithPaperMetadata,
+} from "@/src/actions/data-actions/question.actions";
+import { edu_level } from "@prisma/client";
+import { UnexpectedError } from "@/src/custom-errors/errors";
+import { getQueryClient } from "@/utils/react-query-client/client";
+import { useToast } from "../ui/use-toast";
+
 
 /**
  * Some guidelines on the availability of options for certain fields:
@@ -36,6 +51,8 @@ import {
  */
 
 export default function AddQuestionForm() {
+  const {toast} = useToast()
+
   // SET FORM STEP
   const [formStep, setFormStep] = useState<1 | 2 | 3>(1);
   const [formDataToSubmit, setFormDataToSubmit] = useState<AddQuestionFormData>(
@@ -44,8 +61,9 @@ export default function AddQuestionForm() {
   const [isDialogueOpen, setIsDialogueOpen] = useState(false);
   const [isExistingQuestionNumber, setIsExistingQuestionNumber] =
     useState<boolean>(false);
+
   const [formSubmitting, setFormSubmitting] = useState(false); // For loading spinner on submit button
-  const [submissionError, setSubmissionError] = useState({message: ""})
+  const [submissionError, setSubmissionError] = useState<Error | null>(null);
   const fieldsEachStep: { [key: number]: Path<AddQuestionFormData>[] } = {
     1: [
       "year",
@@ -98,8 +116,8 @@ export default function AddQuestionForm() {
   });
 
   // // default value for images should be new File([], "")
-  const { control, clearErrors, getValues, setError } = form;
-  const { isSubmitting } = useFormState({ control });
+  const { control, clearErrors, getValues, setError, resetField, handleSubmit } = form;
+  // const { isSubmitting } = useFormState({ control });
 
   // Changing to using useWatch because watch() causes a rerender of the form whenever there is a change in formValues, i do not want that
   const watchedValues = useWatch({
@@ -214,35 +232,132 @@ export default function AddQuestionForm() {
     setFormStep((prev) => (prev - 1) as 1 | 2 | 3);
   }
 
+  // // SET UP MUTATION WITH REACT QUERY
+  const { mutateAsync: asyncAddQuestionMutate } = useMutation({
+    mutationFn: createQuestionWithPaperMetadata,
+  });
+
+  useEffect(()=> {
+    if(submissionError){
+      toast({
+        title: "Error adding question",
+        description: `${submissionError.name}: ${submissionError.message}`,
+        variant: "destructive",
+      })
+    }
+  },[submissionError])
+
   // FUNCTIONS TO BE CALLED AFTER SUBMISSION
   // Initial submission: Client-side validation -> Check if question number in the paper exists -> Open dialog to move to next step
   async function onSubmit(values: z.infer<typeof questionPartSchema>) {
     // await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log("Submitted: ", values);
     setFormDataToSubmit(values);
-    /** 
+    /**
      * Check if the question number already exists here.
      */
-    setIsDialogueOpen(true);
+    const { year, examType, subject, school, educationLevel, questionNumber } =
+      values;
+    try {
+      const isQuestionNumberExists = await checkIfQuestionNumberExists({
+        year,
+        examType,
+        subjectId: subject,
+        educationLevel: educationLevel as edu_level,
+        schoolId: school,
+        questionNumber: questionNumber,
+      });
+      if (isQuestionNumberExists) {
+        setIsExistingQuestionNumber(true);
+      } else {
+        setIsExistingQuestionNumber(false);
+      }
+      setIsDialogueOpen(true);
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        setSubmissionError(error)
+      } else {
+        setSubmissionError(new UnexpectedError())
+      }
+    }
   }
 
   // If the user presses the cancel button or the dialog is closed
   async function onSubmitCancel() {
-    setIsDialogueOpen(false)
+    console.log("Submit canceled");
+    setIsDialogueOpen(false);
     setIsExistingQuestionNumber(false);
-    setFormDataToSubmit(addQuestionFormDefaultValues)
+    setFormDataToSubmit(addQuestionFormDefaultValues);
   }
 
   // If the user presses the confirm button on dialog
   async function onSubmitConfirm() {
+    console.log("Submit confirmed");
+    
     setIsDialogueOpen(false);
     setFormSubmitting(true);
     /**
      * Perform all the submission logic here
      */
+    const supabase = createClient();
+    const userSession = await supabase.auth.getSession();
+    const userId = userSession.data?.session?.user.id;
+    try {
+      if (!userId) {
+        throw new Error("User not logged in");
+      }
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setFormSubmitting(false)
+      const {questionAnswer, questionPart} = formDataToSubmit
+
+      // pre-upload the image files
+      const {processedQuestionAnswer, processedQuestionPart} = await uploadImagesForQuestionPartsAndAnswer(formDataToSubmit)
+      const formDataIntoServer ={
+        ...formDataToSubmit,
+        questionAnswer: processedQuestionAnswer,
+        questionPart: processedQuestionPart,
+        educationLevel: formDataToSubmit.educationLevel as edu_level
+      }
+
+      await asyncAddQuestionMutate({
+        userId,
+        questionFormData: formDataIntoServer,
+      });
+      toast({
+        title: "Question added successfully",
+        variant: "success",
+      })
+
+      // reset relevant fields
+      setFormStep(1);
+      setFormDataToSubmit(addQuestionFormDefaultValues);
+      resetField("topics")
+      resetField("questionType")
+      resetField("questionNumber")
+      resetField("questionPart")
+      resetField("questionAnswer")
+
+      const queryClient = getQueryClient()
+      queryClient.invalidateQueries({
+        queryKey: ["questions"],
+        refetchType:"active",
+      }, {cancelRefetch: true});
+
+    } catch(error) {
+      console.error(error);
+      if (error instanceof Error) {
+        setSubmissionError(error);
+      }else{
+        setSubmissionError(new UnexpectedError())
+      }
+    } finally {
+      setFormSubmitting(false);
+      setIsExistingQuestionNumber(false);
+    }
+    /**
+     * Perform mutation here, and modify such that button is loading based on the state of the mutation, not the state of the formSubmitting (delete formSubmitting )
+     */
+
     /**
      * If submission is successful, reset the form and reset the formData state
      * If unsuccessful, update error state and use useEffect to display a toast.
@@ -316,9 +431,15 @@ export default function AddQuestionForm() {
         {/* <DialogTrigger>Open</DialogTrigger> */}
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{isExistingQuestionNumber ? "Replace an existing question?" : "Add a new question?"}</DialogTitle>
+            <DialogTitle>
+              {isExistingQuestionNumber
+                ? "Replace an existing question?"
+                : "Add a new question?"}
+            </DialogTitle>
             <DialogDescription>
-              {isExistingQuestionNumber ? "Text if question number does exist" : "Text if question number does not exist"}
+              {isExistingQuestionNumber
+                ? "Text if question number does exist"
+                : "Text if question number does not exist"}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-start">

@@ -13,15 +13,17 @@ model Paper {
   id                      String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   schoolId                String                    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   subjectId               String                    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                  String                    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   educationLevel          edu_level
-  totalMark               Int                       @db.SmallInt
+  totalMark               Int                       @default(0) @db.SmallInt
   examType                exam_type
-  visible                 Boolean                   @default(true)
+  visible                 Boolean                   @default(false)
   year                    String
   School                  School                    @relation(fields: [schoolId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   Subject                 Subject                   @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   UserPaperProgressStatus UserPaperProgressStatus[]
   Question                Question[]
+  User                    User                      @relation(fields: [userId], references: [id])
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -40,7 +42,6 @@ model Subject {
   educationLevels edu_level[]
   Paper           Paper[]
   Topic           Topic[]
-  Question        Question[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -64,6 +65,7 @@ model User {
   username                String
   UserLog                 UserLog[]
   UserPaperProgressStatus UserPaperProgressStatus[]
+  Paper                   Paper[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -76,21 +78,22 @@ model UserLog {
 }
 
 model Question {
-  id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  paperId         String     @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  subjectId       String     @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  paperId         String       @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   questionType    QuestionType
   isMulti         Boolean?
   topics          String[]
-  fullMark        Int        @db.SmallInt // total marks for the question
+  fullMark        Int          @db.SmallInt // total marks for the question
   markScheme      Json? // marks for each section
   difficulty      Difficulty?
   passingRate     Float?
+  questionNumber  Int
   questionLeafs   Json?
   questionContent Json
   questionAnswer  Json
-  Paper           Paper      @relation(fields: [paperId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  Subject         Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Paper           Paper        @relation(fields: [paperId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([paperId, questionNumber])
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.

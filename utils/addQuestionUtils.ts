@@ -7,15 +7,34 @@ import {
   AddQuestionAnswerItem,
   AddQuestionFormData,
   AddQuestionFormQuestionPart,
+  BaseQuestionAttributes,
+  FinalisedMarkScheme,
+  FinalisedMultiMCQQuestionAnswer,
+  FinalisedNonMultiMCQQuestionAnswer,
+  FinalisedOEQQuestionAnswer,
+  FinalisedQuestionAnswer,
+  FinalisedQuestionContent,
+  FinalisedQuestionLeafs,
+  ImageQuestionPartOrderInt,
+  MCQAnswerItemArray,
+  OEQAnswerArray,
+  OEQImageAnswerItem,
+  OEQTextAnswerItem,
   ProcessedOEQQuestionAnswerJSON,
   ProcessedQuestionContentCombinedJSON,
   ProcessedQuestionPart,
+  QuestionAnswerArray,
+  QuestionContentWithOrder,
+  QuestionPartWithOrderInt,
+  QuestionPartWithOrderIntArray,
+  QuestionPartWithOrderIntWithoutIdx,
 } from "@/src/types/types";
 import { exam_type } from "@prisma/client";
 import { z } from "zod";
 import { convertRomanToInt, parseStringify } from "./utils";
-import {v4 as uuidv4 } from "uuid";
-
+import { v4 as uuidv4 } from "uuid";
+import { createClient } from "./supabase/client";
+import { UnexpectedError } from "@/src/custom-errors/errors";
 
 export const defaultValues: AddQuestionFormData = {
   year: "",
@@ -23,25 +42,25 @@ export const defaultValues: AddQuestionFormData = {
   school: "",
   subject: "",
   topics: [],
-  examType: undefined,
+  examType: "OTHER",
   questionType: "",
   questionNumber: "",
   questionPart: [],
   questionAnswer: [],
-}
+};
 
-
-const textQuestionPartSchema = z.object({
+export const textQuestionPartSchema = z.object({
   questionIdx: z.string().min(1, { message: "Choose an index" }),
   questionSubIdx: z.string().min(1, { message: "Choose an sub index" }),
-  order: z.string().refine(val => !isNaN(Number(val)), { message: "Must be a valid number" }) // Check if it's a valid number
-  .transform(val => Number(val)), // Transform the string into a number
+  order: z.string().refine((val) => !isNaN(Number(val)), {
+    message: "Must be a valid number",
+  }), // Check if it's a valid number
   isText: z.boolean(),
   text: z.string().min(1, { message: "Required, delete if not needed" }),
   id: z.string(),
 });
 
-const imageQuestionPartSchema = z.object({
+export const imageQuestionPartSchema = z.object({
   questionIdx: z.string().min(1, { message: "Choose an index" }),
   questionSubIdx: z.string().min(1, { message: "Choose an sub index" }),
   order: z.string().refine(
@@ -74,12 +93,14 @@ export const MCQAnswerSchema = z
         .array(z.string())
         .min(2, { message: "At least 2 options are required" }),
       answer: z.array(z.string()).min(1, {
-        message:"There must be at least 1 correct answer",
+        message: "There must be at least 1 correct answer",
       }),
       mark: z
-      .string() // The input is a string
-      .refine(val => !isNaN(Number(val)), { message: "Must be a valid number" }) // Validate that it's a valid number
-      .refine(val => Number(val) !== 0, { message: "Cannot be 0" })
+        .string() // The input is a string
+        .refine((val) => !isNaN(Number(val)), {
+          message: "Must be a valid number",
+        }) // Validate that it's a valid number
+        .refine((val) => Number(val) !== 0, { message: "Cannot be 0" }),
     })
   )
   .max(1, { message: "MCQ should only have 1 answer input" });
@@ -87,29 +108,38 @@ export const MCQAnswerSchema = z
 // For OEQ, there should be an array of objects with questionIdx, questionSubIdx and the answer
 // The questionIdx and questionSubIdx is automatically set when rendering the answer step of the form, hence no need to validate them
 export const OEQAnswerSchema = z.array(
-  z.object({
-    questionIdx: z.string(),
-    questionSubIdx: z.string(),
-    answer: z.union([
-      z.string().min(1, { message: "Answer cannot be empty" }),
-      z.instanceof(File).refine(
-        (file) => ["image/jpeg", "image/png"].includes(file.type),
-        { message: "File must be a JPEG or PNG image" }
-      )
-    ]),
-    id: z.string(),
-    isText: z.boolean(),
-    mark: z
-    .string() // The input is a string
-    .refine(val => !isNaN(Number(val)), { message: "Must be a valid number" }) // Validate that it's a valid number
-    .refine(val => Number(val) !== 0, { message: "Cannot be 0" })
-  }).refine(
-    (data) => (data.isText ? typeof data.answer === "string" : data.answer instanceof File),
-    {
-      message: "Answer must be a string if isText is true, or a JPEG/PNG file if isText is false",
-      path: ["answer"],
-    }
-  )
+  z
+    .object({
+      questionIdx: z.string(),
+      questionSubIdx: z.string(),
+      answer: z.union([
+        z.string().min(1, { message: "Answer cannot be empty" }),
+        z
+          .instanceof(File)
+          .refine((file) => ["image/jpeg", "image/png"].includes(file.type), {
+            message: "File must be a JPEG or PNG image",
+          }),
+      ]),
+      id: z.string(),
+      isText: z.boolean(),
+      mark: z
+        .string() // The input is a string
+        .refine((val) => !isNaN(Number(val)), {
+          message: "Must be a valid number",
+        }) // Validate that it's a valid number
+        .refine((val) => Number(val) !== 0, { message: "Cannot be 0" }),
+    })
+    .refine(
+      (data) =>
+        data.isText
+          ? typeof data.answer === "string"
+          : data.answer instanceof File,
+      {
+        message:
+          "Answer must be a string if isText is true, or a JPEG/PNG file if isText is false",
+        path: ["answer"],
+      }
+    )
 );
 
 export const answerCombinedSchema = z.union([MCQAnswerSchema, OEQAnswerSchema]);
@@ -237,7 +267,7 @@ export function processQuestionPartIntoQuestionContentJSON(
   });
 
   // Sort root and indexed arrays by order and remove `order` from final output
-  questionContentJSON.questionContent.root.sort((a, b) => a.order - b.order);
+  questionContentJSON.questionContent.root.sort((a, b) => a.order! - b.order!);
   questionContentJSON.questionContent.root =
     questionContentJSON.questionContent.root.map(({ order, ...rest }) => rest);
 
@@ -245,7 +275,7 @@ export function processQuestionPartIntoQuestionContentJSON(
     Object.keys(questionContentJSON.questionContent.indexed[idx]).forEach(
       (subIdx) => {
         questionContentJSON.questionContent.indexed[idx][subIdx].sort(
-          (a, b) => a.order - b.order
+          (a, b) => a.order! - b.order!
         );
         questionContentJSON.questionContent.indexed[idx][subIdx] =
           questionContentJSON.questionContent.indexed[idx][subIdx].map(
@@ -255,7 +285,6 @@ export function processQuestionPartIntoQuestionContentJSON(
     );
   });
   // console.log(JSON.stringify(tempLeafSets, null, 2));
-  
 
   if (Object.keys(tempLeafSets).length === 0 || questionType === "MCQ") {
     questionContentJSON.questionLeafs = null;
@@ -287,15 +316,19 @@ export function questionAnswerRequiresReset(
   // console.log("watchedQuestionType:" + questionType);
   // FIRST, DETERMINE IF questionAnswer REQUIRES A RESET
   if (questionAnswer.length === 0) return true;
-  
+
   const firstObj = questionAnswer[0];
   console.log(firstObj);
   if (questionType === "MCQ") {
     // IF questionType is MCQ, questionAnswer should be an array containing a singular object
     // WITH THE KEYS `options` and `answer`
     // console.log("here", (!firstObj || !("options" in firstObj && "answer" in firstObj)));
-    
-    return !firstObj || !("options" in firstObj && "answer" in firstObj) || !(firstObj.options !== undefined && firstObj.answer !== undefined);
+
+    return (
+      !firstObj ||
+      !("options" in firstObj && "answer" in firstObj) ||
+      !(firstObj.options !== undefined && firstObj.answer !== undefined)
+    );
   } else if (questionType === "OEQ") {
     return (
       !firstObj ||
@@ -318,7 +351,9 @@ export function createQuestionAnswerValueAfterReset(
 
   if (questionType === "MCQ") {
     // FOR MCQ, JUST UPDATE IT TO ARRAY WITH THE BAREBONES OBJECT
-    return [{ options: [], answer: [], mark: "0" }] as z.infer<typeof MCQAnswerSchema>;
+    return [{ options: [], answer: [], mark: "0" }] as z.infer<
+      typeof MCQAnswerSchema
+    >;
   } else if (questionType === "OEQ") {
     const newQuestionAnswerValue: z.infer<typeof OEQAnswerSchema> = [];
 
@@ -330,7 +365,7 @@ export function createQuestionAnswerValueAfterReset(
         answer: "",
         id: uuidv4(),
         isText: true,
-        mark: "0"
+        mark: "0",
       });
     } else {
       // CREATE ONE OBJECT FOR EACH questionLeaf in questionLeafs, in order, first by questionIdx, then by questionSubIdx
@@ -343,7 +378,7 @@ export function createQuestionAnswerValueAfterReset(
             answer: "",
             id: uuidv4(),
             isText: true,
-            mark: "0"
+            mark: "0",
           });
         } else {
           // ELSE, THERE IS NO ROOT AND ONLY HAVE THE OTHER SUBKEYS AS SUBINDEX
@@ -354,7 +389,7 @@ export function createQuestionAnswerValueAfterReset(
               answer: "",
               id: uuidv4(),
               isText: true,
-              mark: "0"
+              mark: "0",
             });
           });
         }
@@ -366,10 +401,14 @@ export function createQuestionAnswerValueAfterReset(
 }
 
 // Type guard to check if an object is of type AnswerWithIndices
-function hasQuestionIndices(obj: any): obj is { questionIdx: string; questionSubIdx: string; answer: string } {
-  return typeof obj.questionIdx === "string" && typeof obj.questionSubIdx === "string";
+function hasQuestionIndices(
+  obj: any
+): obj is { questionIdx: string; questionSubIdx: string; answer: string } {
+  return (
+    typeof obj.questionIdx === "string" &&
+    typeof obj.questionSubIdx === "string"
+  );
 }
-
 
 export function createQuestionAnswerValueWithoutReset(
   questionType: string,
@@ -377,68 +416,100 @@ export function createQuestionAnswerValueWithoutReset(
   questionAnswer: z.infer<typeof answerCombinedSchema>
 ) {
   if (questionType === "MCQ") {
-    // IF THERE IS NO RESET, IT MEANS QUESTION TYPE DID NOT CHANGE. 
+    // IF THERE IS NO RESET, IT MEANS QUESTION TYPE DID NOT CHANGE.
     // SINCE MCQ WILL ONLY EVER HAVE 1 ELEMENT IN questionAnswer ARRAY, JUST RETURN IT. NO CHANGE
     return questionAnswer;
-  }else if(questionType === "OEQ"){
+  } else if (questionType === "OEQ") {
     const newQuestionAnswerValue: z.infer<typeof OEQAnswerSchema> = [];
-    questionAnswer = questionAnswer as z.infer<typeof OEQAnswerSchema>
-    if(!questionLeafs){
+    questionAnswer = questionAnswer as z.infer<typeof OEQAnswerSchema>;
+    if (!questionLeafs) {
       // IF questionLeafs is NULL, we search for an object in questionAnswer that has "root", "root" for questionIdx and questionSubIdx
       // IF FOUND, WE TAKE IT AS THE NEW QUESTION ANSWER VALUE
       // IF NOT FOUND, WE CREATE A NEW OBJECT WITH "root", "root" for questionIdx and questionSubIdx
-      const foundObj  = questionAnswer.find(
-        (obj) => hasQuestionIndices(obj) && obj.questionIdx === "root" && obj.questionSubIdx === "root"
-      ) as { questionIdx: string; questionSubIdx: string; answer: string|File }|undefined;
+      const foundObj = questionAnswer.find(
+        (obj) =>
+          hasQuestionIndices(obj) &&
+          obj.questionIdx === "root" &&
+          obj.questionSubIdx === "root"
+      ) as
+        | { questionIdx: string; questionSubIdx: string; answer: string | File }
+        | undefined;
 
-      if(foundObj){
+      if (foundObj) {
         // IF SUCH AN OBJECT IS FOUND, RETURN IT
         return [foundObj];
-      }else{
+      } else {
         // IF NO SUCH AN OBJECT IS FOUND, CREATE A NEW OBJECT WITH "root", "root" for questionIdx and questionSubIdx
-        return [{ questionIdx: "root", questionSubIdx: "root", answer: "", id: uuidv4(), isText: true, mark:"0" }] as z.infer<typeof OEQAnswerSchema>;
+        return [
+          {
+            questionIdx: "root",
+            questionSubIdx: "root",
+            answer: "",
+            id: uuidv4(),
+            isText: true,
+            mark: "0",
+          },
+        ] as z.infer<typeof OEQAnswerSchema>;
       }
-    }else{
+    } else {
       // IF questionLeafs IS NOT NULL, WE CREATE AN OBJECT FOR EACH questionLeaf in questionLeafs, IN ORDER, FIRST BY questionIdx, THEN BY questionSubIdx
-      const hashMap = new Map()
+      const hashMap = new Map();
 
       Object.keys(questionLeafs).forEach((key) => {
         if (questionLeafs[key].length === 0) {
           // IF THE ARRAY UNDER THE KEY IS EMPTY, IT MEANS ITS questionSubIdx is root, a-root
           // HENCE, WE WILL CREATE A KEY UNDER THE HASH MAP WITH {key}-root as the key and value of undefined
-          hashMap.set(`${key}-root`, undefined)
+          hashMap.set(`${key}-root`, undefined);
         } else {
           // ELSE, THERE IS NO ROOT AND ONLY HAVE THE OTHER SUBKEYS AS SUBINDEX
           questionLeafs[key].forEach((subKey) => {
-            hashMap.set(`${key}-${subKey}`, undefined)
+            hashMap.set(`${key}-${subKey}`, undefined);
           });
         }
       });
 
       // NEXT, WE LOOP THROUGH questionANSWER AND WE CHECK IF THE KEY EXISTS IN THE HASH MAP, if it does, we replace the value with that object
       questionAnswer.forEach((answer) => {
-        if(hashMap.has(`${answer.questionIdx}-${answer.questionSubIdx}`)){
-          hashMap.set(`${answer.questionIdx}-${answer.questionSubIdx}`, answer)
+        if (hashMap.has(`${answer.questionIdx}-${answer.questionSubIdx}`)) {
+          hashMap.set(`${answer.questionIdx}-${answer.questionSubIdx}`, answer);
         }
-      })
-      
+      });
+
       // THEN LOOP THROUGH QUESTIONLEAFS AGAIN, THIS TIME, IF VALUE IS UNDEFINED, we create a value for it
       // IF IT IS NOT UNDEFINED, THEN WE PUSH IT IN
       Object.keys(questionLeafs).forEach((key) => {
         if (questionLeafs[key].length === 0) {
           // IF THE ARRAY UNDER THE KEY IS EMPTY, IT MEANS ITS questionSubIdx is root, a-root
-          if(hashMap.get(`${key}-root`)){
-            newQuestionAnswerValue.push(hashMap.get(`${key}-root`) as AddQuestionAnswerItem)
-          }else{
-            newQuestionAnswerValue.push({ questionIdx: key, questionSubIdx: "root", isText: true, answer: "", id: uuidv4(), mark:"0" })
+          if (hashMap.get(`${key}-root`)) {
+            newQuestionAnswerValue.push(
+              hashMap.get(`${key}-root`) as AddQuestionAnswerItem
+            );
+          } else {
+            newQuestionAnswerValue.push({
+              questionIdx: key,
+              questionSubIdx: "root",
+              isText: true,
+              answer: "",
+              id: uuidv4(),
+              mark: "0",
+            });
           }
         } else {
           // ELSE, THERE IS NO ROOT AND ONLY HAVE THE OTHER SUBKEYS AS SUBINDEX
           questionLeafs[key].forEach((subKey) => {
-            if(hashMap.get(`${key}-${subKey}`)){
-              newQuestionAnswerValue.push(hashMap.get(`${key}-${subKey}`) as AddQuestionAnswerItem)
-            }else{
-              newQuestionAnswerValue.push({ questionIdx: key, questionSubIdx: subKey, isText: true, answer: "", id: uuidv4(), mark:"0" })
+            if (hashMap.get(`${key}-${subKey}`)) {
+              newQuestionAnswerValue.push(
+                hashMap.get(`${key}-${subKey}`) as AddQuestionAnswerItem
+              );
+            } else {
+              newQuestionAnswerValue.push({
+                questionIdx: key,
+                questionSubIdx: subKey,
+                isText: true,
+                answer: "",
+                id: uuidv4(),
+                mark: "0",
+              });
             }
           });
         }
@@ -449,16 +520,15 @@ export function createQuestionAnswerValueWithoutReset(
   }
 }
 
-
 // FOR PROCESSING questionAnswer into questionAnswerJSON
 /**
  * For OEQ:
  * [
-  * {
-  *    questionIdx: string;
-  *    questionSubIdx: string;
-  *    answer: string;
-  * }
+ * {
+ *    questionIdx: string;
+ *    questionSubIdx: string;
+ *    answer: string;
+ * }
  * ]
  * should be turned into
  * {
@@ -467,39 +537,371 @@ export function createQuestionAnswerValueWithoutReset(
  *  }
  * }
  * IF questionLeafs is NULL, then the only combination possible is root-root
- * 
- * For MCQ: 
+ *
+ * For MCQ:
  * [
  *  {
  *    options: []
  *    answer: []
  *  }
  * ]
- * 
- * Just extract out the one object for answer object. It will be corresponding displayed at 
- * the root of the question. 
+ *
+ * Just extract out the one object for answer object. It will be corresponding displayed at
+ * the root of the question.
  */
 
-export function processMCQQuestionAnswerIntoJSON(questionAnswer: z.infer<typeof MCQAnswerSchema>){
-  if(questionAnswer.length===0){
-    return {options: [], answer: [], mark: "0"}
+export function processMCQQuestionAnswerIntoJSON(
+  questionAnswer: z.infer<typeof MCQAnswerSchema>
+) {
+  if (questionAnswer.length === 0) {
+    return { options: [], answer: [], mark: "0" };
   }
-  return parseStringify(questionAnswer[0]) as {options: string[], answer: string[], mark: string;}
+  return parseStringify(questionAnswer[0]) as {
+    options: string[];
+    answer: string[];
+    mark: string;
+  };
 }
 
-export function processOEQQuestionAnswerIntoJSON(questionAnswer: z.infer<typeof OEQAnswerSchema>) {
-  const processedQuestionAnswerJSON: ProcessedOEQQuestionAnswerJSON = {}
-  
+export function processOEQQuestionAnswerIntoJSON(
+  questionAnswer: z.infer<typeof OEQAnswerSchema>
+) {
+  const processedQuestionAnswerJSON: ProcessedOEQQuestionAnswerJSON = {};
+
   questionAnswer.forEach((answer) => {
-    if(!processedQuestionAnswerJSON[answer.questionIdx]){
-      processedQuestionAnswerJSON[answer.questionIdx] = {}
+    if (!processedQuestionAnswerJSON[answer.questionIdx]) {
+      processedQuestionAnswerJSON[answer.questionIdx] = {};
     }
     processedQuestionAnswerJSON[answer.questionIdx][answer.questionSubIdx] = {
       answer: answer.answer,
       isText: answer.isText,
-      mark: answer.mark
-    }
-  })
-  
-  return processedQuestionAnswerJSON
+      mark: answer.mark,
+    };
+  });
+
+  return processedQuestionAnswerJSON;
 }
+
+// #####################################################################################
+// ### ALL FUNCTIONS BELOW ARE TO FORMAT QUESTION PARTS AND QUESTION ANSWER
+// INTO FINALISED JSON STRUCTURES IN THE DATABASE
+
+// For uploading images on client-side for questionParts and questionAnswer
+export async function uploadImagesForQuestionPartsAndAnswer({
+  year,
+  educationLevel,
+  school,
+  subject,
+  examType,
+  topics,
+  questionType,
+  questionNumber,
+  questionPart,
+  questionAnswer,
+}: AddQuestionFormData
+){
+  const returnJSON:{
+    processedQuestionPart: QuestionPartWithOrderIntArray
+    processedQuestionAnswer: QuestionAnswerArray
+  } = {
+    processedQuestionPart: [],
+    processedQuestionAnswer: [],
+  }
+
+  const questionPartImagesHandled: QuestionPartWithOrderIntArray = [];
+  const supabase = createClient();
+  for (const part of questionPart) {
+    const { questionIdx, questionSubIdx, isText } = part;
+    if (!isText) {
+      const imageFile = (part as z.infer<typeof imageQuestionPartSchema>).image;
+      const { data, error } = await supabase.storage
+        .from("question-images")
+        .upload(
+          `${year}/${educationLevel}/${school}/${subject}/${examType}/content/${questionIdx}/${questionSubIdx}/image_${uuidv4()}`,
+          imageFile,
+          {
+            upsert: true,
+          }
+        );
+      if (error) {
+        console.error(error);
+        throw new UnexpectedError("Error uploading image file to storage");
+      } else {
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("question-images").getPublicUrl(data.path);
+
+        const { image, ...restOfPart } = part as z.infer<
+          typeof imageQuestionPartSchema
+        >;
+
+        const newPart: ImageQuestionPartOrderInt = {
+          ...(restOfPart as z.infer<typeof imageQuestionPartSchema>),
+          image: publicUrl,
+          order: parseInt(part.order),
+          isText: false,
+        };
+        // remove the image attribute since we now will access the image through the url
+        questionPartImagesHandled.push({
+          ...newPart,
+        });
+      }
+    } else {
+      const partParsedInt: {
+        order: number;
+        isText: true;
+        questionIdx: string;
+        questionSubIdx: string;
+        text: string;
+        id: string;
+      } = {
+        ...(part as z.infer<typeof textQuestionPartSchema>),
+        order: parseInt(part.order),
+        isText: true,
+      };
+      questionPartImagesHandled.push(partParsedInt);
+    }
+  }
+  returnJSON.processedQuestionPart = questionPartImagesHandled;
+
+  // process questionAnswer only if OEQ
+  if (questionType === "OEQ") {
+    const questionAnswerImageHandled: OEQAnswerArray = [];
+
+    for (const answer of questionAnswer as z.infer<typeof OEQAnswerSchema>) {
+      const { questionIdx, questionSubIdx, isText } = answer;
+      if (answer.answer instanceof File && !isText) {
+        const imageFile = answer.answer;
+        const { data, error } = await supabase.storage
+          .from("question-images")
+          .upload(
+            `${year}/${educationLevel}/${school}/${subject}/${examType}/answer/${questionIdx}/${questionSubIdx}/image_${uuidv4()}`,
+            imageFile,
+            {
+              upsert: true,
+            }
+          );
+        if (error) {
+          console.error(error);
+          throw new UnexpectedError(
+            "Error uploading image file to storage"
+          );
+        } else {
+          const {
+            data: { publicUrl },
+          } = supabase.storage.from("question-images").getPublicUrl(data.path);
+          const { answer: answerImage, ...restOfAnswer } = answer;
+          const newAnswer: OEQImageAnswerItem = {
+            ...restOfAnswer,
+            image: publicUrl,
+            isText: false,
+          };
+
+          questionAnswerImageHandled.push(newAnswer);
+        }
+      } else {
+        const { answer: answerText, ...restOfAnswer } = answer;
+        if (typeof answerText === "string" && isText) {
+          const newAnswer: OEQTextAnswerItem = {
+            ...restOfAnswer,
+            text: answerText,
+            isText: true,
+          };
+          questionAnswerImageHandled.push(newAnswer);
+        }
+      }
+    }
+    returnJSON.processedQuestionAnswer = questionAnswerImageHandled;
+  }else{
+    returnJSON.processedQuestionAnswer = (questionAnswer as MCQAnswerItemArray)
+  }
+
+  return returnJSON
+}
+
+
+
+// For questionContent and questionLeafs
+export function processQuestionPartIntoFinalQuestionContentQuestionLeafs(
+  questionParts: QuestionPartWithOrderIntArray,
+  questionType: string
+) {
+  const questionContentWithOrderJSON: QuestionContentWithOrder = {
+    root: [],
+    indexed: {},
+  };
+
+  const tempLeafSets: { [key: string]: Set<string> } = {};
+
+  questionParts.forEach((questionPart) => {
+    const { questionIdx, questionSubIdx, order, isText, id } = questionPart;
+
+    const contentItem: QuestionPartWithOrderIntWithoutIdx = isText
+      ? {
+          isText: true,
+          text: questionPart.text,
+          order,
+          id,
+        }
+      : {
+          isText: false,
+          image: questionPart.image,
+          order,
+          id,
+        };
+
+    if (questionIdx === "root") {
+      questionContentWithOrderJSON.root.push(contentItem);
+    } else {
+      if (!questionContentWithOrderJSON.indexed[questionIdx]) {
+        questionContentWithOrderJSON.indexed[questionIdx] = {};
+      }
+      if (!questionContentWithOrderJSON.indexed[questionIdx][questionSubIdx]) {
+        questionContentWithOrderJSON.indexed[questionIdx][questionSubIdx] = [];
+      }
+      questionContentWithOrderJSON.indexed[questionIdx][questionSubIdx].push(
+        contentItem
+      );
+    }
+
+    // Add to questionLeafs using a Set
+    if (questionIdx !== "root" && !tempLeafSets[questionIdx]) {
+      tempLeafSets[questionIdx] = new Set<string>();
+    }
+    if (questionSubIdx !== "root") {
+      tempLeafSets[questionIdx].add(questionSubIdx);
+    }
+  });
+  const finalQuestionContent: FinalisedQuestionContent = {
+    root: [],
+    indexed: {},
+  };
+
+  questionContentWithOrderJSON.root.sort((a, b) => a.order - b.order);
+  finalQuestionContent.root = questionContentWithOrderJSON.root.map(
+    ({ order, ...rest }) => rest
+  );
+  Object.keys(questionContentWithOrderJSON.indexed).forEach((idx) => {
+    Object.keys(questionContentWithOrderJSON.indexed[idx]).forEach((subIdx) => {
+      if(!finalQuestionContent.indexed[idx]){
+        finalQuestionContent.indexed[idx] = {};
+      } // Ensure that it is initialised
+      
+      questionContentWithOrderJSON.indexed[idx][subIdx].sort(
+        (a, b) => a.order! - b.order!
+      );
+      finalQuestionContent.indexed[idx][subIdx] =
+        questionContentWithOrderJSON.indexed[idx][subIdx].map(
+          ({ order, ...rest }) => rest
+        );
+    });
+  });
+
+
+  if (Object.keys(tempLeafSets).length === 0 || questionType === "MCQ") {
+    const questionLeafs: FinalisedQuestionLeafs = null;
+
+    return { questionContent:finalQuestionContent, questionLeafs };
+  }
+
+  const questionLeafs: FinalisedQuestionLeafs = {};
+  // Need to sort the tempLeafSet's keys alphabetically to keep it in order
+  const sortedTempLeafSets = Object.keys(tempLeafSets)
+    .sort((a, b) => a.localeCompare(b))
+    .reduce((sortedObj: { [key: string]: Set<string> }, key) => {
+      sortedObj[key] = tempLeafSets[key];
+      return sortedObj;
+    }, {});
+
+  // Convert Sets to sorted arrays and assign to questionLeafs
+  Object.keys(sortedTempLeafSets).forEach((key) => {
+    questionLeafs[key] = Array.from(
+      sortedTempLeafSets[key]
+    ).sort((a, b) => convertRomanToInt(a) - convertRomanToInt(b));
+  });
+
+  return { questionContent:finalQuestionContent, questionLeafs };
+}
+
+export function processQuestionAnswerIntoFinalQuestionAnswer(
+  questionAnswer: QuestionAnswerArray,
+  questionType: string,
+) {
+  /**
+   * In this function, we are parsing through questionAnswer to get 
+   * 4 things:
+   * isMulti, fullMark, markScheme, finalised questionAnswer
+   */
+  if(questionType === "OEQ"){
+    const resultJSON: {
+      isMulti: boolean | null,
+      fullMark: number,
+      markScheme: FinalisedMarkScheme,
+      finalisedQuestionAnswer: FinalisedOEQQuestionAnswer
+    } = {
+      isMulti: null,
+      fullMark: 0,
+      markScheme: null,
+      finalisedQuestionAnswer: {}
+    };
+    // Treat here for OEQ
+    (questionAnswer as OEQAnswerArray).forEach((answer)=>{
+      if(!resultJSON.finalisedQuestionAnswer[answer.questionIdx]){
+        resultJSON.finalisedQuestionAnswer[answer.questionIdx] = {};
+      }
+      resultJSON.finalisedQuestionAnswer[answer.questionIdx][answer.questionSubIdx] = answer.isText ? {
+        isText: true,
+        text: answer.text,
+        mark: parseInt(answer.mark)
+      } : {
+        isText: false,
+        image: answer.image,
+        mark: parseInt(answer.mark)
+      }
+      resultJSON.markScheme![answer.questionIdx] = {}
+      resultJSON.markScheme![answer.questionIdx][answer.questionSubIdx] = parseInt(answer.mark)
+      resultJSON.fullMark += parseInt(answer.mark);
+    })
+    return resultJSON
+  }else{
+    // Treat here for MCQ
+    const extractedMCQAnswer = (questionAnswer as MCQAnswerItemArray )[0];
+    if(extractedMCQAnswer.answer.length === 1){
+      // isMulti is false
+      const resultJSON: {
+        isMulti: false,
+        fullMark: number,
+        markScheme: null,
+        finalisedQuestionAnswer: FinalisedNonMultiMCQQuestionAnswer
+      } = {
+        isMulti: false,
+        fullMark: 0,
+        markScheme: null,
+        finalisedQuestionAnswer: {options: [], answer: ""}
+      };
+      
+      resultJSON.fullMark = parseInt(extractedMCQAnswer.mark);
+      resultJSON.finalisedQuestionAnswer.answer = extractedMCQAnswer.answer[0];
+      resultJSON.finalisedQuestionAnswer.options = extractedMCQAnswer.options;
+      return resultJSON
+    }else{
+      const resultJSON: {
+        isMulti: true,
+        fullMark: number,
+        markScheme: null,
+        finalisedQuestionAnswer: FinalisedMultiMCQQuestionAnswer
+      } = {
+        isMulti: true,
+        fullMark: 0,
+        markScheme: null,
+        finalisedQuestionAnswer: {options: [], answer: []}
+      };
+
+      resultJSON.fullMark = parseInt(extractedMCQAnswer.mark);
+      resultJSON.finalisedQuestionAnswer.answer = extractedMCQAnswer.answer;
+      resultJSON.finalisedQuestionAnswer.options = extractedMCQAnswer.options;
+      return resultJSON
+    }
+  }
+}
+
