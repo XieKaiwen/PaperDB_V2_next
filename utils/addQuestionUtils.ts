@@ -841,7 +841,7 @@ export function processQuestionAnswerIntoFinalQuestionAnswer(
     } = {
       isMulti: null,
       fullMark: 0,
-      markScheme: null,
+      markScheme: {},
       finalisedQuestionAnswer: {}
     };
     // Treat here for OEQ

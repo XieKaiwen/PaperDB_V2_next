@@ -4,6 +4,11 @@ import { Difficulty, edu_level, exam_type, PrismaClient, QuestionType } from "@p
 const prisma = new PrismaClient().$extends({
   // Extending the client with custom methods
   model: {
+    user: {
+      async getUserById(id: string) {
+        return prisma.user.findUnique({ where: { id } });
+      }
+    },
     question: {
       
       async createQuestion({
