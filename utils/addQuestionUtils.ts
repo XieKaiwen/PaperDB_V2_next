@@ -7,12 +7,10 @@ import {
   AddQuestionAnswerItem,
   AddQuestionFormData,
   AddQuestionFormQuestionPart,
-  BaseQuestionAttributes,
   FinalisedMarkScheme,
   FinalisedMultiMCQQuestionAnswer,
   FinalisedNonMultiMCQQuestionAnswer,
   FinalisedOEQQuestionAnswer,
-  FinalisedQuestionAnswer,
   FinalisedQuestionContent,
   FinalisedQuestionLeafs,
   ImageQuestionPartOrderInt,
@@ -25,7 +23,6 @@ import {
   ProcessedQuestionPart,
   QuestionAnswerArray,
   QuestionContentWithOrder,
-  QuestionPartWithOrderInt,
   QuestionPartWithOrderIntArray,
   QuestionPartWithOrderIntWithoutIdx,
 } from "@/src/types/types";
@@ -35,6 +32,7 @@ import { convertRomanToInt, parseStringify } from "./utils";
 import { v4 as uuidv4 } from "uuid";
 import { createClient } from "./supabase/client";
 import { UnexpectedError } from "@/src/custom-errors/errors";
+import murmurhash from "murmurhash";
 
 export const defaultValues: AddQuestionFormData = {
   year: "",
@@ -610,14 +608,30 @@ export async function uploadImagesForQuestionPartsAndAnswer({
 
   const questionPartImagesHandled: QuestionPartWithOrderIntArray = [];
   const supabase = createClient();
+  let imageNumber = 0;
   for (const part of questionPart) {
     const { questionIdx, questionSubIdx, isText } = part;
     if (!isText) {
       const imageFile = (part as z.infer<typeof imageQuestionPartSchema>).image;
+      imageNumber++;
+      const hashingJSONString = JSON.stringify({
+        year,
+        educationLevel,
+        school,
+        subject,
+        examType,
+        questionType,
+        questionNumber,
+        questionIdx,
+        questionSubIdx,
+        imageNumber
+      })
+      const imageHash = murmurhash.v3(hashingJSONString)
+
       const { data, error } = await supabase.storage
         .from("question-images")
         .upload(
-          `${year}/${educationLevel}/${school}/${subject}/${examType}/content/${questionIdx}/${questionSubIdx}/image_${uuidv4()}`,
+          `${year}/${educationLevel}/${school}/${subject}/${examType}/${questionNumber}/content/${questionIdx}/${questionSubIdx}/image_${imageHash}`,
           imageFile,
           {
             upsert: true,
@@ -666,16 +680,32 @@ export async function uploadImagesForQuestionPartsAndAnswer({
 
   // process questionAnswer only if OEQ
   if (questionType === "OEQ") {
+    imageNumber = 0;
     const questionAnswerImageHandled: OEQAnswerArray = [];
 
     for (const answer of questionAnswer as z.infer<typeof OEQAnswerSchema>) {
       const { questionIdx, questionSubIdx, isText } = answer;
       if (answer.answer instanceof File && !isText) {
+        imageNumber++;
         const imageFile = answer.answer;
+        const hashingJSONString = JSON.stringify({
+          year,
+          educationLevel,
+          school,
+          subject,
+          examType,
+          questionType,
+          questionNumber,
+          questionIdx,
+          questionSubIdx,
+          imageNumber
+        })
+        const imageHash = murmurhash.v3(hashingJSONString)
+
         const { data, error } = await supabase.storage
           .from("question-images")
           .upload(
-            `${year}/${educationLevel}/${school}/${subject}/${examType}/answer/${questionIdx}/${questionSubIdx}/image_${uuidv4()}`,
+            `${year}/${educationLevel}/${school}/${subject}/${examType}/answer/${questionIdx}/${questionSubIdx}/image_${imageHash}`,
             imageFile,
             {
               upsert: true,
