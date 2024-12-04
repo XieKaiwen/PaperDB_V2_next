@@ -396,6 +396,7 @@ export function createQuestionAnswerValueAfterReset(
 
     return newQuestionAnswerValue;
   }
+  return [];
 }
 
 // Type guard to check if an object is of type AnswerWithIndices
@@ -430,7 +431,7 @@ export function createQuestionAnswerValueWithoutReset(
           obj.questionIdx === "root" &&
           obj.questionSubIdx === "root"
       ) as
-        | { questionIdx: string; questionSubIdx: string; answer: string | File }
+        | { questionIdx: string; questionSubIdx: string; answer: string | File; id: string; isText: boolean; mark: string }
         | undefined;
 
       if (foundObj) {
@@ -516,6 +517,7 @@ export function createQuestionAnswerValueWithoutReset(
       return newQuestionAnswerValue;
     }
   }
+  return []
 }
 
 // FOR PROCESSING questionAnswer into questionAnswerJSON

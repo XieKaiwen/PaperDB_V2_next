@@ -20,34 +20,36 @@ interface CustomTextAreaProps<T extends FieldValues> {
 }
 
 
-const CustomTextArea = React.memo(function CustomTextArea<T extends FieldValues>({
-  control,
-  name,
-  label,
-  placeholder,
-  className,
-  textAreaClassName,
-}: CustomTextAreaProps<T>) {
+const CustomTextArea = React.memo(
+  function CustomTextArea<T extends FieldValues>({
+    control,
+    name,
+    label,
+    placeholder,
+    className,
+    textAreaClassName,
+  }: CustomTextAreaProps<T>) {
+    return (
+      <FormField
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <FormItem className={className}>
+            {label && <FormLabel>{label}</FormLabel>}
+            <FormControl>
+              <Textarea
+                className={textAreaClassName}
+                placeholder={placeholder}
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    );
+  }
+) as <T extends FieldValues>(props: CustomTextAreaProps<T>) => JSX.Element;
 
-  return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <FormItem className={className}>
-          {label && <FormLabel>{label}</FormLabel>}
-          <FormControl>
-            <Textarea
-              className={textAreaClassName}
-              placeholder={placeholder}
-              {...field}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-}) as <T>(props: T) => JSX.Element;
 
 export default CustomTextArea;

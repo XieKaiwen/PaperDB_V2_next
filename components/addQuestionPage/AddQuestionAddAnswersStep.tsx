@@ -6,6 +6,8 @@ import {
 import {
   createQuestionAnswerValueAfterReset,
   createQuestionAnswerValueWithoutReset,
+  MCQAnswerSchema,
+  OEQAnswerSchema,
   questionAnswerRequiresReset,
 } from "@/utils/addQuestionUtils";
 import React, { forwardRef, ReactElement, useEffect, useState } from "react";
@@ -124,13 +126,13 @@ export default function AddQuestionAddAnswersStep() {
 
   // USE useFieldArray to render the questionAnswer INPUTS
   // NO NEED FOR append and remove, BECAUSE USER DOES NOT NEED TO ADD OR REMOVE ANSWERS
-  const { fields, update } = useFieldArray<AddQuestionFormData>({
+  const { fields, update } = useFieldArray({
     control,
     name: "questionAnswer",
   });
 
   function toggleFileClick(index: number) {
-    const answerItem = getValues(`questionAnswer.${index}`);
+    const answerItem = getValues(`questionAnswer.${index}`) as { questionIdx: string; questionSubIdx: string; answer: string | File; id: string; isText: boolean; mark: string } //Since this is only for OEQ
 
     // Create a new object to avoid mutating the existing answerItem
     const updatedAnswerItem = {
@@ -155,7 +157,7 @@ export default function AddQuestionAddAnswersStep() {
 
       {watchedQuestionType === "OEQ" && (
         <div className="w-full space-y-4">
-          {fields.map((answerPart, index) => {
+          {(fields as z.infer<typeof OEQAnswerSchema>).map((answerPart, index) => {
             const { questionIdx, questionSubIdx, isText, answer } = answerPart;
             return (
               <div key={answerPart.id}>
@@ -199,7 +201,7 @@ function AddMCQAnswerInput() {
 
   // THIS COMPONENT IS ONLY MOUNTED WHEN questionType === MCQ, hence
   const [options, setOptions] = useState<string[]>(() => {
-    const formMCQAnswer = getValues("questionAnswer")[0];
+    const formMCQAnswer = (getValues("questionAnswer") as z.infer<typeof MCQAnswerSchema>)[0];
     if (formMCQAnswer && formMCQAnswer.options !== undefined) {
       return formMCQAnswer.options;
     }
