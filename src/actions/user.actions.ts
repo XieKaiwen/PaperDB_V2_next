@@ -82,6 +82,9 @@ export async function signUp({
       }`,
     },
   });
+  console.log("Email Redirect URL:", `${origin}/auth/callback?${
+    redirectedFrom ? `redirectedFrom=${redirectedFrom}` : ""
+  }`);
 
   const user = data?.user;
   console.log("Created user: ", user);
