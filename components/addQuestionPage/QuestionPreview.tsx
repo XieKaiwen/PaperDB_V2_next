@@ -1,18 +1,22 @@
 import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
 import {
   AddQuestionFormData,
+  AddQuestionFormQuestionPart,
   ProcessedOEQQuestionAnswerJSON,
   ProcessedQuestionPart,
 } from "@/src/types/types";
 
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  MCQAnswerSchema,
+  OEQAnswerSchema,
   processMCQQuestionAnswerIntoJSON,
   processOEQQuestionAnswerIntoJSON,
   processQuestionPartIntoQuestionContentJSON,
 } from "@/utils/addQuestionUtils";
 import QuestionSectionDisplay from "../QuestionSectionDisplay";
 import QuestionLeafAnswerDisplay from "../QuestionLeafAnswerDisplay";
+import { z } from "zod";
 
 // TODO: Scrap the live preview and make it such that its a generated preview when clicking a button, to optimise the user experience, fix the "laggy input issue"
 
@@ -21,7 +25,18 @@ export default function QuestionPreview() {
     formData: { subscribe: subscribeToFormData },
     questionContentJSON: { update: updateQuestionContentJSON },
   } = useAddQuestionContext();
-  const [formData, setFormData] = useState<AddQuestionFormData>({});
+  const [formData, setFormData] = useState<AddQuestionFormData>({
+    subject: "",
+    educationLevel: "",
+    school: "",
+    questionType: "",
+    topics: [],
+    questionNumber: "",
+    questionAnswer: [],
+    examType: "OTHER", // Provide a default valid examType
+    year: "",
+    questionPart: [],
+  });
 
   useEffect(() => {
     const unsubscribeToFormData = subscribeToFormData((updatedFormData) => {
@@ -53,7 +68,7 @@ export default function QuestionPreview() {
     // console.log("Recalculating questionContentCombinedJSON in QuestionPreview");
 
     return processQuestionPartIntoQuestionContentJSON(
-      questionPart,
+      questionPart as AddQuestionFormQuestionPart[],
       questionType
     ); // questionLeafs should be null if there are no children from the root
   }, [questionPart, questionType]);
@@ -76,8 +91,8 @@ export default function QuestionPreview() {
 
   const questionAnswerJSON = useMemo(() => {
     return questionType === "MCQ"
-      ? processMCQQuestionAnswerIntoJSON(questionAnswer)
-      : processOEQQuestionAnswerIntoJSON(questionAnswer);
+      ? processMCQQuestionAnswerIntoJSON(questionAnswer as z.infer<typeof MCQAnswerSchema>)
+      : processOEQQuestionAnswerIntoJSON(questionAnswer as z.infer<typeof OEQAnswerSchema>);
   }, [questionAnswer]);
   console.log("questionAnswerJSON: ", questionAnswerJSON);
 

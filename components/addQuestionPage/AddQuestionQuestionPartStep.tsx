@@ -45,7 +45,7 @@ export default function AddQuestionQuestionPartStep() {
 
   return (
     <>
-      {fields.map(
+      {(fields as z.infer<typeof contentTypeSchema>[]).map(
         (questionPart: z.infer<typeof contentTypeSchema>, index: number) => {
           const { isText } = questionPart;
           return (

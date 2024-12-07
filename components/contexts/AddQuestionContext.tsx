@@ -18,7 +18,7 @@ import { parseStringify } from '../../utils/utils';
 interface FormDataContext {
   update: (updatedFormData: AddQuestionFormData) => void;
   subscribe: (subscriber: AddQuestionFormDataSubscriber) => () => void;
-  retrieve: () => AddQuestionFormData;
+  retrieve: () => AddQuestionFormData | {};
 }
 
 interface QuestionContentJSONContext {
@@ -58,7 +58,18 @@ function AddQuestionContextProvider({ children }: { children: ReactNode }) {
     queryFn: getAllSchools,
   });
 
-  const addQuestionFormData = useRef<AddQuestionFormData>({});
+  const addQuestionFormData = useRef<AddQuestionFormData>({
+    subject: "",
+    educationLevel: "",
+    school: "",
+    questionType: "",
+    topics: [],
+    questionNumber: "",
+    questionAnswer: [],
+    examType: "OTHER", // Provide a default valid examType
+    year: "",
+    questionPart: [],
+  });
   const formDataSubscribers = useRef<Set<AddQuestionFormDataSubscriber>>(
     new Set()
   );
