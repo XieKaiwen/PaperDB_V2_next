@@ -96,14 +96,14 @@ export default function AddQuestionAddAnswersStep() {
     if (!questionContent) {
       return;
     }
-    console.log("watchedQuestionAnswer:", watchedQuestionAnswer);
+    // console.log("watchedQuestionAnswer:", watchedQuestionAnswer);
 
     const requireReset = questionAnswerRequiresReset(
       watchedQuestionType,
       watchedQuestionAnswer
     );
     if (requireReset) {
-      console.log("update questionAnswer with reset");
+      // console.log("update questionAnswer with reset");
 
       resetField("questionAnswer", { defaultValue: [] });
       const newQuestionAnswerValue = createQuestionAnswerValueAfterReset(
@@ -112,7 +112,7 @@ export default function AddQuestionAddAnswersStep() {
       );
       setValue("questionAnswer", newQuestionAnswerValue);
     } else {
-      console.log("update questionAnswer without reset");
+      // console.log("update questionAnswer without reset");
       const newQuestionAnswerValue = createQuestionAnswerValueWithoutReset(
         watchedQuestionType,
         questionLeafs!,
@@ -261,13 +261,13 @@ function AddMCQAnswerInput() {
 
   // HANDLING DELETION OF OPTIONS
   function handleDeleteOption(index: number) {
-    console.log("Deleting option at index:", index);
+    // console.log("Deleting option at index:", index);
 
     const optionDeleted = options[index];
 
     setOptions((prev) => {
       const newOptions = prev.filter((_, i) => i !== index);
-      console.log("Updated options:", newOptions);
+      // console.log("Updated options:", newOptions);
       return newOptions;
     });
 
@@ -276,7 +276,7 @@ function AddMCQAnswerInput() {
         const updatedCorrectAnswers = prev.filter(
           (answer) => answer !== optionDeleted
         );
-        console.log("Updated correctAnswers:", updatedCorrectAnswers);
+        // console.log("Updated correctAnswers:", updatedCorrectAnswers);
         return updatedCorrectAnswers;
       });
     }
@@ -418,7 +418,7 @@ const MCQAddAnswerOptionItem = forwardRef<
         variant="destructive"
         size="sm"
         onClick={() => {
-          console.log("Button clicked, index:", index);
+          // console.log("Button clicked, index:", index);
           onDelete(index);
         }}
       >
