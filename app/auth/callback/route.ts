@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       console.log(response.data.user?.user_metadata); // This contains all the relevant information that I need to store in the database, dont need to parse the metadata string
       const userData = response.data.user?.user_metadata;
       if (!userData) {
-        throw new Error("userData not defined. Metadata missing");
+        throw new Error("user data not defined. Metadata missing");
       }
       /*
       {
