@@ -111,7 +111,7 @@ importers:
         specifier: ^2.0.1
         version: 2.0.1
       next:
-        specifier: latest
+        specifier: ^14.2.13
         version: 14.2.13(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       postcss:
         specifier: 8.4.33
