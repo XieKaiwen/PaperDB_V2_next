@@ -8,7 +8,6 @@ import { getQueryClient } from "@/utils/react-query-client/client";
 import {
   dehydrate,
   HydrationBoundary,
-  QueryClient,
 } from "@tanstack/react-query";
 import React from "react";
 

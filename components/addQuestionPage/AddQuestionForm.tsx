@@ -259,6 +259,7 @@ export default function AddQuestionForm() {
     const { year, examType, subject, school, educationLevel, questionNumber } =
       values;
     try {
+      console.log("Checking question number...");
       const isQuestionNumberExists = await checkIfQuestionNumberExists({
         year,
         examType,
@@ -267,14 +268,12 @@ export default function AddQuestionForm() {
         schoolId: school,
         questionNumber: questionNumber,
       });
-      if (isQuestionNumberExists) {
-        setIsExistingQuestionNumber(true);
-      } else {
-        setIsExistingQuestionNumber(false);
-      }
+      console.log("Question number exists:", isQuestionNumberExists);
+      setIsExistingQuestionNumber(isQuestionNumberExists);
       setIsDialogueOpen(true);
+      console.log("Dialog state updated. Opening dialog...");
     } catch (error) {
-      console.error(error);
+      console.error("Error during onSubmit:", error);
       if (error instanceof Error) {
         setSubmissionError(error)
       } else {
