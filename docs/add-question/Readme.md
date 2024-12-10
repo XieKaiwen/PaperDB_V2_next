@@ -569,7 +569,9 @@ We will arrange the paper metadata in the image name in increasing specificity.
 
 Also, since both `questionContent` and `questionAnswer` can include images, we will also further separate the image names by adding paths __content__ and __answer__.
 
-Furthermore, to prevent being targetted by malicious actors, we will be **adding a `uuid` number to the name** of the image file as well. In the future, rate limiting techniques will also be explored. 
+Furthermore, to prevent being targetted by malicious actors, we will be **adding a `imageHash` number to the name**. This imageHash will be produced by murmurhash using year, educationLevel, school, subject, examType, questionNumber, questionIdx, questionSubIdx and imageNumber (a variable being tracked)
 
 Now, we put everything together:
-image file path: __[*year*]/[*educationLevel*]/[*school*]/[*subject*]/[*examType*]/[*content/answer*]/[index]/[sub-index]/image_[*uuid*]__
+image file path: __[*year*]/[*educationLevel*]/[*school*]/[*subject*]/[*examType*]/[questionNumber]/[*content/answer*]/[index]/[sub-index]/image_[*imageHash*]__
+
+**query_keys** for fetching paper data, should also following year/educationLevel/school/subject/examType. If there are no filters or specifiers used for that particular key in the query key array, "default" value will be used

@@ -1,8 +1,10 @@
 "use server";
 
 import prisma from "@/utils/prisma-client/client";
+import { whereClauseConstructorForPapers } from "@/utils/prismaUtils";
 import { edu_level, exam_type } from "@prisma/client";
 
+// ### CREATE ###
 export async function createPaper({
   userId,
   school,
@@ -59,3 +61,38 @@ export async function getPaperIdByMetadata({
 
   return paperId;
 }
+
+// ### READ ###
+export async function getPapersWithFilters({
+  year = "all",
+  educationLevel = "all",
+  school = "all",
+  subject = "all",
+  examType = "all",
+  visible = true
+}: {
+  year?: "all" | string[];
+  educationLevel?: "all" | edu_level[];
+  school?: "all" | string[];
+  subject?: "all" | string[];
+  examType?: "all" | exam_type[];
+  visible?: boolean
+}){
+  const whereClause = whereClauseConstructorForPapers({year, educationLevel, school, subject, examType, visible});
+
+  const papers = await prisma.paper.findMany({
+    where: whereClause,
+    include: {
+      School: true,
+      Subject: true,
+      UserPaperProgressStatus: true,
+    },
+  });
+  return papers
+}
+
+
+// ### UPDATE ###
+
+// ### DELETE ###
+

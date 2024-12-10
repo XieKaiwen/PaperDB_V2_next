@@ -18,15 +18,15 @@ import React from "react";
 
 export default async function AdminAddQuestionPage() {
   const queryClient = getQueryClient();
-  queryClient.prefetchQuery({
+  await queryClient.prefetchQuery({
     queryKey: ["subjects"],
     queryFn: getAllSubjects
   });
-  queryClient.prefetchQuery({
+  await queryClient.prefetchQuery({
     queryKey: ["topics"],
     queryFn: getAllTopics,
   });
-  queryClient.prefetchQuery({
+  await queryClient.prefetchQuery({
     queryKey: ["schools"],
     queryFn: getAllSchools,
   });

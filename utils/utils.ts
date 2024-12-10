@@ -69,3 +69,4 @@ export function removeImagesFromHtml(htmlString: string) {
   // Return the modified HTML as a string
   return tempElement.innerHTML;
 }
+
