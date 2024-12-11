@@ -5,7 +5,7 @@ import {
   schoolTypeMapToEduLevel,
 } from "@/src/constants/constants";
 import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
-import { validateTopicWithinEducationLevel } from "@/utils/addQuestionUtils";
+import { validateTopicWithinEducationLevel } from "@/utils/add-question/addQuestionUtils(client)";
 import { generateOptionsFromJsonList, generateYearList } from "@/utils/utils";
 import { edu_level, exam_type } from "@prisma/client";
 import React, { useEffect, useMemo } from "react";

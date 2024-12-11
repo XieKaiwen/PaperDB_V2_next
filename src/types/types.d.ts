@@ -1,4 +1,4 @@
-import { contentTypeSchema, imageQuestionPartSchema, questionPartSchema, textQuestionPartSchema } from "@/utils/addQuestionUtils";
+import { contentTypeSchema, imageQuestionPartSchema, questionPartSchema, textQuestionPartSchema } from "@/utils/add-question/addQuestionUtils(client)";
 import { authFormSchema } from "@/utils/authFormUtils";
 import { UserMetadata } from "@supabase/supabase-js";
 import { FieldValues } from "react-hook-form";

@@ -4,7 +4,7 @@ import {
   questionPartSchema,
   defaultValues as addQuestionFormDefaultValues,
   uploadImagesForQuestionPartsAndAnswer,
-} from "@/utils/addQuestionUtils";
+} from "@/utils/add-question/addQuestionUtils(client)";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
 import {

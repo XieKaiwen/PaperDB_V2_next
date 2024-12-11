@@ -1,5 +1,5 @@
 import { AddQuestionFormData } from "@/src/types/types";
-import { contentTypeSchema } from "@/utils/addQuestionUtils";
+import { contentTypeSchema } from "@/utils/add-question/addQuestionUtils(client)";
 import React, { ReactElement, useCallback } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";

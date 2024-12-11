@@ -9,11 +9,11 @@ import {
   MCQAnswerSchema,
   OEQAnswerSchema,
   questionAnswerRequiresReset,
-} from "@/utils/addQuestionUtils";
+} from "@/utils/add-question/addQuestionUtils(client)";
 import React, { forwardRef, ReactElement, useEffect, useState } from "react";
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { z } from "zod";
-import { answerCombinedSchema } from "../../utils/addQuestionUtils";
+import { answerCombinedSchema } from "../../utils/add-question/addQuestionUtils(client)";
 import CustomTextArea from "../form-components/CustomTextArea";
 import CustomFileInput from "../form-components/CustomFileInput";
 import { Switch } from "@/components/ui/switch";

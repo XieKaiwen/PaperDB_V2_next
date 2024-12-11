@@ -9,8 +9,8 @@ import { createPaper, getPaperIdByMetadata } from "./paper.actions";
 import { InternalServerError } from "@/src/custom-errors/errors";
 import {
   processQuestionAnswerIntoFinalQuestionAnswer,
-  processQuestionPartIntoFinalQuestionContentQuestionLeafs,
-} from "@/utils/addQuestionUtils";
+  processQuestionPartIntoFinalQuestionContentQuestionLeafs
+} from "@/utils/add-question/addQuestionUtils(server)";
 import { edu_level, exam_type } from "@prisma/client";
 import prisma from "@/utils/prisma-client/client";
 

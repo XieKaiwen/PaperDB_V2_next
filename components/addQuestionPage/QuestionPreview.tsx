@@ -13,7 +13,7 @@ import {
   processMCQQuestionAnswerIntoJSON,
   processOEQQuestionAnswerIntoJSON,
   processQuestionPartIntoQuestionContentJSON,
-} from "@/utils/addQuestionUtils";
+} from "@/utils/add-question/addQuestionUtils(client)";
 import QuestionSectionDisplay from "../QuestionSectionDisplay";
 import QuestionLeafAnswerDisplay from "../QuestionLeafAnswerDisplay";
 import { z } from "zod";
