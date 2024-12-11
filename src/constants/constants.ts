@@ -1,4 +1,4 @@
-import { edu_level, exam_type } from "@prisma/client";
+import { edu_level, exam_type, SchoolType } from "@prisma/client";
 export const debugStyle = { border: '1px solid red' };
 
 export const educationLevelOptions = [
@@ -73,11 +73,27 @@ export const questionSubIndex = [
   { value: "x", label: "x" }
 ];
 
-export const schoolTypeMapToEduLevel = {
+export const schoolTypeMapToEduLevel: { [key: string]: string[] } = {
   PRIMARY: ["P1", "P2", "P3", "P4", "P5", "P6"],
   SECONDARY: ["S1", "S2", "S3", "S4"],
   JC: ["J1", "J2"]
 }
+
+export const eduLevelMapToSchoolType: { [key: string]: SchoolType } = {
+  "P1": "PRIMARY",
+  "P2": "PRIMARY",
+  "P3": "PRIMARY",
+  "P4": "PRIMARY",
+  "P5": "PRIMARY",
+  "P6": "PRIMARY",
+  "S1": "SECONDARY",
+  "S2": "SECONDARY",
+  "S3": "SECONDARY",
+  "S4": "SECONDARY",
+  "J1": "JC",
+  "J2": "JC"
+}
+
 
 export const questionTypeOptions = [
   { value: "MCQ", label: "MCQ" },

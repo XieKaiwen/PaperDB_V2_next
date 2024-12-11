@@ -19,6 +19,7 @@ model Paper {
   examType                exam_type
   visible                 Boolean                   @default(false)
   year                    String
+  dateAdded               DateTime                  @default(now()) @db.Timestamptz(6)
   School                  School                    @relation(fields: [schoolId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   Subject                 Subject                   @relation(fields: [subjectId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   UserPaperProgressStatus UserPaperProgressStatus[]

@@ -1,5 +1,6 @@
 import PaperTable from "@/components/PaperTable";
 import { getPapersWithFilters } from "@/src/actions/data-actions/paper.actions";
+import { eduLevelMapToSchoolType, schoolTypeMapToEduLevel } from "@/src/constants/constants";
 import { getQueryClient } from "@/utils/react-query-client/client";
 import { createClient } from "@/utils/supabase/server";
 import { edu_level, exam_type } from "@prisma/client";
@@ -29,6 +30,8 @@ export default async function Papers({ searchParams:{year = "all", school = "all
     redirect("/login");
   }
   const edul = user?.user_metadata?.educationLevel as edu_level;
+  const userSchoolType = eduLevelMapToSchoolType[edul];
+  const edulList = schoolTypeMapToEduLevel[userSchoolType];
   
   await queryClient.prefetchQuery({
     queryKey: ["papers", JSON.stringify({year, school, subject, examType})],

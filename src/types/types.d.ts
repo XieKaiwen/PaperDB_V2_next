@@ -119,6 +119,12 @@ type ProcessedOEQQuestionAnswerJSON = {
 }
 
 type AddQuestionAnswerItem = { questionIdx: string; questionSubIdx: string; answer: string; isText: true; id: string, mark: string } | { id: string; questionIdx: string; questionSubIdx: string; answer: File; isText: false, mark:string } 
+
+type PaperFilters = {
+  year: "all" | string[];
+  
+}
+
 //#####################################################################################
 // This are the types used for preprocessing and finalising the questionContent, questionLeafs and questionAnswer
 interface BaseQuestionIndex{
