@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   questionPartSchema,
@@ -7,12 +7,7 @@ import {
 } from "@/utils/add-question/addQuestionUtils(client)";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useState } from "react";
-import {
-  FieldValues,
-  Path,
-  useForm,
-  useWatch,
-} from "react-hook-form";
+import { FieldValues, Path, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Form } from "../ui/form";
 import { Button } from "../ui/button";
@@ -41,7 +36,6 @@ import { UnexpectedError } from "@/src/custom-errors/errors";
 import { getQueryClient } from "@/utils/react-query-client/client";
 import { useToast } from "../ui/use-toast";
 
-
 /**
  * Some guidelines on the availability of options for certain fields:
  * 1. educationLevel decides the options for: school and subject, directly.
@@ -52,7 +46,7 @@ import { useToast } from "../ui/use-toast";
  */
 
 export default function AddQuestionForm() {
-  const {toast} = useToast()
+  const { toast } = useToast();
 
   // SET FORM STEP
   const [formStep, setFormStep] = useState<1 | 2 | 3>(1);
@@ -117,7 +111,14 @@ export default function AddQuestionForm() {
   });
 
   // // default value for images should be new File([], "")
-  const { control, clearErrors, getValues, setError, resetField, handleSubmit } = form;
+  const {
+    control,
+    clearErrors,
+    getValues,
+    setError,
+    resetField,
+    handleSubmit,
+  } = form;
   // const { isSubmitting } = useFormState({ control });
 
   // Changing to using useWatch because watch() causes a rerender of the form whenever there is a change in formValues, i do not want that
@@ -238,15 +239,15 @@ export default function AddQuestionForm() {
     mutationFn: createQuestionWithPaperMetadata,
   });
 
-  useEffect(()=> {
-    if(submissionError){
+  useEffect(() => {
+    if (submissionError) {
       toast({
         title: "Error adding question",
         description: `${submissionError.name}: ${submissionError.message}`,
         variant: "destructive",
-      })
+      });
     }
-  },[submissionError])
+  }, [submissionError]);
 
   // FUNCTIONS TO BE CALLED AFTER SUBMISSION
   // Initial submission: Client-side validation -> Check if question number in the paper exists -> Open dialog to move to next step
@@ -276,9 +277,9 @@ export default function AddQuestionForm() {
     } catch (error) {
       console.error("Error during onSubmit:", error);
       if (error instanceof Error) {
-        setSubmissionError(error)
+        setSubmissionError(error);
       } else {
-        setSubmissionError(new UnexpectedError())
+        setSubmissionError(new UnexpectedError());
       }
     }
   }
@@ -294,7 +295,7 @@ export default function AddQuestionForm() {
   // If the user presses the confirm button on dialog
   async function onSubmitConfirm() {
     console.log("Submit confirmed");
-    
+
     setIsDialogueOpen(false);
     setFormSubmitting(true);
     /**
@@ -308,16 +309,17 @@ export default function AddQuestionForm() {
         throw new Error("User not logged in");
       }
 
-      const {questionAnswer, questionPart} = formDataToSubmit
+      const { questionAnswer, questionPart } = formDataToSubmit;
 
       // pre-upload the image files
-      const {processedQuestionAnswer, processedQuestionPart} = await uploadImagesForQuestionPartsAndAnswer(formDataToSubmit)
-      const formDataIntoServer ={
+      const { processedQuestionAnswer, processedQuestionPart } =
+        await uploadImagesForQuestionPartsAndAnswer(formDataToSubmit);
+      const formDataIntoServer = {
         ...formDataToSubmit,
         questionAnswer: processedQuestionAnswer,
         questionPart: processedQuestionPart,
-        educationLevel: formDataToSubmit.educationLevel as edu_level
-      }
+        educationLevel: formDataToSubmit.educationLevel as edu_level,
+      };
 
       await asyncAddQuestionMutate({
         userId,
@@ -326,29 +328,31 @@ export default function AddQuestionForm() {
       toast({
         title: "Question added successfully",
         variant: "success",
-      })
+      });
 
       // reset relevant fields
       setFormStep(1);
       setFormDataToSubmit(addQuestionFormDefaultValues);
-      resetField("topics")
-      resetField("questionType")
-      resetField("questionNumber")
-      resetField("questionPart")
-      resetField("questionAnswer")
+      resetField("topics");
+      resetField("questionType");
+      resetField("questionNumber");
+      resetField("questionPart");
+      resetField("questionAnswer");
 
-      const queryClient = getQueryClient()
-      queryClient.invalidateQueries({
-        queryKey: ["questions"],
-        refetchType:"active",
-      }, {cancelRefetch: true});
-
-    } catch(error) {
+      const queryClient = getQueryClient();
+      queryClient.invalidateQueries(
+        {
+          queryKey: ["questions"],
+          refetchType: "active",
+        },
+        { cancelRefetch: true }
+      );
+    } catch (error) {
       console.error(error);
       if (error instanceof Error) {
         setSubmissionError(error);
-      }else{
-        setSubmissionError(new UnexpectedError())
+      } else {
+        setSubmissionError(new UnexpectedError());
       }
     } finally {
       setFormSubmitting(false);
@@ -437,9 +441,60 @@ export default function AddQuestionForm() {
                 : "Add a new question?"}
             </DialogTitle>
             <DialogDescription>
-              {isExistingQuestionNumber
-                ? "Text if question number does exist"
-                : "Text if question number does not exist"}
+              {isExistingQuestionNumber ? (
+                <div>
+                  <p className="font-bold text-red-700">
+                    Question number {questionNumber} already exists
+                  </p>
+                  <p>Before submitting, please check the following:</p>
+                  <ol>
+                    <li>
+                      Ensure that the text and images in the questions are of
+                      the <span className="font-semibold">right order</span>
+                    </li>
+                    <li>
+                      Ensure that the{" "}
+                      <span className="font-semibold">mark</span> entered for
+                      each part are{" "}
+                      <span className="font-semibold">INTEGERS</span>
+                    </li>
+                    <li>
+                      Ensure that all the paper metadata are filled in{" "}
+                      <span className="font-semibold">CORRECTLY</span> (year,
+                      education level...)
+                    </li>
+                    <li>
+                      Ensure that the options (only applicable for MCQ) are in
+                      the right order
+                    </li>
+                  </ol>
+                </div>
+              ) : (
+                <div>
+                  <p>Before submitting, please check the following:</p>
+                  <ol>
+                    <li>
+                      Ensure that the text and images in the questions are of
+                      the <span className="font-semibold">right order</span>
+                    </li>
+                    <li>
+                      Ensure that the{" "}
+                      <span className="font-semibold">mark</span> entered for
+                      each part are{" "}
+                      <span className="font-semibold">INTEGERS</span>
+                    </li>
+                    <li>
+                      Ensure that all the paper metadata are filled in{" "}
+                      <span className="font-semibold">CORRECTLY</span> (year,
+                      education level...)
+                    </li>
+                    <li>
+                      Ensure that the options (only applicable for MCQ) are in
+                      the right order
+                    </li>
+                  </ol>
+                </div>
+              )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-start">
