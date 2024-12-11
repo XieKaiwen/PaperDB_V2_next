@@ -1,34 +1,18 @@
 "use server";
 
 import {
-  AddQuestionAnswerItem,
-  AddQuestionFormData,
-  AddQuestionFormQuestionPart,
-  ImageQuestionPartOrderInt,
   MCQAnswerItemArray,
-  OEQAnswerArray,
-  OEQImageAnswerItem,
-  OEQTextAnswerItem,
   QuestionAnswerArray,
-  QuestionPart,
   QuestionPartWithOrderIntArray,
 } from "@/src/types/types";
 import { createPaper, getPaperIdByMetadata } from "./paper.actions";
 import { InternalServerError } from "@/src/custom-errors/errors";
 import {
-  imageQuestionPartSchema,
-  OEQAnswerSchema,
   processQuestionAnswerIntoFinalQuestionAnswer,
   processQuestionPartIntoFinalQuestionContentQuestionLeafs,
-  processQuestionPartIntoQuestionContentJSON,
-  textQuestionPartSchema,
 } from "@/utils/addQuestionUtils";
-import { createClient } from "@/utils/supabase/server";
-import { v4 as uuidv4 } from "uuid";
 import { edu_level, exam_type } from "@prisma/client";
 import prisma from "@/utils/prisma-client/client";
-import { parseStringify } from "@/utils/utils";
-import { z } from "zod";
 
 // ### CREATE ###
 interface RequiredQuestionInfo{
