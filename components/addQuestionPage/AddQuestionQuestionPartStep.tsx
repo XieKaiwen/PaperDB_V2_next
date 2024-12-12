@@ -1,7 +1,7 @@
 import { AddQuestionFormData } from "@/src/types/types";
 import { contentTypeSchema } from "@/utils/add-question/addQuestionUtils(client)";
 import React, { ReactElement, useCallback } from "react";
-import { useFieldArray, useFormContext } from "react-hook-form";
+import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 import QuestionPartInput from "./QuestionPartInput";
@@ -15,26 +15,49 @@ export default function AddQuestionQuestionPartStep() {
     control,
     name: "questionPart",
   });
+  const questionType = useWatch({
+    control,
+    name: "questionType",
+  });
+
   const addTextArea = useCallback(() => {
-    append({
-      questionIdx: "",
-      questionSubIdx: "",
-      order: "0",
-      isText: true,
-      text: "",
-      id: uuidv4(),
-    });
+    questionType === "MCQ"
+      ? append({
+          questionIdx: "root",
+          questionSubIdx: "root",
+          order: "0",
+          isText: true,
+          text: "",
+          id: uuidv4(),
+        })
+      : append({
+          questionIdx: "",
+          questionSubIdx: "",
+          order: "0",
+          isText: true,
+          text: "",
+          id: uuidv4(),
+        });
   }, [append]);
 
   const addImageInput = useCallback(() => {
-    append({
-      questionIdx: "",
-      questionSubIdx: "",
-      order: "0",
-      isText: false,
-      image: new File([], ""),
-      id: uuidv4(),
-    });
+    questionType === "MCQ"
+      ? append({
+          questionIdx: "root",
+          questionSubIdx: "root",
+          order: "0",
+          isText: false,
+          image: new File([], ""),
+          id: uuidv4(),
+        })
+      : append({
+          questionIdx: "",
+          questionSubIdx: "",
+          order: "0",
+          isText: false,
+          image: new File([], ""),
+          id: uuidv4(),
+        });
   }, [append]);
   const deleteQuestionPart = useCallback(
     (index: number) => {
@@ -60,18 +83,18 @@ export default function AddQuestionQuestionPartStep() {
           );
         }
       )}
-    <FormField
-      control={control}
-      name="questionPart"
-      render={({ fieldState }): ReactElement => {
-        // Only render if fieldState exists and has an error
-        if (!fieldState?.error?.message) {
-          return <></>
-        }
-        
-        return <FormMessage>{fieldState.error.message}</FormMessage>
-      }}
-    />
+      <FormField
+        control={control}
+        name="questionPart"
+        render={({ fieldState }): ReactElement => {
+          // Only render if fieldState exists and has an error
+          if (!fieldState?.error?.message) {
+            return <></>;
+          }
+
+          return <FormMessage>{fieldState.error.message}</FormMessage>;
+        }}
+      />
       <div className="flex gap-4 w-full mt-2">
         <Button
           className="w-full  bg-lavender-300 hover:bg-lavender-400 text-gray-700"

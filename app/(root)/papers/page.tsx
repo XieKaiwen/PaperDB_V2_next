@@ -15,7 +15,7 @@ interface PapersPageSearchParams{
   examType: "all" | exam_type[];
 }
 
-export default async function Papers({ searchParams:{year = "all", school = "all", subject = "all", examType = "all"} }) {
+export default async function Papers({ searchParams:{year = "all", school = "all", subject = "all", examType = "all", page=1, pageSize=10} }) {
   const queryClient = getQueryClient();
 
   // Display Paper Table in default mode (just all papers for now), without any other features.

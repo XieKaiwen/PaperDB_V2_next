@@ -35,7 +35,7 @@ import { edu_level } from "@prisma/client";
 import { UnexpectedError } from "@/src/custom-errors/errors";
 import { getQueryClient } from "@/utils/react-query-client/client";
 import { useToast } from "../ui/use-toast";
-
+import { v4 as uuid } from "uuid";
 /**
  * Some guidelines on the availability of options for certain fields:
  * 1. educationLevel decides the options for: school and subject, directly.
@@ -105,7 +105,40 @@ export default function AddQuestionForm() {
       examType: undefined,
       questionType: "",
       questionNumber: "",
-      questionPart: [],
+      questionPart: [
+        {
+          id: uuid(),
+          isText: true,
+          text: "",
+          order: "0",
+          questionIdx: "root",
+          questionSubIdx: "root",
+        },
+        {
+          id: uuid(),
+          isText: true,
+          text: "",
+          order: "0",
+          questionIdx: "root",
+          questionSubIdx: "root",
+        },
+        {
+          id: uuid(),
+          isText: true,
+          text: "",
+          order: "0",
+          questionIdx: "root",
+          questionSubIdx: "root",
+        },
+        {
+          id: uuid(),
+          isText: true,
+          text: "",
+          order: "0",
+          questionIdx: "root",
+          questionSubIdx: "root",
+        },
+      ],
       questionAnswer: [],
     },
   });
@@ -255,6 +288,7 @@ export default function AddQuestionForm() {
     // await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log("Submitted: ", values);
     setFormDataToSubmit(values);
+    setFormSubmitting(true);
     /**
      * Check if the question number already exists here.
      */
@@ -290,6 +324,7 @@ export default function AddQuestionForm() {
     setIsDialogueOpen(false);
     setIsExistingQuestionNumber(false);
     setFormDataToSubmit(addQuestionFormDefaultValues);
+    setFormSubmitting(false);
   }
 
   // If the user presses the confirm button on dialog
@@ -297,7 +332,6 @@ export default function AddQuestionForm() {
     console.log("Submit confirmed");
 
     setIsDialogueOpen(false);
-    setFormSubmitting(true);
     /**
      * Perform all the submission logic here
      */
