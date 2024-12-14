@@ -1,27 +1,36 @@
-import { edu_level, exam_type } from "@prisma/client";
+import { ParsedPaperFilterProps } from "@/src/types/types";
 
+export function determineVisibility(onlyVisible: boolean, onlyNonVisible: boolean) {
+  if (onlyVisible && onlyNonVisible) {
+    return true; // Rule 1
+  }
+  if (onlyVisible) {
+    return true; // Rule 2
+  }
+  if (onlyNonVisible) {
+    return false; // Rule 3
+  }
+  return null; // Rule 4
+}
 export function whereClauseConstructorForPapers({
-  year = "all",
-  educationLevel = "all",
-  school = "all",
-  subject = "all",
-  examType = "all",
-  visible = true
-}: {
-  year?: "all" | string[];
-  educationLevel?: "all" | edu_level[];
-  school?: "all" | string[];
-  subject?: "all" | string[];
-  examType?: "all" | exam_type[];
-  visible?: boolean
-}) {
+  year,
+  educationLevel,
+  school,
+  subject,
+  examType,
+  onlyVisible = false,
+  onlyNonVisible = false
+}: ParsedPaperFilterProps) {
+
+  const visible = determineVisibility(onlyVisible, onlyNonVisible);
+
   const whereClause = {
-    year: year === "all" ? {} : {in: year},
-    educationLevel: educationLevel === "all" ? {} : {in: educationLevel},
-    school: school === "all" ? {} : {in: school},
-    subject: subject === "all" ? {} : {in: subject},
-    examType: examType === "all" ? {} : {in: examType},
-    visible
+    year: year.length === 0 ? {} : {in: year},
+    educationLevel: educationLevel.length === 0 ? {} : {in: educationLevel},
+    school: school ? {} : {in: school},
+    subject: subject.length === 0 ? {} : {in: subject},
+    examType: examType.length === 0 ? {} : {in: examType},
+    ...(visible !== null && { visible })
   };
   return whereClause;
 }

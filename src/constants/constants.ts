@@ -177,4 +177,8 @@ export const adminActions = [
     title: "Add Question",
     link: "/admin/add-question",
   },
+  {
+    title: "View Paper",
+    link: "/admin/view-paper",
+  }
 ]

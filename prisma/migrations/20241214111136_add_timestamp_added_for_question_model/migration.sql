@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Question" ADD COLUMN     "dateAdded" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP;

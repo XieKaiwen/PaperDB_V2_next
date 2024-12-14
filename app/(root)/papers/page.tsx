@@ -23,28 +23,29 @@ export default async function Papers({ searchParams:{year = "all", school = "all
   /** Hence, we will be retrieving all papers here (pagination related data retrieval will be added later)
    * AKA. when we actually have enough papers to make a paginated table LOL
    * */
-  const supabase = createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
 
-  if (error || !user) {
-    redirect("/login");
-  }
-  const edul = user?.user_metadata?.educationLevel as edu_level;
-  const userSchoolType = eduLevelMapToSchoolType[edul];
-  const edulList = schoolTypeMapToEduLevel[userSchoolType];
+  // const supabase = createClient();
+  // const { data: { user }, error } = await supabase.auth.getUser();
+
+  // if (error || !user) {
+  //   redirect("/login");
+  // }
+  // const edul = user?.user_metadata?.educationLevel as edu_level;
+  // const userSchoolType = eduLevelMapToSchoolType[edul];
+  // const edulList = schoolTypeMapToEduLevel[userSchoolType];
   
-  await queryClient.prefetchQuery({
-    queryKey: ["papers", JSON.stringify({year, school, subject, examType})],
-    queryFn: ({queryKey}) => {
-      const [, filterString] = queryKey;
-      const filters = JSON.parse(filterString) as PapersPageSearchParams 
-      return getPapersWithFilters({...filters, educationLevel: [edul]});
-    },
-  });
+  // await queryClient.prefetchQuery({
+  //   queryKey: ["papers", JSON.stringify({year, school, subject, examType})],
+  //   queryFn: ({queryKey}) => {
+  //     const [, filterString] = queryKey;
+  //     const filters = JSON.parse(filterString) as PapersPageSearchParams 
+  //     return getPapersWithFilters({...filters, educationLevel: [edul]});
+  //   },
+  // });
 
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <PaperTable type="default"/>
-    </HydrationBoundary>
-  );
+  // return (
+  //   <HydrationBoundary state={dehydrate(queryClient)}>
+  //     <PaperTable type="default"/>
+  //   </HydrationBoundary>
+  // );
 }

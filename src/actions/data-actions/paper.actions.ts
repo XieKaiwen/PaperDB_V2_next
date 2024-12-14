@@ -1,8 +1,9 @@
 "use server";
 
+import { ParsedPaperFilterProps } from "@/src/types/types";
 import prisma from "@/utils/prisma-client/client";
 import { whereClauseConstructorForPapers } from "@/utils/prismaUtils";
-import { edu_level, exam_type } from "@prisma/client";
+import { edu_level, exam_type, Prisma } from "@prisma/client";
 
 // ### CREATE ###
 export async function createPaper({
@@ -63,36 +64,41 @@ export async function getPaperIdByMetadata({
 }
 
 // ### READ ###
-export async function getPapersWithFilters({
-  year = "all",
-  educationLevel = "all",
-  school = "all",
-  subject = "all",
-  examType = "all",
-  visible = true
-}: {
-  year?: "all" | string[];
-  educationLevel?: "all" | edu_level[];
-  school?: "all" | string[];
-  subject?: "all" | string[];
-  examType?: "all" | exam_type[];
-  visible?: boolean
-}){
-  const whereClause = whereClauseConstructorForPapers({year, educationLevel, school, subject, examType, visible});
-
+export async function getPapersWithFilters(
+  {
+    year = [],
+    educationLevel = [],
+    school = [],
+    subject = [],
+    examType = [],
+    onlyVisible = false,
+    onlyNonVisible = false,
+  }: ParsedPaperFilterProps,
+  page: number,
+  pageSize: number,
+  includeFields: Prisma.PaperInclude = {},
+  selectFields: Prisma.PaperSelect = {},
+) {
+  // onlyVisible should take precedence over onlyNonVisible. If both are true, only show Visible
+  const whereClause = whereClauseConstructorForPapers({
+    year,
+    educationLevel,
+    school,
+    subject,
+    examType,
+    onlyVisible,
+    onlyNonVisible,
+  });
+// TODO: create a prisma extension for paper model, retrievePaperPaginated
   const papers = await prisma.paper.findMany({
     where: whereClause,
-    include: {
-      School: true,
-      Subject: true,
-      UserPaperProgressStatus: true,
-    },
+    ...(Object.keys(selectFields).length > 0
+      ? { select: selectFields } // Use `select` if `selectFields` is not empty
+      : { include: includeFields }), // Otherwise, use `include`
   });
-  return papers
+  return papers;
 }
-
 
 // ### UPDATE ###
 
 // ### DELETE ###
-

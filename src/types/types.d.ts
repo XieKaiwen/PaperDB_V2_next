@@ -445,3 +445,23 @@ interface QuestionInfoInputProps{
   className?: string;
 }
 
+
+// #####################################################################################
+// BELOW ARE TYPES USED FOR DATA TABLE PAGINATION FOR VIEWING PAPERS, INCLUDING FILTERS
+interface UnparsedPaperFilterProps{
+  year: string;
+  school: string;
+  subject: string;
+  examType: string;
+  edul: string;
+}
+
+interface ParsedPaperFilterProps {
+  year: string[];
+  school: string[];
+  subject: string[];
+  examType: exam_type[];
+  educationLevel: edu_level[];
+  onlyVisible?: boolean
+  onlyNonVisible?: boolean
+}
