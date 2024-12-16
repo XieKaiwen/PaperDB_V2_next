@@ -341,7 +341,7 @@ export function createQuestionAnswerValueAfterReset(
 
   if (questionType === "MCQ") {
     // FOR MCQ, JUST UPDATE IT TO ARRAY WITH THE BAREBONES OBJECT
-    return [{ options: [], answer: [], mark: "0" }] as z.infer<
+    return [{ options: [], answer: [], mark: "2" }] as z.infer<
       typeof MCQAnswerSchema
     >;
   } else if (questionType === "OEQ") {
@@ -355,7 +355,7 @@ export function createQuestionAnswerValueAfterReset(
         answer: "",
         id: uuidv4(),
         isText: true,
-        mark: "0",
+        mark: "1",
       });
     } else {
       // CREATE ONE OBJECT FOR EACH questionLeaf in questionLeafs, in order, first by questionIdx, then by questionSubIdx
@@ -368,7 +368,7 @@ export function createQuestionAnswerValueAfterReset(
             answer: "",
             id: uuidv4(),
             isText: true,
-            mark: "0",
+            mark: "1",
           });
         } else {
           // ELSE, THERE IS NO ROOT AND ONLY HAVE THE OTHER SUBKEYS AS SUBINDEX
@@ -379,7 +379,7 @@ export function createQuestionAnswerValueAfterReset(
               answer: "",
               id: uuidv4(),
               isText: true,
-              mark: "0",
+              mark: "1",
             });
           });
         }
@@ -438,7 +438,7 @@ export function createQuestionAnswerValueWithoutReset(
             answer: "",
             id: uuidv4(),
             isText: true,
-            mark: "0",
+            mark: "1",
           },
         ] as z.infer<typeof OEQAnswerSchema>;
       }
@@ -482,7 +482,7 @@ export function createQuestionAnswerValueWithoutReset(
               isText: true,
               answer: "",
               id: uuidv4(),
-              mark: "0",
+              mark: "1",
             });
           }
         } else {
@@ -499,7 +499,7 @@ export function createQuestionAnswerValueWithoutReset(
                 isText: true,
                 answer: "",
                 id: uuidv4(),
-                mark: "0",
+                mark: "1",
               });
             }
           });

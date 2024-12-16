@@ -61,7 +61,7 @@ export default function QuestionPreview() {
     questionPart = [],
     questionAnswer = [],
   } = formData as AddQuestionFormData;
-  console.log("questionPart:", formData);
+  // console.log("questionPart:", formData);
 
   // CONSTRUCT THE QuestionContentCombinedJSON here
   const questionContentCombinedJSON = useMemo(() => {
@@ -84,17 +84,17 @@ export default function QuestionPreview() {
     questionContent: { root: questionRoot, indexed: questionIndexedParts },
     questionLeafs,
   } = questionContentCombinedJSON;
-  console.log(
-    "questionContentCombinedJSON: " +
-      JSON.stringify(questionContentCombinedJSON, null, 2)
-  );
+  // console.log(
+  //   "questionContentCombinedJSON: " +
+  //     JSON.stringify(questionContentCombinedJSON, null, 2)
+  // );
 
   const questionAnswerJSON = useMemo(() => {
     return questionType === "MCQ"
       ? processMCQQuestionAnswerIntoJSON(questionAnswer as z.infer<typeof MCQAnswerSchema>)
       : processOEQQuestionAnswerIntoJSON(questionAnswer as z.infer<typeof OEQAnswerSchema>);
   }, [questionAnswer]);
-  console.log("questionAnswerJSON: ", questionAnswerJSON);
+  // console.log("questionAnswerJSON: ", questionAnswerJSON);
 
   // FUNCTION TO CHECK IF TO DISPLAY THE ANSWER PART:
   // If questionType is OEQ, we need to check the appropriate keys exists on the JSON

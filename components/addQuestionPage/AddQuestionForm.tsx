@@ -115,28 +115,12 @@ export default function AddQuestionForm() {
           questionSubIdx: "root",
         },
         {
-          id: uuid(),
-          isText: true,
-          text: "",
-          order: "0",
           questionIdx: "root",
           questionSubIdx: "root",
-        },
-        {
-          id: uuid(),
-          isText: true,
-          text: "",
           order: "0",
-          questionIdx: "root",
-          questionSubIdx: "root",
-        },
-        {
+          isText: false,
+          image: new File([], ""),
           id: uuid(),
-          isText: true,
-          text: "",
-          order: "0",
-          questionIdx: "root",
-          questionSubIdx: "root",
         },
       ],
       questionAnswer: [],
@@ -241,7 +225,7 @@ export default function AddQuestionForm() {
           valuesArray[index],
         ])
       ) as FieldValues;
-      console.log(valuesToValidate);
+      // console.log(valuesToValidate);
 
       //  validate with zod
       // Choose the schema based on the current step
@@ -250,7 +234,7 @@ export default function AddQuestionForm() {
       if (validationResult.success) {
         setFormStep((prev) => (prev + 1) as 1 | 2 | 3);
       } else {
-        console.log(validationResult);
+        // console.log(validationResult);
         validationResult.error.errors.forEach((error) => {
           const { message, path } = error;
           setError(path.join(".") as Path<AddQuestionFormData>, {
@@ -286,7 +270,7 @@ export default function AddQuestionForm() {
   // Initial submission: Client-side validation -> Check if question number in the paper exists -> Open dialog to move to next step
   async function onSubmit(values: z.infer<typeof questionPartSchema>) {
     // await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Submitted: ", values);
+    // console.log("Submitted: ", values);
     setFormDataToSubmit(values);
     setFormSubmitting(true);
     /**
@@ -295,7 +279,7 @@ export default function AddQuestionForm() {
     const { year, examType, subject, school, educationLevel, questionNumber } =
       values;
     try {
-      console.log("Checking question number...");
+      // console.log("Checking question number...");
       const isQuestionNumberExists = await checkIfQuestionNumberExists({
         year,
         examType,
@@ -304,12 +288,12 @@ export default function AddQuestionForm() {
         schoolId: school,
         questionNumber: questionNumber,
       });
-      console.log("Question number exists:", isQuestionNumberExists);
+      // console.log("Question number exists:", isQuestionNumberExists);
       setIsExistingQuestionNumber(isQuestionNumberExists);
       setIsDialogueOpen(true);
-      console.log("Dialog state updated. Opening dialog...");
+      // console.log("Dialog state updated. Opening dialog...");
     } catch (error) {
-      console.error("Error during onSubmit:", error);
+      console.error("Error during on submit:", error);
       if (error instanceof Error) {
         setSubmissionError(error);
       } else {
@@ -329,7 +313,7 @@ export default function AddQuestionForm() {
 
   // If the user presses the confirm button on dialog
   async function onSubmitConfirm() {
-    console.log("Submit confirmed");
+    // console.log("Submit confirmed");
 
     setIsDialogueOpen(false);
     /**

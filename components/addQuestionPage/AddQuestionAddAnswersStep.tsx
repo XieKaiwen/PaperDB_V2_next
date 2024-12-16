@@ -205,7 +205,7 @@ function AddMCQAnswerInput() {
     if (formMCQAnswer && formMCQAnswer.options !== undefined) {
       return formMCQAnswer.options;
     }
-    return [];
+    return ["1", "2", "3", "4"];
   });
   const [correctAnswers, setCorrectAnswers] = useState<string[]>(() => {
     const formMCQAnswer = getValues("questionAnswer")[0];

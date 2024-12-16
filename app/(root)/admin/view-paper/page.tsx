@@ -63,7 +63,6 @@ export default async function AdminViewPaperPage({
   const userId = user?.id; // use in the future to get access to just a your papers, and maybe in the future can specifically see other admin's as well
 
   const queryClient = getQueryClient();
-
   // Prefetching the paginated
   await queryClient.prefetchQuery({
     queryKey: [
@@ -88,6 +87,8 @@ export default async function AdminViewPaperPage({
         number
       ];
       const filters: ParsedPaperFilterProps = JSON.parse(filterString);
+      console.log("Current filters: ", filters);
+      
       return getPapersWithFilters({ ...filters }, page, pageSize, {
         School: true,
         Subject: true,
@@ -101,6 +102,4 @@ export default async function AdminViewPaperPage({
       <PaperTable type="default" />
     </HydrationBoundary>
   );
-
-  return <div>AdminViewPaperPage</div>;
 }

@@ -10,8 +10,8 @@ import { MAX_QUESTION_PART_NUM } from "@/src/constants/constants";
 import { FormField, FormMessage } from "../ui/form";
 export default function AddQuestionQuestionPartStep() {
   // INITIATE FIELDS ARRAY
-  const { control } = useFormContext<AddQuestionFormData>();
-  const { fields, append, remove } = useFieldArray<AddQuestionFormData>({
+  const { control, getValues } = useFormContext<AddQuestionFormData>();
+  const { fields, append, remove } = useFieldArray({
     control,
     name: "questionPart",
   });
@@ -21,7 +21,8 @@ export default function AddQuestionQuestionPartStep() {
   });
 
   const addTextArea = useCallback(() => {
-    questionType === "MCQ"
+    const currentFields = getValues("questionPart");
+    currentFields.length === 0
       ? append({
           questionIdx: "root",
           questionSubIdx: "root",
@@ -31,17 +32,18 @@ export default function AddQuestionQuestionPartStep() {
           id: uuidv4(),
         })
       : append({
-          questionIdx: "",
-          questionSubIdx: "",
+          questionIdx: currentFields[currentFields.length - 1].questionIdx,
+          questionSubIdx: currentFields[currentFields.length - 1].questionSubIdx,
           order: "0",
           isText: true,
           text: "",
           id: uuidv4(),
         });
-  }, [append]);
+  }, [getValues, append]);
 
   const addImageInput = useCallback(() => {
-    questionType === "MCQ"
+    const currentFields = getValues("questionPart");
+    currentFields.length === 0
       ? append({
           questionIdx: "root",
           questionSubIdx: "root",
@@ -51,14 +53,14 @@ export default function AddQuestionQuestionPartStep() {
           id: uuidv4(),
         })
       : append({
-          questionIdx: "",
-          questionSubIdx: "",
+          questionIdx: currentFields[currentFields.length - 1].questionIdx,
+          questionSubIdx: currentFields[currentFields.length - 1].questionSubIdx,
           order: "0",
           isText: false,
           image: new File([], ""),
           id: uuidv4(),
         });
-  }, [append]);
+  }, [getValues, append]);
   const deleteQuestionPart = useCallback(
     (index: number) => {
       remove(index);

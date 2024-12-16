@@ -12,6 +12,7 @@ export default function ImageReader({content, width, height, className=""} : Ima
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     useEffect(() => {
+      if(content.size === 0) return;
       const imageReader = new FileReader();
       imageReader.readAsDataURL(content);
   
@@ -30,6 +31,6 @@ export default function ImageReader({content, width, height, className=""} : Ima
     if (!imageUrl) {
       return <Image className={className} src={placeholderImage} alt="loading image..." width={width} height={height}/>; // You can add a placeholder or spinner here if needed
     }
-  
-    return <Image className={className} src={imageUrl} alt="question image" width={width} height={height}/>;
+    if(content.size === 0) return <></>
+    return <Image className={className} src={imageUrl} alt="image" width={width} height={height}/>;
 }
