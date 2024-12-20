@@ -1,4 +1,4 @@
-import PaperTable from '@/components/PaperTable';
+import PaperTable from '@/components/PaperTable/PaperTable';
 import { ParsedPaperFilterProps } from '@/src/types/types';
 import { getQueryClient } from '@/utils/react-query-client/client';
 import {
@@ -137,7 +137,7 @@ export default async function AdminViewPaperPage({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <PaperTable type="default" page={parsedPage} filters={fullFilter} />
+      <PaperTable type="admin" />
     </HydrationBoundary>
   );
 }

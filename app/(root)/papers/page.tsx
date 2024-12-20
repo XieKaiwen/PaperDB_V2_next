@@ -1,4 +1,4 @@
-import PaperTable from '@/components/PaperTable';
+import PaperTable from '@/components/PaperTable/PaperTable';
 import { getPapersWithFilters } from '@/src/actions/data-actions/paper.actions';
 import { eduLevelMapToSchoolType, schoolTypeMapToEduLevel } from '@/src/constants/constants';
 import { getQueryClient } from '@/utils/react-query-client/client';

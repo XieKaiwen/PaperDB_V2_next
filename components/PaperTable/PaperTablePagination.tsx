@@ -8,7 +8,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from './ui/pagination';
+} from '@/components/ui/pagination';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface PaperTablePaginationProps {

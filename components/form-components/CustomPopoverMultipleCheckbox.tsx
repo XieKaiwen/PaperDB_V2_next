@@ -41,7 +41,7 @@ export default function CustomPopoverMultipleCheckBox<T extends FieldValues>({
             {label && <FormLabel className="text-sm font-semibold">{label}</FormLabel>}
             {description && <FormDescription> {description} </FormDescription>}
           </div>
-          <Popover onOpenChange={handleOpenChange}>
+          <Popover open={isOpen} onOpenChange={handleOpenChange}>
             <PopoverTrigger asChild className="text-sm">
               <Button variant="outline">
                 {triggerText}

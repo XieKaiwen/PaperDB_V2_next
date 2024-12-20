@@ -188,14 +188,3 @@ export const LG_BREAKPOINT = 1024;
 export const XL_BREAKPOINT = 1280;
 export const XXL_BREAKPOINT = 1536;
 
-// Admin actions
-export const adminActions = [
-  {
-    title: 'Add Question',
-    link: '/admin/add-question',
-  },
-  {
-    title: 'View Paper',
-    link: '/admin/view-paper',
-  },
-];

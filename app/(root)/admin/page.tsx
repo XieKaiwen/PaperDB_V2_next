@@ -1,7 +1,18 @@
 import { buttonVariants } from '@/components/ui/button';
-import { adminActions } from '@/src/constants/constants';
 import Link from 'next/link';
 import React from 'react';
+
+// Admin actions
+export const adminActions = [
+  {
+    title: 'Add question',
+    link: '/admin/add-question',
+  },
+  {
+    title: 'View papers',
+    link: '/admin/paper',
+  },
+];
 
 export default function AdminPage() {
   return (

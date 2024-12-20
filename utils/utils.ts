@@ -31,16 +31,19 @@ export function generateYearList() {
   return years;
 }
 
-export function generateOptionsFromJsonList(
-  JSONList: Record<string, string>[],
-  valueKey: string,
-  labelKey: string,
+export function generateOptionsFromJsonList<
+  T extends Record<string, unknown>,
+  VKey extends keyof T,
+  LKey extends keyof T
+>(
+  JSONList: T[],
+  valueKey: VKey & (T[VKey] extends string ? VKey : never),
+  labelKey: LKey & (T[LKey] extends string ? LKey : never)
 ): { value: string; label: string }[] {
-  const optionsList = JSONList.map((item) => {
-    return { value: item[valueKey], label: item[labelKey] };
-  });
-
-  return optionsList;
+  return JSONList.map((item) => ({
+    value: item[valueKey] as string,
+    label: item[labelKey] as string,
+  }));
 }
 
 export function convertRomanToInt(romanNumeral: string): number {

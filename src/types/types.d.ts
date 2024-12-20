@@ -488,5 +488,5 @@ interface ParsedPaperFilterProps {
   educationLevel: edu_level[];
   userId: string[];
   fetchVisible: boolean;
-  fetchNonVisible?: boolean;
+  fetchNonVisible: boolean;
 }

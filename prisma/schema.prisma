@@ -16,6 +16,7 @@ model Paper {
   userId                  String                    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   educationLevel          edu_level
   totalMark               Int                       @default(0) @db.SmallInt
+  difficulty              Difficulty?
   examType                exam_type
   visible                 Boolean                   @default(false)
   year                    String
