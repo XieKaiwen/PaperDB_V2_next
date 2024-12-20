@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
       } catch (err) {
         // TODO roll back on supabase entry, and then prompt the user to re-signup for their account. 
         console.error(err);
-        const { data, error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
+        const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
           userData.sub, false
         )  
         if(deleteError){

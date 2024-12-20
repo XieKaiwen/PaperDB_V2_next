@@ -405,7 +405,7 @@ interface CustomComboBoxProps<T extends FieldValues> {
   commandPlaceholder: string;
   commandEmptyText: string;
   options: { value: string; label: string }[];
-  onSelectChange: (name: Path<T>, value: unknown, config?: Object) => void;
+  onSelectChange: (name: Path<T>, value: unknown, config?: object) => void;
   label?: string;
   description?: string;
   className?: string;

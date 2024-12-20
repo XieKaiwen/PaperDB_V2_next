@@ -1,4 +1,5 @@
 // Import Prisma Client
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { PrismaClient } = require('@prisma/client');
 
 

@@ -87,27 +87,27 @@ export default function AuthForm({ type }: AuthFormProps) {
           }
           setDisplayedError(false);
           const encodedError = encodeURIComponent(
-            "User not found, incorrect email or password"
+            "User not found, incorrect email or password",
           );
           router.replace(
             `/login?error=${encodedError}${
               redirectedFrom
                 ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}`
                 : ""
-            }`
+            }`,
           );
         } catch (error) {
           setDisplayedError(false);
           console.error(error);
           const encodedError = encodeURIComponent(
-            "Error occurred during login process"
+            "Error occurred during login process",
           );
           router.replace(
             `/login?error=${encodedError}${
               redirectedFrom
                 ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}`
                 : ""
-            }`
+            }`,
           );
         }
       } else if (type === "sign-up") {
@@ -131,14 +131,14 @@ export default function AuthForm({ type }: AuthFormProps) {
           setDisplayedError(false);
           console.error(error);
           const encodedError = encodeURIComponent(
-            "Error occurred in sign up process"
+            "Error occurred in sign up process",
           );
           router.replace(
             `/sign-up?error=${encodedError}${
               redirectedFrom
                 ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}`
                 : ""
-            }`
+            }`,
           );
         }
       }
@@ -167,7 +167,7 @@ export default function AuthForm({ type }: AuthFormProps) {
                   href={`/login${
                     searchParams.get("redirectedFrom")
                       ? `?redirectedFrom=${encodeURIComponent(
-                          searchParams.get("redirectedFrom")!
+                          searchParams.get("redirectedFrom")!,
                         )}`
                       : ""
                   }`}
@@ -178,7 +178,7 @@ export default function AuthForm({ type }: AuthFormProps) {
             </p>
           ) : (
             <p className="text-sm mt-1.5">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <span>
                 Sign up{" "}
                 <Link
@@ -186,7 +186,7 @@ export default function AuthForm({ type }: AuthFormProps) {
                   href={`/sign-up${
                     searchParams.get("redirectedFrom")
                       ? `?redirectedFrom=${encodeURIComponent(
-                          searchParams.get("redirectedFrom")!
+                          searchParams.get("redirectedFrom")!,
                         )}`
                       : ""
                   }`}

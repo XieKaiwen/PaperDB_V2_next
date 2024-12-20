@@ -19,7 +19,6 @@ import {
   CommandItem,
   CommandList,
 } from "../ui/command";
-import { valuesIn } from "lodash";
 import { CustomComboBoxProps } from "@/src/types/types";
 import { FieldValues } from "react-hook-form";
 

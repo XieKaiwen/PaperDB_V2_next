@@ -18,7 +18,7 @@ import { parseStringify } from '../../utils/utils';
 interface FormDataContext {
   update: (updatedFormData: AddQuestionFormData) => void;
   subscribe: (subscriber: AddQuestionFormDataSubscriber) => () => void;
-  retrieve: () => AddQuestionFormData | {};
+  retrieve: () => AddQuestionFormData;
 }
 
 interface QuestionContentJSONContext {

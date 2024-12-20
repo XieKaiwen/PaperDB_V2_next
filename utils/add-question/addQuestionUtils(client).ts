@@ -391,15 +391,15 @@ export function createQuestionAnswerValueAfterReset(
   return [];
 }
 
-// Type guard to check if an object is of type AnswerWithIndices
-function hasQuestionIndices(
-  obj: any
-): obj is { questionIdx: string; questionSubIdx: string; answer: string } {
-  return (
-    typeof obj.questionIdx === "string" &&
-    typeof obj.questionSubIdx === "string"
-  );
-}
+// // Type guard to check if an object is of type AnswerWithIndices
+// function hasQuestionIndices(
+//   obj: any
+// ): obj is { questionIdx: string; questionSubIdx: string; answer: string } {
+//   return (
+//     typeof obj.questionIdx === "string" &&
+//     typeof obj.questionSubIdx === "string"
+//   );
+// }
 
 export function createQuestionAnswerValueWithoutReset(
   questionType: string,
@@ -419,7 +419,6 @@ export function createQuestionAnswerValueWithoutReset(
       // IF NOT FOUND, WE CREATE A NEW OBJECT WITH "root", "root" for questionIdx and questionSubIdx
       const foundObj = questionAnswer.find(
         (obj) =>
-          hasQuestionIndices(obj) &&
           obj.questionIdx === "root" &&
           obj.questionSubIdx === "root"
       ) as

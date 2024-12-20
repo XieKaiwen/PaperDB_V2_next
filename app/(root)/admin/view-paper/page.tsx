@@ -1,10 +1,5 @@
 import PaperTable from "@/components/PaperTable";
 import {
-  countPapersWithFilters,
-  getPapersWithFilters,
-} from "@/src/actions/data-actions/paper.actions";
-import {
-  UnparsedPaperFilterProps,
   ParsedPaperFilterProps,
 } from "@/src/types/types";
 import { getQueryClient } from "@/utils/react-query-client/client";
@@ -77,7 +72,7 @@ export default async function AdminViewPaperPage({
   if (error || !user) {
     redirect("/login");
   }
-  const userId = user?.id; // use in the future to get access to just a your papers, and maybe in the future can specifically see other admin's as well
+  // const userId = user?.id; // use in the future to get access to just a your papers, and maybe in the future can specifically see other admin's as well
 
   // TODO: use queryOptions to bundle together queryKey and queryFunctions for refactoring
 
