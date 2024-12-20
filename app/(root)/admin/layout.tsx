@@ -32,7 +32,7 @@ export default async function AdminLayout({
 
 
   return (
-    <section>
+    <section className="w-full">
       {children}
     </section>
   );

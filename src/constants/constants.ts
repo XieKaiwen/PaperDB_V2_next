@@ -16,6 +16,24 @@ export const educationLevelOptions = [
   { value: "J2", label: "JC 2" }
 ];
 
+export const examTypeOrder: Record<exam_type, number> = {
+  [exam_type.CA1]: 1,
+  [exam_type.CA2]: 2,
+  [exam_type.SA1]: 3,
+  [exam_type.SA2]: 4,
+  [exam_type.PSLE]: 5,
+  [exam_type.WA]: 6,
+  [exam_type.SA]: 7,
+  [exam_type.O_LEVEL]: 8,
+  [exam_type.COMMON_TEST]: 9,
+  [exam_type.BLOCK_TEST]: 10,
+  [exam_type.PROMO]: 11,
+  [exam_type.PRELIM]: 12,
+  [exam_type.A_LEVEL]: 13,
+  [exam_type.OTHER]: 14,
+};
+
+
 export const navRoutes = [
   { title: "Home", link: "/home" },
   { title: "Contact Us", link: "/contact-us" },

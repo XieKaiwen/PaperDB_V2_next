@@ -10,7 +10,7 @@ import {
   ProcessedQuestionContentCombinedJSON,
 } from "@/src/types/types";
 import { School, Subject, Topic } from "@prisma/client";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { debounce } from "lodash";
 import React, { createContext, ReactNode, useMemo, useRef } from "react";
 import { parseStringify } from '../../utils/utils';
@@ -46,16 +46,18 @@ function AddQuestionContextProvider({ children }: { children: ReactNode }) {
   const { data: allSubjects } = useSuspenseQuery({
     queryKey: ["subjects"],
     queryFn: getAllSubjects,
+    staleTime: 600 * 1000 
   });
 
   const { data: allTopics } = useSuspenseQuery({
     queryKey: ["topics"],
     queryFn: getAllTopics,
+    staleTime: 600 * 1000,
   });
-
   const { data: allSchools } = useSuspenseQuery({
     queryKey: ["schools"],
     queryFn: getAllSchools,
+    staleTime: 600 * 1000 
   });
 
   const addQuestionFormData = useRef<AddQuestionFormData>({

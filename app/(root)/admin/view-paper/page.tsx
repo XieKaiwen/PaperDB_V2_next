@@ -1,12 +1,20 @@
 import PaperTable from "@/components/PaperTable";
-import { getPapersWithFilters } from "@/src/actions/data-actions/paper.actions";
+import {
+  countPapersWithFilters,
+  getPapersWithFilters,
+} from "@/src/actions/data-actions/paper.actions";
 import {
   UnparsedPaperFilterProps,
   ParsedPaperFilterProps,
 } from "@/src/types/types";
 import { getQueryClient } from "@/utils/react-query-client/client";
+import {
+  paperTableCountWithFiltersQueryOptions,
+  paperTableFilterDistinctValuesQueryOptions,
+  paperTableWithFiltersQueryOptions,
+} from "@/utils/react-query-client/query-options/paper";
 import { createClient } from "@/utils/supabase/server";
-import { parseViewPaperSearchParamsIntoFilters } from "@/utils/view-paper/utils";
+import { parsePaperSearchTablesParamsIntoFilters } from "@/utils/view-paper/utils";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -18,10 +26,11 @@ export default async function AdminViewPaperPage({
     subject = "[]",
     examType = "[]",
     edul = "[]",
+    users = "[]",
     page = "1",
     pageSize = "10",
-    onlyVisible = "false",
-    onlyNonVisible = "false",
+    visible = "true",
+    nonVisible = "true",
   },
 }) {
   // Display Paper Table in default mode (just all papers for now), without any other features.
@@ -34,23 +43,31 @@ export default async function AdminViewPaperPage({
   // If searchParam is just an empty array, then take it as that for that param, there are no filters
 
   // Handling all the searchParameters
-  const parsedPage = isNaN(parseInt(page)) ? 1 : parseInt(page);
-  const parsedPageSize = isNaN(parseInt(pageSize)) ? 1 : parseInt(pageSize);
   const {
     edul: parsedEdul,
     year: parsedYear,
     school: parsedSchool,
     subject: parsedSubject,
     examType: parsedExamType,
-  } = parseViewPaperSearchParamsIntoFilters({
-    year,
-    school,
-    subject,
-    examType,
-    edul,
-  });
-  const parsedOnlyVisible = onlyVisible === "true" ? true : false;
-  const parsedOnlyNonVisible = onlyNonVisible === "true" ? true : false;
+    users: parsedUsers,
+    fetchVisible: parsedFetchVisible,
+    fetchNonVisible: parsedFetchNonVisible,
+    page: parsedPage,
+    pageSize: parsedPageSize,
+  } = parsePaperSearchTablesParamsIntoFilters(
+    {
+      year,
+      school,
+      subject,
+      examType,
+      edul,
+      users,
+    },
+    page,
+    pageSize,
+    visible,
+    nonVisible
+  );
   // Getting the user id for future feature implementations (not yet)
   const supabase = createClient();
   const {
@@ -62,44 +79,72 @@ export default async function AdminViewPaperPage({
   }
   const userId = user?.id; // use in the future to get access to just a your papers, and maybe in the future can specifically see other admin's as well
 
+  // TODO: use queryOptions to bundle together queryKey and queryFunctions for refactoring
+
   const queryClient = getQueryClient();
-  // Prefetching the paginated
-  await queryClient.prefetchQuery({
-    queryKey: [
-      "papers",
-      JSON.stringify({
+  // Prefetching the paginated paper data
+  await queryClient.prefetchQuery(
+    paperTableWithFiltersQueryOptions(
+      {
         year: parsedYear,
         school: parsedSchool,
         subject: parsedSubject,
         examType: parsedExamType,
         educationLevel: parsedEdul,
-        onlyVisible: parsedOnlyVisible,
-        onlyNonVisible: parsedOnlyNonVisible,
-      } as ParsedPaperFilterProps),
+        userId: parsedUsers,
+        fetchVisible: parsedFetchVisible,
+        fetchNonVisible: parsedFetchNonVisible,
+      },
       parsedPage,
       parsedPageSize,
-    ],
-    queryFn: ({ queryKey }) => {
-      const [, filterString, page, pageSize] = queryKey as [
-        string,
-        string,
-        number,
-        number
-      ];
-      const filters: ParsedPaperFilterProps = JSON.parse(filterString);
-      console.log("Current filters: ", filters);
-      
-      return getPapersWithFilters({ ...filters }, page, pageSize, {
-        School: true,
+      {
+        School:true,
         Subject: true,
         User: true
-      });
-    },
-  });
+      }
+    )
+  );
+
+  // Prefetch the number of papers for pagination (for total number of pages)
+  await queryClient.prefetchQuery(
+    paperTableCountWithFiltersQueryOptions(
+      {
+        year: parsedYear,
+        school: parsedSchool,
+        subject: parsedSubject,
+        examType: parsedExamType,
+        educationLevel: parsedEdul,
+        userId: parsedUsers,
+        fetchVisible: parsedFetchVisible,
+        fetchNonVisible: parsedFetchNonVisible,
+      },
+      parsedPageSize
+    )
+  );
+
+  // Prefetch data required for the filtering: year, school, subject, examType, edul, users
+  // Only fetch distinct data that exists in the database
+  await queryClient.prefetchQuery(
+    paperTableFilterDistinctValuesQueryOptions({
+      includeNonVisible: parsedFetchNonVisible,
+      includeVisible: parsedFetchVisible,
+    })
+  )
+
+  const fullFilter: ParsedPaperFilterProps = {
+    year: parsedYear,
+    school: parsedSchool,
+    subject: parsedSubject,
+    examType: parsedExamType,
+    educationLevel: parsedEdul,
+    userId: parsedUsers,
+    fetchVisible: parsedFetchVisible,
+    fetchNonVisible: parsedFetchNonVisible,
+  };
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <PaperTable type="default" />
+      <PaperTable type="default" page={parsedPage} filters={fullFilter} />
     </HydrationBoundary>
   );
 }

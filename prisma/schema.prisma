@@ -8,7 +8,7 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Paper {
   id                      String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   schoolId                String                    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -27,7 +27,7 @@ model Paper {
   User                    User                      @relation(fields: [userId], references: [id])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model School {
   id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   schoolType      SchoolType
@@ -36,7 +36,7 @@ model School {
   Paper           Paper[]
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Subject {
   id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   subjectName     String      @unique
@@ -45,7 +45,7 @@ model Subject {
   Topic           Topic[]
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Topic {
   id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   subjectId      String    @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -55,7 +55,7 @@ model Topic {
 }
 
 // Add a role enum 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model User {
   id                      String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email                   String                    @unique
@@ -69,7 +69,7 @@ model User {
   Paper                   Paper[]
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model UserLog {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId     String   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -94,35 +94,11 @@ model Question {
   questionAnswer  Json
   Paper           Paper        @relation(fields: [paperId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   dateAdded       DateTime?    @default(now()) @db.Timestamptz(6)
+
   @@unique([paperId, questionNumber])
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-// model UserMCQAnswer {
-//   id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-//   userId        String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-//   MCQId         String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-//   userAnswer    String
-//   obtainedMarks Int         @db.SmallInt
-//   MCQQuestion   MCQQuestion @relation(fields: [MCQId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-//   User          User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-// }
-
-// /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-// model UserOEQAnswer {
-//   id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-//   userId        String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-//   OEQId         String      @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-//   index         String?
-//   subIndex      String?
-//   userAnswer    String
-//   obtainedMarks Float?      @default(0) @db.Real
-//   marked        Boolean     @default(false)
-//   OEQQuestion   OEQQuestion @relation(fields: [OEQId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-//   User          User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-// }
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model UserPaperProgressStatus {
   id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId         String         @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -164,8 +140,8 @@ enum exam_type {
   O_LEVEL     @map("O Level")
   COMMON_TEST @map("Common Test")
   BLOCK_TEST  @map("Block Test")
-  PRELIM      @map("Preliminary Exam")
   PROMO       @map("Promotional Exam")
+  PRELIM      @map("Preliminary Exam")
   A_LEVEL     @map("A Level")
   OTHER       @map("Other")
 }

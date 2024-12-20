@@ -454,6 +454,7 @@ interface UnparsedPaperFilterProps{
   subject: string;
   examType: string;
   edul: string;
+  users: string;
 }
 
 interface ParsedPaperFilterProps {
@@ -462,6 +463,7 @@ interface ParsedPaperFilterProps {
   subject: string[];
   examType: exam_type[];
   educationLevel: edu_level[];
-  onlyVisible?: boolean
-  onlyNonVisible?: boolean
+  userId: string[]
+  fetchVisible: boolean
+  fetchNonVisible?: boolean
 }

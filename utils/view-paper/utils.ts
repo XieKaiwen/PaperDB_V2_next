@@ -11,12 +11,18 @@ function parseJSONToStringArray(jsonString: string): string[]{
     }
 }
 
-export function parseViewPaperSearchParamsIntoFilters({year, school, subject, examType, edul}: UnparsedPaperFilterProps) {
+export function parsePaperSearchTablesParamsIntoFilters({year, school, subject, examType, edul, users}: UnparsedPaperFilterProps, page: string, pageSize: string, visible: string, nonVisible: string) {
     const parsedYear = parseJSONToStringArray(year);
     const parsedSchool = parseJSONToStringArray(school);
     const parsedSubject = parseJSONToStringArray(subject);
     const parsedExamType = parseJSONToStringArray(examType);
     const parsedEdul = parseJSONToStringArray(edul);
+    const parsedUsers = parseJSONToStringArray(users);
 
-    return {year: parsedYear, school: parsedSchool, subject: parsedSubject, examType: parsedExamType, edul: parsedEdul};
+    const parsedPage = isNaN(parseInt(page)) ? 1 : parseInt(page);
+    const parsedPageSize = isNaN(parseInt(pageSize)) ? 1 : parseInt(pageSize);
+
+    const parsedFetchVisible = visible === "true" ? true : false;
+    const parsedFetchNonVisible = nonVisible === "true" ? true : false;
+    return {year: parsedYear, school: parsedSchool, subject: parsedSubject, examType: parsedExamType, edul: parsedEdul, users: parsedUsers, page: parsedPage, pageSize: parsedPageSize, fetchVisible: parsedFetchVisible, fetchNonVisible: parsedFetchNonVisible};
 }

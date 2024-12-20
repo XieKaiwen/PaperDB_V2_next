@@ -71,32 +71,78 @@ export async function getPapersWithFilters(
     school = [],
     subject = [],
     examType = [],
-    onlyVisible = false,
-    onlyNonVisible = false,
+    userId = [],
+    fetchVisible = false,
+    fetchNonVisible = false,
   }: ParsedPaperFilterProps,
   page: number,
   pageSize: number,
   includeFields: Prisma.PaperInclude = {},
-  selectFields: Prisma.PaperSelect = {},
+  selectFields: Prisma.PaperSelect = {}
 ) {
-  // onlyVisible should take precedence over onlyNonVisible. If both are true, only show Visible
-  const whereClause = whereClauseConstructorForPapers({
+  // TODO: create a prisma extension for paper model, retrievePaperPaginated
+
+  const papers = await prisma.paper.retrievePapersPaginated(
+    {
+      year,
+      educationLevel,
+      school,
+      subject,
+      examType,
+      userId,
+      fetchVisible,
+      fetchNonVisible,
+    },
+    page,
+    pageSize,
+    includeFields,
+    selectFields
+  );
+  return papers;
+}
+
+export async function countPapersWithFilters(
+  {
+    year = [],
+    educationLevel = [],
+    school = [],
+    subject = [],
+    examType = [],
+    userId = [],
+    fetchVisible = false,
+    fetchNonVisible = false,
+  }: ParsedPaperFilterProps,
+  pageSize: number
+) {
+  const totalNumPapers = await prisma.paper.retrievePapersCount({
     year,
     educationLevel,
     school,
     subject,
     examType,
-    onlyVisible,
-    onlyNonVisible,
+    userId,
+    fetchVisible,
+    fetchNonVisible,
   });
-// TODO: create a prisma extension for paper model, retrievePaperPaginated
-  const papers = await prisma.paper.findMany({
-    where: whereClause,
-    ...(Object.keys(selectFields).length > 0
-      ? { select: selectFields } // Use `select` if `selectFields` is not empty
-      : { include: includeFields }), // Otherwise, use `include`
-  });
-  return papers;
+
+  return {
+    totalCount: totalNumPapers,
+    totalPages: Math.ceil(totalNumPapers / pageSize),
+  };
+}
+
+export async function getPaperDistinctValuesInColumns({
+  includeVisible,
+  includeNonVisible,
+}: {
+  includeVisible: boolean;
+  includeNonVisible: boolean;
+}) {
+  const columnDistinctValues = await prisma.paper.getDistinctPaperColumnValues(
+    includeVisible,
+    includeNonVisible
+  );
+  return columnDistinctValues
 }
 
 // ### UPDATE ###
