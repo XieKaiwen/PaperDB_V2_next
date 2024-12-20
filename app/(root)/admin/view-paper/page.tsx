@@ -1,31 +1,29 @@
-import PaperTable from "@/components/PaperTable";
-import {
-  ParsedPaperFilterProps,
-} from "@/src/types/types";
-import { getQueryClient } from "@/utils/react-query-client/client";
+import PaperTable from '@/components/PaperTable';
+import { ParsedPaperFilterProps } from '@/src/types/types';
+import { getQueryClient } from '@/utils/react-query-client/client';
 import {
   paperTableCountWithFiltersQueryOptions,
   paperTableFilterDistinctValuesQueryOptions,
   paperTableWithFiltersQueryOptions,
-} from "@/utils/react-query-client/query-options/paper";
-import { createClient } from "@/utils/supabase/server";
-import { parsePaperSearchTablesParamsIntoFilters } from "@/utils/view-paper/utils";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { redirect } from "next/navigation";
-import React from "react";
+} from '@/utils/react-query-client/query-options/paper';
+import { createClient } from '@/utils/supabase/server';
+import { parsePaperSearchTablesParamsIntoFilters } from '@/utils/view-paper/utils';
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import { redirect } from 'next/navigation';
+import React from 'react';
 
 export default async function AdminViewPaperPage({
   searchParams: {
-    year = "[]",
-    school = "[]",
-    subject = "[]",
-    examType = "[]",
-    edul = "[]",
-    users = "[]",
-    page = "1",
-    pageSize = "10",
-    visible = "true",
-    nonVisible = "true",
+    year = '[]',
+    school = '[]',
+    subject = '[]',
+    examType = '[]',
+    edul = '[]',
+    users = '[]',
+    page = '1',
+    pageSize = '10',
+    visible = 'true',
+    nonVisible = 'true',
   },
 }) {
   // Display Paper Table in default mode (just all papers for now), without any other features.
@@ -61,7 +59,7 @@ export default async function AdminViewPaperPage({
     page,
     pageSize,
     visible,
-    nonVisible
+    nonVisible,
   );
   // Getting the user id for future feature implementations (not yet)
   const supabase = createClient();
@@ -70,7 +68,7 @@ export default async function AdminViewPaperPage({
     error,
   } = await supabase.auth.getUser();
   if (error || !user) {
-    redirect("/login");
+    redirect('/login');
   }
   // const userId = user?.id; // use in the future to get access to just a your papers, and maybe in the future can specifically see other admin's as well
 
@@ -93,11 +91,11 @@ export default async function AdminViewPaperPage({
       parsedPage,
       parsedPageSize,
       {
-        School:true,
+        School: true,
         Subject: true,
-        User: true
-      }
-    )
+        User: true,
+      },
+    ),
   );
 
   // Prefetch the number of papers for pagination (for total number of pages)
@@ -113,8 +111,8 @@ export default async function AdminViewPaperPage({
         fetchVisible: parsedFetchVisible,
         fetchNonVisible: parsedFetchNonVisible,
       },
-      parsedPageSize
-    )
+      parsedPageSize,
+    ),
   );
 
   // Prefetch data required for the filtering: year, school, subject, examType, edul, users
@@ -123,8 +121,8 @@ export default async function AdminViewPaperPage({
     paperTableFilterDistinctValuesQueryOptions({
       includeNonVisible: parsedFetchNonVisible,
       includeVisible: parsedFetchVisible,
-    })
-  )
+    }),
+  );
 
   const fullFilter: ParsedPaperFilterProps = {
     year: parsedYear,

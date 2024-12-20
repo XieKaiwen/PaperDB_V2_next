@@ -173,68 +173,68 @@ This was gotten from the below `questionParts` value:
 ```javascript
 [
   {
-    questionIdx: "root",
-    questionSubIdx: "root",
-    order: "0",
+    questionIdx: 'root',
+    questionSubIdx: 'root',
+    order: '0',
     isText: true,
-    text: "Choose from the following compounds to answer the questions.",
-    id: "86f3742d-bb04-433b-a542-3cf72340741c",
+    text: 'Choose from the following compounds to answer the questions.',
+    id: '86f3742d-bb04-433b-a542-3cf72340741c',
   },
   {
-    questionIdx: "root",
-    questionSubIdx: "root",
-    order: "0",
+    questionIdx: 'root',
+    questionSubIdx: 'root',
+    order: '0',
     isText: true,
-    text: "Each compound may be used once, more than once or not at all",
-    id: "499ad7b9-d1d0-4ac7-bbdd-026107ad3234",
+    text: 'Each compound may be used once, more than once or not at all',
+    id: '499ad7b9-d1d0-4ac7-bbdd-026107ad3234',
   },
   {
-    questionIdx: "root",
-    questionSubIdx: "root",
-    order: "0",
+    questionIdx: 'root',
+    questionSubIdx: 'root',
+    order: '0',
     isText: true,
-    text: "state which compound",
-    id: "e60288ca-9b83-4944-82b6-84406f1d71c6",
+    text: 'state which compound',
+    id: 'e60288ca-9b83-4944-82b6-84406f1d71c6',
   },
   {
-    questionIdx: "a",
-    questionSubIdx: "root",
-    order: "0",
+    questionIdx: 'a',
+    questionSubIdx: 'root',
+    order: '0',
     isText: true,
-    text: "Reacts with dilute nitric acid to form a gas that produces white precipitate in limewater. ",
-    id: "6639ccc9-390f-49a4-9a3f-72259a1d7ce2",
+    text: 'Reacts with dilute nitric acid to form a gas that produces white precipitate in limewater. ',
+    id: '6639ccc9-390f-49a4-9a3f-72259a1d7ce2',
   },
   {
-    questionIdx: "b",
-    questionSubIdx: "root",
-    order: "0",
+    questionIdx: 'b',
+    questionSubIdx: 'root',
+    order: '0',
     isText: true,
-    text: "reacts with warm aqueous sodium hydroxide...\n",
-    id: "61004ff0-c2a6-4ca4-9017-a901ee809e39",
+    text: 'reacts with warm aqueous sodium hydroxide...\n',
+    id: '61004ff0-c2a6-4ca4-9017-a901ee809e39',
   },
   {
-    questionIdx: "c",
-    questionSubIdx: "root",
-    order: "0",
+    questionIdx: 'c',
+    questionSubIdx: 'root',
+    order: '0',
     isText: true,
-    text: "contains an anion with a charge of -3",
-    id: "ff8c3daa-3ad8-40aa-a239-32217dff9b87",
+    text: 'contains an anion with a charge of -3',
+    id: 'ff8c3daa-3ad8-40aa-a239-32217dff9b87',
   },
   {
-    questionIdx: "d",
-    questionSubIdx: "i",
-    order: "0",
+    questionIdx: 'd',
+    questionSubIdx: 'i',
+    order: '0',
     isText: true,
-    text: "is prepared using the method of precipitation reaction",
-    id: "20fc344a-0cf5-436e-87e1-685301335056",
+    text: 'is prepared using the method of precipitation reaction',
+    id: '20fc344a-0cf5-436e-87e1-685301335056',
   },
   {
-    questionIdx: "d",
-    questionSubIdx: "ii",
-    order: "0",
+    questionIdx: 'd',
+    questionSubIdx: 'ii',
+    order: '0',
     isText: true,
-    text: "is used to test for a reducing agent",
-    id: "6f608f94-253f-424c-b2a5-6e20bd79c31f",
+    text: 'is used to test for a reducing agent',
+    id: '6f608f94-253f-424c-b2a5-6e20bd79c31f',
   },
 ];
 ```
@@ -336,9 +336,9 @@ There is also an input for the user to input marks. Hence, the `questionAnswer` 
 ```javascript
 [
   {
-    options: ["a", "b", "c", "d"],
-    answer: ["a", "b"],
-    mark: "1",
+    options: ['a', 'b', 'c', 'd'],
+    answer: ['a', 'b'],
+    mark: '1',
   },
 ];
 ```
@@ -391,44 +391,44 @@ As for OEQ, let's take a look at an example of the structure of the value of `qu
 ```javascript
 [
   {
-    questionIdx: "a",
-    questionSubIdx: "root",
+    questionIdx: 'a',
+    questionSubIdx: 'root',
     answer: {},
-    id: "93c0605a-088f-43c0-9580-595c774cefb4",
+    id: '93c0605a-088f-43c0-9580-595c774cefb4',
     isText: false,
-    mark: "1",
+    mark: '1',
   },
   {
-    questionIdx: "b",
-    questionSubIdx: "root",
-    answer: "ANSWER",
-    id: "19d13c19-0a14-428d-9101-8c9e0c0068a5",
+    questionIdx: 'b',
+    questionSubIdx: 'root',
+    answer: 'ANSWER',
+    id: '19d13c19-0a14-428d-9101-8c9e0c0068a5',
     isText: true,
-    mark: "2",
+    mark: '2',
   },
   {
-    questionIdx: "c",
-    questionSubIdx: "root",
-    answer: "ANSWER",
-    id: "f9bf09fa-be75-4fda-b1ba-bfee526ea0a6",
+    questionIdx: 'c',
+    questionSubIdx: 'root',
+    answer: 'ANSWER',
+    id: 'f9bf09fa-be75-4fda-b1ba-bfee526ea0a6',
     isText: true,
-    mark: "2",
+    mark: '2',
   },
   {
-    questionIdx: "d",
-    questionSubIdx: "i",
-    answer: "ANSWER",
-    id: "90440c86-6bb5-479b-87e9-43d8e23ede5d",
+    questionIdx: 'd',
+    questionSubIdx: 'i',
+    answer: 'ANSWER',
+    id: '90440c86-6bb5-479b-87e9-43d8e23ede5d',
     isText: true,
-    mark: "3",
+    mark: '3',
   },
   {
-    questionIdx: "d",
-    questionSubIdx: "ii",
-    answer: "ANSWER",
-    id: "284387a5-cb40-4108-ad90-a2ad403a6fe3",
+    questionIdx: 'd',
+    questionSubIdx: 'ii',
+    answer: 'ANSWER',
+    id: '284387a5-cb40-4108-ad90-a2ad403a6fe3',
     isText: true,
-    mark: "4",
+    mark: '4',
   },
 ];
 ```
@@ -553,25 +553,25 @@ Hence for **OEQ**, using the above example it should look like this:
 
 For **MCQ**, since there should be no indexed parts in an MCQ, `markScheme` will be `null`. Marks given to students will be calculated in a different way
 
-
 ## Naming convention for image files in storage
 
-The name for image files should include most of the **paper metadata** as well, for *"foldering" and better identification* of the images. 
+The name for image files should include most of the **paper metadata** as well, for _"foldering" and better identification_ of the images.
 
 List of paper metadata collected:
+
 1. year
 2. educationLevel
 3. school
 4. subject
-5. examType 
+5. examType
 
 We will arrange the paper metadata in the image name in increasing specificity.
 
-Also, since both `questionContent` and `questionAnswer` can include images, we will also further separate the image names by adding paths __content__ and __answer__.
+Also, since both `questionContent` and `questionAnswer` can include images, we will also further separate the image names by adding paths **content** and **answer**.
 
 Furthermore, to prevent being targetted by malicious actors, we will be **adding a `imageHash` number to the name**. This imageHash will be produced by murmurhash using year, educationLevel, school, subject, examType, questionNumber, questionIdx, questionSubIdx and imageNumber (a variable being tracked)
 
 Now, we put everything together:
-image file path: __[*year*]/[*educationLevel*]/[*school*]/[*subject*]/[*examType*]/[questionNumber]/[*content/answer*]/[index]/[sub-index]/image_[*imageHash*]__
+image file path: **[*year*]/[*educationLevel*]/[*school*]/[*subject*]/[*examType*]/[questionNumber]/[*content/answer*]/[index]/[sub-index]/image\_[*imageHash*]**
 
 **query_keys** for fetching paper data, should also following year/educationLevel/school/subject/examType. If there are no filters or specifiers used for that particular key in the query key array, "default" value will be used

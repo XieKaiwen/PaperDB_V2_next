@@ -1,9 +1,9 @@
-"use server";
+'use server';
 
-import { ParsedPaperFilterProps } from "@/src/types/types";
-import prisma from "@/utils/prisma-client/client";
-import { whereClauseConstructorForPapers } from "@/utils/prismaUtils";
-import { edu_level, exam_type, Prisma } from "@prisma/client";
+import { ParsedPaperFilterProps } from '@/src/types/types';
+import prisma from '@/utils/prisma-client/client';
+import { whereClauseConstructorForPapers } from '@/utils/prismaUtils';
+import { edu_level, exam_type, Prisma } from '@prisma/client';
 
 // ### CREATE ###
 export async function createPaper({
@@ -35,7 +35,7 @@ export async function createPaper({
     visible: visible,
     year: year,
   });
-  console.log("New paper successfully created", newPaper);
+  console.log('New paper successfully created', newPaper);
   return newPaper;
 }
 
@@ -78,7 +78,7 @@ export async function getPapersWithFilters(
   page: number,
   pageSize: number,
   includeFields: Prisma.PaperInclude = {},
-  selectFields: Prisma.PaperSelect = {}
+  selectFields: Prisma.PaperSelect = {},
 ) {
   // TODO: create a prisma extension for paper model, retrievePaperPaginated
 
@@ -96,7 +96,7 @@ export async function getPapersWithFilters(
     page,
     pageSize,
     includeFields,
-    selectFields
+    selectFields,
   );
   return papers;
 }
@@ -112,7 +112,7 @@ export async function countPapersWithFilters(
     fetchVisible = false,
     fetchNonVisible = false,
   }: ParsedPaperFilterProps,
-  pageSize: number
+  pageSize: number,
 ) {
   const totalNumPapers = await prisma.paper.retrievePapersCount({
     year,
@@ -140,9 +140,9 @@ export async function getPaperDistinctValuesInColumns({
 }) {
   const columnDistinctValues = await prisma.paper.getDistinctPaperColumnValues(
     includeVisible,
-    includeNonVisible
+    includeNonVisible,
   );
-  return columnDistinctValues
+  return columnDistinctValues;
 }
 
 // ### UPDATE ###

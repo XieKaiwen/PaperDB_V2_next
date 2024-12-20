@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
 import {
   questionPartSchema,
   defaultValues as addQuestionFormDefaultValues,
   uploadImagesForQuestionPartsAndAnswer,
-} from "@/utils/add-question/addQuestionUtils(client)";
-import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useState } from "react";
-import { FieldValues, Path, useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
-import { Form } from "../ui/form";
-import { Button } from "../ui/button";
-import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
-import { AddQuestionFormData } from "@/src/types/types";
-import { Oval } from "react-loader-spinner";
-import AddQuestionQuestionPartStep from "./AddQuestionQuestionPartStep";
-import AddQuestionPaperMetadataStep from "./AddQuestionPaperMetadataStep";
-import AddQuestionAddAnswersStep from "./AddQuestionAddAnswersStep";
+} from '@/utils/add-question/addQuestionUtils(client)';
+import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useEffect, useState } from 'react';
+import { FieldValues, Path, useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
+import { Form } from '../ui/form';
+import { Button } from '../ui/button';
+import { useAddQuestionContext } from '@/src/hooks/useAddQuestionContext';
+import { AddQuestionFormData } from '@/src/types/types';
+import { Oval } from 'react-loader-spinner';
+import AddQuestionQuestionPartStep from './AddQuestionQuestionPartStep';
+import AddQuestionPaperMetadataStep from './AddQuestionPaperMetadataStep';
+import AddQuestionAddAnswersStep from './AddQuestionAddAnswersStep';
 import {
   Dialog,
   DialogContent,
@@ -24,18 +24,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import { useMutation } from "@tanstack/react-query";
-import { createClient } from "@/utils/supabase/client";
+} from '../ui/dialog';
+import { useMutation } from '@tanstack/react-query';
+import { createClient } from '@/utils/supabase/client';
 import {
   checkIfQuestionNumberExists,
   createQuestionWithPaperMetadata,
-} from "@/src/actions/data-actions/question.actions";
-import { edu_level } from "@prisma/client";
-import { UnexpectedError } from "@/src/custom-errors/errors";
-import { getQueryClient } from "@/utils/react-query-client/client";
-import { useToast } from "../ui/use-toast";
-import { v4 as uuid } from "uuid";
+} from '@/src/actions/data-actions/question.actions';
+import { edu_level } from '@prisma/client';
+import { UnexpectedError } from '@/src/custom-errors/errors';
+import { getQueryClient } from '@/utils/react-query-client/client';
+import { useToast } from '../ui/use-toast';
+import { v4 as uuid } from 'uuid';
 /**
  * Some guidelines on the availability of options for certain fields:
  * 1. educationLevel decides the options for: school and subject, directly.
@@ -51,26 +51,25 @@ export default function AddQuestionForm() {
   // SET FORM STEP
   const [formStep, setFormStep] = useState<1 | 2 | 3>(1);
   const [formDataToSubmit, setFormDataToSubmit] = useState<AddQuestionFormData>(
-    addQuestionFormDefaultValues
+    addQuestionFormDefaultValues,
   );
   const [isDialogueOpen, setIsDialogueOpen] = useState(false);
-  const [isExistingQuestionNumber, setIsExistingQuestionNumber] =
-    useState<boolean>(false);
+  const [isExistingQuestionNumber, setIsExistingQuestionNumber] = useState<boolean>(false);
 
   const [formSubmitting, setFormSubmitting] = useState(false); // For loading spinner on submit button
   const [submissionError, setSubmissionError] = useState<Error | null>(null);
   const fieldsEachStep: { [key: number]: Path<AddQuestionFormData>[] } = {
     1: [
-      "year",
-      "educationLevel",
-      "school",
-      "subject",
-      "topics",
-      "examType",
-      "questionType",
-      "questionNumber",
+      'year',
+      'educationLevel',
+      'school',
+      'subject',
+      'topics',
+      'examType',
+      'questionType',
+      'questionNumber',
     ],
-    2: ["questionPart"],
+    2: ['questionPart'],
     3: [],
   };
   const step1Schema = questionPartSchema.pick({
@@ -97,29 +96,29 @@ export default function AddQuestionForm() {
   const form = useForm<z.infer<typeof questionPartSchema>>({
     resolver: zodResolver(questionPartSchema),
     defaultValues: {
-      year: "",
-      educationLevel: "",
-      school: "",
-      subject: "",
+      year: '',
+      educationLevel: '',
+      school: '',
+      subject: '',
       topics: [],
       examType: undefined,
-      questionType: "",
-      questionNumber: "",
+      questionType: '',
+      questionNumber: '',
       questionPart: [
         {
           id: uuid(),
           isText: true,
-          text: "",
-          order: "0",
-          questionIdx: "root",
-          questionSubIdx: "root",
+          text: '',
+          order: '0',
+          questionIdx: 'root',
+          questionSubIdx: 'root',
         },
         {
-          questionIdx: "root",
-          questionSubIdx: "root",
-          order: "0",
+          questionIdx: 'root',
+          questionSubIdx: 'root',
+          order: '0',
           isText: false,
-          image: new File([], ""),
+          image: new File([], ''),
           id: uuid(),
         },
       ],
@@ -128,51 +127,36 @@ export default function AddQuestionForm() {
   });
 
   // // default value for images should be new File([], "")
-  const {
-    control,
-    clearErrors,
-    getValues,
-    setError,
-    resetField,
-    handleSubmit,
-  } = form;
+  const { control, clearErrors, getValues, setError, resetField, handleSubmit } = form;
   // const { isSubmitting } = useFormState({ control });
 
   // Changing to using useWatch because watch() causes a rerender of the form whenever there is a change in formValues, i do not want that
   const watchedValues = useWatch({
     control,
     name: [
-      "year",
-      "educationLevel",
-      "school",
-      "subject",
-      "topics",
-      "examType",
-      "questionType",
-      "questionNumber",
-      "questionPart",
-      "questionAnswer",
+      'year',
+      'educationLevel',
+      'school',
+      'subject',
+      'topics',
+      'examType',
+      'questionType',
+      'questionNumber',
+      'questionPart',
+      'questionAnswer',
     ], // Fields to watch
   });
   // destructure watchedValues
-  const [
-    year,
-    educationLevel,
-    school,
-    subject,
-    topics,
-    examType,
-    questionType,
-    questionNumber,
-  ] = watchedValues;
+  const [year, educationLevel, school, subject, topics, examType, questionType, questionNumber] =
+    watchedValues;
   // SEPARATE questionPart AND questionAnswer INTO SEPARATE useWatch, for more stable references
   const questionPart = useWatch({
     control,
-    name: "questionPart",
+    name: 'questionPart',
   });
   const questionAnswer = useWatch({
     control,
-    name: "questionAnswer",
+    name: 'questionAnswer',
   });
 
   useEffect(() => {
@@ -220,10 +204,7 @@ export default function AddQuestionForm() {
 
       // Transform array of values into an object with field names as keys
       const valuesToValidate = Object.fromEntries(
-        fieldsEachStep[formStep].map((field, index) => [
-          field,
-          valuesArray[index],
-        ])
+        fieldsEachStep[formStep].map((field, index) => [field, valuesArray[index]]),
       ) as FieldValues;
       // console.log(valuesToValidate);
 
@@ -237,7 +218,7 @@ export default function AddQuestionForm() {
         // console.log(validationResult);
         validationResult.error.errors.forEach((error) => {
           const { message, path } = error;
-          setError(path.join(".") as Path<AddQuestionFormData>, {
+          setError(path.join('.') as Path<AddQuestionFormData>, {
             message,
           });
         });
@@ -259,9 +240,9 @@ export default function AddQuestionForm() {
   useEffect(() => {
     if (submissionError) {
       toast({
-        title: "Error adding question",
+        title: 'Error adding question',
         description: `${submissionError.name}: ${submissionError.message}`,
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   }, [submissionError]);
@@ -276,8 +257,7 @@ export default function AddQuestionForm() {
     /**
      * Check if the question number already exists here.
      */
-    const { year, examType, subject, school, educationLevel, questionNumber } =
-      values;
+    const { year, examType, subject, school, educationLevel, questionNumber } = values;
     try {
       // console.log("Checking question number...");
       const isQuestionNumberExists = await checkIfQuestionNumberExists({
@@ -293,7 +273,7 @@ export default function AddQuestionForm() {
       setIsDialogueOpen(true);
       // console.log("Dialog state updated. Opening dialog...");
     } catch (error) {
-      console.error("Error during on submit:", error);
+      console.error('Error during on submit:', error);
       if (error instanceof Error) {
         setSubmissionError(error);
       } else {
@@ -304,7 +284,7 @@ export default function AddQuestionForm() {
 
   // If the user presses the cancel button or the dialog is closed
   async function onSubmitCancel() {
-    console.log("Submit canceled");
+    console.log('Submit canceled');
     setIsDialogueOpen(false);
     setIsExistingQuestionNumber(false);
     setFormDataToSubmit(addQuestionFormDefaultValues);
@@ -324,7 +304,7 @@ export default function AddQuestionForm() {
     const userId = userSession.data?.session?.user.id;
     try {
       if (!userId) {
-        throw new Error("User not logged in");
+        throw new Error('User not logged in');
       }
 
       const { questionAnswer, questionPart } = formDataToSubmit;
@@ -344,26 +324,26 @@ export default function AddQuestionForm() {
         questionFormData: formDataIntoServer,
       });
       toast({
-        title: "Question added successfully",
-        variant: "success",
+        title: 'Question added successfully',
+        variant: 'success',
       });
 
       // reset relevant fields
       setFormStep(1);
       setFormDataToSubmit(addQuestionFormDefaultValues);
-      resetField("topics");
-      resetField("questionType");
-      resetField("questionNumber");
-      resetField("questionPart");
-      resetField("questionAnswer");
+      resetField('topics');
+      resetField('questionType');
+      resetField('questionNumber');
+      resetField('questionPart');
+      resetField('questionAnswer');
 
       const queryClient = getQueryClient();
       queryClient.invalidateQueries(
         {
-          queryKey: ["questions"],
-          refetchType: "active",
+          queryKey: ['questions'],
+          refetchType: 'active',
         },
-        { cancelRefetch: true }
+        { cancelRefetch: true },
       );
     } catch (error) {
       console.error(error);
@@ -391,39 +371,24 @@ export default function AddQuestionForm() {
   return (
     <section>
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="p-2 w-full space-y-7"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-7 p-2">
           {formStep === 1 && <AddQuestionPaperMetadataStep />}
           {formStep === 3 && <AddQuestionAddAnswersStep />}
           <div className="space-y-2">
             {formStep === 2 && <AddQuestionQuestionPartStep />}
-            <div className="flex gap-4 w-full mt-2">
+            <div className="mt-2 flex w-full gap-4">
               {formStep > 1 && (
-                <Button
-                  className="w-full"
-                  type="button"
-                  onClick={prevStepClick}
-                >
+                <Button className="w-full" type="button" onClick={prevStepClick}>
                   Back
                 </Button>
               )}
               {formStep < 3 && (
-                <Button
-                  className="w-full"
-                  type="button"
-                  onClick={nextStepClick}
-                >
+                <Button className="w-full" type="button" onClick={nextStepClick}>
                   Next
                 </Button>
               )}
               {formStep === 3 && (
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={formSubmitting}
-                >
+                <Button type="submit" className="w-full" disabled={formSubmitting}>
                   {formSubmitting ? (
                     <div className="flex gap-4">
                       <p>Loading</p>
@@ -438,7 +403,7 @@ export default function AddQuestionForm() {
                       />
                     </div>
                   ) : (
-                    "Submit"
+                    'Submit'
                   )}
                 </Button>
               )}
@@ -446,17 +411,12 @@ export default function AddQuestionForm() {
           </div>
         </form>
       </Form>
-      <Dialog
-        open={isDialogueOpen}
-        onOpenChange={(open) => !open && onSubmitCancel()}
-      >
+      <Dialog open={isDialogueOpen} onOpenChange={(open) => !open && onSubmitCancel()}>
         {/* <DialogTrigger>Open</DialogTrigger> */}
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {isExistingQuestionNumber
-                ? "Replace an existing question?"
-                : "Add a new question?"}
+              {isExistingQuestionNumber ? 'Replace an existing question?' : 'Add a new question?'}
             </DialogTitle>
             <DialogDescription>
               {isExistingQuestionNumber ? (
@@ -467,23 +427,19 @@ export default function AddQuestionForm() {
                   <p>Before submitting, please check the following:</p>
                   <ol>
                     <li>
-                      Ensure that the text and images in the questions are of
-                      the <span className="font-semibold">right order</span>
+                      Ensure that the text and images in the questions are of the{' '}
+                      <span className="font-semibold">right order</span>
                     </li>
                     <li>
-                      Ensure that the{" "}
-                      <span className="font-semibold">mark</span> entered for
-                      each part are{" "}
-                      <span className="font-semibold">INTEGERS</span>
+                      Ensure that the <span className="font-semibold">mark</span> entered for each
+                      part are <span className="font-semibold">INTEGERS</span>
                     </li>
                     <li>
-                      Ensure that all the paper metadata are filled in{" "}
-                      <span className="font-semibold">CORRECTLY</span> (year,
-                      education level...)
+                      Ensure that all the paper metadata are filled in{' '}
+                      <span className="font-semibold">CORRECTLY</span> (year, education level...)
                     </li>
                     <li>
-                      Ensure that the options (only applicable for MCQ) are in
-                      the right order
+                      Ensure that the options (only applicable for MCQ) are in the right order
                     </li>
                   </ol>
                 </div>
@@ -492,23 +448,19 @@ export default function AddQuestionForm() {
                   <p>Before submitting, please check the following:</p>
                   <ol>
                     <li>
-                      Ensure that the text and images in the questions are of
-                      the <span className="font-semibold">right order</span>
+                      Ensure that the text and images in the questions are of the{' '}
+                      <span className="font-semibold">right order</span>
                     </li>
                     <li>
-                      Ensure that the{" "}
-                      <span className="font-semibold">mark</span> entered for
-                      each part are{" "}
-                      <span className="font-semibold">INTEGERS</span>
+                      Ensure that the <span className="font-semibold">mark</span> entered for each
+                      part are <span className="font-semibold">INTEGERS</span>
                     </li>
                     <li>
-                      Ensure that all the paper metadata are filled in{" "}
-                      <span className="font-semibold">CORRECTLY</span> (year,
-                      education level...)
+                      Ensure that all the paper metadata are filled in{' '}
+                      <span className="font-semibold">CORRECTLY</span> (year, education level...)
                     </li>
                     <li>
-                      Ensure that the options (only applicable for MCQ) are in
-                      the right order
+                      Ensure that the options (only applicable for MCQ) are in the right order
                     </li>
                   </ol>
                 </div>

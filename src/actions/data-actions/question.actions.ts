@@ -1,34 +1,34 @@
-"use server";
+'use server';
 
 import {
   MCQAnswerItemArray,
   QuestionAnswerArray,
   QuestionPartWithOrderIntArray,
-} from "@/src/types/types";
-import { createPaper, getPaperIdByMetadata } from "./paper.actions";
-import { InternalServerError } from "@/src/custom-errors/errors";
+} from '@/src/types/types';
+import { createPaper, getPaperIdByMetadata } from './paper.actions';
+import { InternalServerError } from '@/src/custom-errors/errors';
 import {
   processQuestionAnswerIntoFinalQuestionAnswer,
-  processQuestionPartIntoFinalQuestionContentQuestionLeafs
-} from "@/utils/add-question/addQuestionUtils(server)";
-import { edu_level, exam_type } from "@prisma/client";
-import prisma from "@/utils/prisma-client/client";
+  processQuestionPartIntoFinalQuestionContentQuestionLeafs,
+} from '@/utils/add-question/addQuestionUtils(server)';
+import { edu_level, exam_type } from '@prisma/client';
+import prisma from '@/utils/prisma-client/client';
 
 // ### CREATE ###
-interface RequiredQuestionInfo{
-  year: string,
-  educationLevel: edu_level,
-  school: string,
-  subject: string,
-  examType: exam_type,
-  topics: string[],
-  questionType: string,
-  questionNumber: string,
-  questionPart: QuestionPartWithOrderIntArray,
-  questionAnswer: QuestionAnswerArray
+interface RequiredQuestionInfo {
+  year: string;
+  educationLevel: edu_level;
+  school: string;
+  subject: string;
+  examType: exam_type;
+  topics: string[];
+  questionType: string;
+  questionNumber: string;
+  questionPart: QuestionPartWithOrderIntArray;
+  questionAnswer: QuestionAnswerArray;
 }
 interface CreateQuestionProps extends RequiredQuestionInfo {
-  paperId: string
+  paperId: string;
 }
 export async function createQuestion({
   paperId,
@@ -45,20 +45,17 @@ export async function createQuestion({
 }: CreateQuestionProps) {
   // 1. Convert questionPart into questionContent and questionLeafs
   const { questionContent, questionLeafs } =
-    processQuestionPartIntoFinalQuestionContentQuestionLeafs(
-      questionPart,
-      questionType
-    );
+    processQuestionPartIntoFinalQuestionContentQuestionLeafs(questionPart, questionType);
 
   // 2. sort topics alphabetically
   topics.sort((a, b) => {
-    return a.localeCompare(b)
-  })
+    return a.localeCompare(b);
+  });
   // 3. turn questionAnswer into finalisedQuestionAnswer
   const { isMulti, fullMark, markScheme, finalisedQuestionAnswer } =
     processQuestionAnswerIntoFinalQuestionAnswer(
       questionAnswer as MCQAnswerItemArray,
-      questionType
+      questionType,
     );
   const newQuestion = await prisma.question.upsertQuestion({
     paperId,
@@ -74,19 +71,16 @@ export async function createQuestion({
     questionContent: questionContent,
     questionAnswer: finalisedQuestionAnswer,
   });
-  console.log("New question successfully created", newQuestion);
+  console.log('New question successfully created', newQuestion);
 }
 
-
-export async function createQuestionWithPaperMetadata(
-  {
-    userId,
-    questionFormData
-  }: {
-    userId: string;
-    questionFormData: RequiredQuestionInfo;
-  }
-) {
+export async function createQuestionWithPaperMetadata({
+  userId,
+  questionFormData,
+}: {
+  userId: string;
+  questionFormData: RequiredQuestionInfo;
+}) {
   const {
     year,
     educationLevel,
@@ -210,7 +204,7 @@ export async function checkIfQuestionNumberExists({
       },
     });
     if (!question) {
-      console.log("Question not found");
+      console.log('Question not found');
       return false;
     }
     return true;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   FormControl,
   FormDescription,
@@ -6,16 +6,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { CustomSelectProps } from "@/src/types/types";
-import { FieldValues } from "react-hook-form";
+} from '../ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { CustomSelectProps } from '@/src/types/types';
+import { FieldValues } from 'react-hook-form';
 
 export default function CustomSelect<T extends FieldValues>({
   control,
@@ -41,16 +35,12 @@ export default function CustomSelect<T extends FieldValues>({
       name={name}
       render={({ field }) => {
         // Find the option that matches the current field value
-        const selectedOption = selectOptions.find(
-          (option) => option.value === field.value
-        );
+        const selectedOption = selectOptions.find((option) => option.value === field.value);
 
         return (
           <FormItem className={className}>
             <div className="mb-1">
-              {label && (
-                <FormLabel className="font-semibold text-sm">{label}</FormLabel>
-              )}
+              {label && <FormLabel className="text-sm font-semibold">{label}</FormLabel>}
               {description && <FormDescription>{description}</FormDescription>}
             </div>
             <Select
@@ -62,7 +52,7 @@ export default function CustomSelect<T extends FieldValues>({
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder={placeholder}>
-                    {selectedOption ? selectedOption.label :placeholder}
+                    {selectedOption ? selectedOption.label : placeholder}
                   </SelectValue>
                 </SelectTrigger>
               </FormControl>
@@ -76,7 +66,7 @@ export default function CustomSelect<T extends FieldValues>({
                     ))}
                   </SelectContent>
                 ) : (
-                  <SelectContent className="text-sm text-slate-700 flex justify-center items-center">
+                  <SelectContent className="flex items-center justify-center text-sm text-slate-700">
                     {emptySelectText}
                   </SelectContent>
                 )
@@ -84,10 +74,7 @@ export default function CustomSelect<T extends FieldValues>({
                 // Render only the matching option when not open
                 <SelectContent className={selectClassName}>
                   {selectedOption && (
-                    <SelectItem
-                      key={selectedOption.value}
-                      value={selectedOption.value}
-                    >
+                    <SelectItem key={selectedOption.value} value={selectedOption.value}>
                       {selectedOption.label}
                     </SelectItem>
                   )}

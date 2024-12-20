@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   FormControl,
   FormDescription,
@@ -6,10 +6,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import { Checkbox } from "../ui/checkbox";
-import { CustomFormMultipleCheckBoxProps } from "@/src/types/types";
-import { FieldValues, UseControllerReturn } from "react-hook-form";
+} from '../ui/form';
+import { Checkbox } from '../ui/checkbox';
+import { CustomFormMultipleCheckBoxProps } from '@/src/types/types';
+import { FieldValues, UseControllerReturn } from 'react-hook-form';
 
 export default function CustomFormCheckBox<T extends FieldValues>({
   control,
@@ -34,7 +34,7 @@ export default function CustomFormCheckBox<T extends FieldValues>({
               key={option.value}
               control={control}
               name={name}
-              render={({ field } : UseControllerReturn<T>) => {
+              render={({ field }: UseControllerReturn<T>) => {
                 return (
                   <FormItem
                     key={option.value}
@@ -47,9 +47,7 @@ export default function CustomFormCheckBox<T extends FieldValues>({
                           return checked
                             ? field.onChange([...field.value, option.value])
                             : field.onChange(
-                                field.value?.filter(
-                                  (value : string) => value !== option.value
-                                )
+                                field.value?.filter((value: string) => value !== option.value),
                               );
                         }}
                       />

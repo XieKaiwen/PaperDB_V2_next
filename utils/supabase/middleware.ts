@@ -1,5 +1,5 @@
-import { createServerClient } from "@supabase/ssr";
-import { type NextRequest, NextResponse } from "next/server";
+import { createServerClient } from '@supabase/ssr';
+import { type NextRequest, NextResponse } from 'next/server';
 
 // DO NOT TOUCH, ALREADY UP TO DATE
 
@@ -7,7 +7,7 @@ export const updateSession = async (request: NextRequest) => {
   // This `try/catch` block is only here for the interactive tutorial.
   // Feel free to remove once you have Supabase connected.
   const headers = new Headers(request.headers);
-  headers.set("x-current-path", request.nextUrl.pathname);
+  headers.set('x-current-path', request.nextUrl.pathname);
   try {
     // Create an unmodified response
     let response = NextResponse.next({
@@ -25,9 +25,7 @@ export const updateSession = async (request: NextRequest) => {
             return request.cookies.getAll();
           },
           setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value),
-            );
+            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
             response = NextResponse.next({
               request,
             });

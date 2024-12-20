@@ -1,22 +1,22 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { z } from "zod";
+'use client';
+import React, { useEffect, useState } from 'react';
+import { z } from 'zod';
 
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { authFormSchema } from "@/utils/authFormUtils";
-import CustomInput from "./CustomAuthInput";
-import Link from "next/link";
-import CustomSelect from "./CustomAuthSelect";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Oval } from "react-loader-spinner";
-import { login, signUp } from "@/src/actions/user.actions";
-import { useToast } from "../ui/use-toast";
-import { educationLevelOptions } from "@/src/constants/constants";
-import { AuthFormProps } from "@/src/types/types";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { authFormSchema } from '@/utils/authFormUtils';
+import CustomInput from './CustomAuthInput';
+import Link from 'next/link';
+import CustomSelect from './CustomAuthSelect';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Oval } from 'react-loader-spinner';
+import { login, signUp } from '@/src/actions/user.actions';
+import { useToast } from '../ui/use-toast';
+import { educationLevelOptions } from '@/src/constants/constants';
+import { AuthFormProps } from '@/src/types/types';
 // TODO Add in Oauth buttons below the forms using shadcn separator
 // TODO Add in reset password for "Forgot password" feature
 
@@ -30,13 +30,13 @@ export default function AuthForm({ type }: AuthFormProps) {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (searchParams.get("error") && !displayedError) {
-      const error = searchParams.get("error")!;
+    if (searchParams.get('error') && !displayedError) {
+      const error = searchParams.get('error')!;
       const decodedError = decodeURIComponent(error);
       setTimeout(() => {
         toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong.",
+          variant: 'destructive',
+          title: 'Uh oh! Something went wrong.',
           description: decodedError,
         });
         setDisplayedError(true);
@@ -48,9 +48,8 @@ export default function AuthForm({ type }: AuthFormProps) {
     if (sentEmail) {
       setTimeout(() => {
         toast({
-          title: "Email sent for verification",
-          description:
-            "Please click the link sent to your email to complete the sign up process.",
+          title: 'Email sent for verification',
+          description: 'Please click the link sent to your email to complete the sign up process.',
         });
       }, 100);
     }
@@ -61,13 +60,13 @@ export default function AuthForm({ type }: AuthFormProps) {
     shouldUnregister: true,
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      password: "",
-      ...(type === "sign-up" && {
-        confirmPassword: "",
-        phoneNumber: "",
-        username: "",
-        educationLevel: "",
+      email: '',
+      password: '',
+      ...(type === 'sign-up' && {
+        confirmPassword: '',
+        phoneNumber: '',
+        username: '',
+        educationLevel: '',
       }),
     },
   });
@@ -76,41 +75,33 @@ export default function AuthForm({ type }: AuthFormProps) {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
       // This will only be called if the form data is valid
-      console.log("Form data:", data);
+      console.log('Form data:', data);
       setIsLoading(true);
-      const redirectedFrom = searchParams.get("redirectedFrom") || "";
-      if (type === "login") {
+      const redirectedFrom = searchParams.get('redirectedFrom') || '';
+      if (type === 'login') {
         try {
           const response = await login({ ...data });
           if (response) {
             router.replace(redirectedFrom);
           }
           setDisplayedError(false);
-          const encodedError = encodeURIComponent(
-            "User not found, incorrect email or password",
-          );
+          const encodedError = encodeURIComponent('User not found, incorrect email or password');
           router.replace(
             `/login?error=${encodedError}${
-              redirectedFrom
-                ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}`
-                : ""
+              redirectedFrom ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}` : ''
             }`,
           );
         } catch (error) {
           setDisplayedError(false);
           console.error(error);
-          const encodedError = encodeURIComponent(
-            "Error occurred during login process",
-          );
+          const encodedError = encodeURIComponent('Error occurred during login process');
           router.replace(
             `/login?error=${encodedError}${
-              redirectedFrom
-                ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}`
-                : ""
+              redirectedFrom ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}` : ''
             }`,
           );
         }
-      } else if (type === "sign-up") {
+      } else if (type === 'sign-up') {
         setSentEmail(false);
         const signUpData = {
           email: data.email,
@@ -130,21 +121,17 @@ export default function AuthForm({ type }: AuthFormProps) {
         } catch (error) {
           setDisplayedError(false);
           console.error(error);
-          const encodedError = encodeURIComponent(
-            "Error occurred in sign up process",
-          );
+          const encodedError = encodeURIComponent('Error occurred in sign up process');
           router.replace(
             `/sign-up?error=${encodedError}${
-              redirectedFrom
-                ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}`
-                : ""
+              redirectedFrom ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}` : ''
             }`,
           );
         }
       }
       // Submit form data to your backend or handle it as needed
     } catch (error) {
-      console.error("Validation failed:", error);
+      console.error('Validation failed:', error);
       // Handle validation errors, if any
     } finally {
       setIsLoading(false);
@@ -154,22 +141,20 @@ export default function AuthForm({ type }: AuthFormProps) {
     <section className="p-10">
       <div className="flex flex-col gap-5">
         <div className="min-w-72">
-          <h1 className="font-merriweather font-bold text-4xl 2xl:text-5xl">
-            {type === "sign-up" ? "Sign up" : "Login"}
+          <h1 className="font-merriweather text-4xl font-bold 2xl:text-5xl">
+            {type === 'sign-up' ? 'Sign up' : 'Login'}
           </h1>
-          {type === "sign-up" ? (
-            <p className="text-sm mt-1.5">
-              Already have an account?{" "}
+          {type === 'sign-up' ? (
+            <p className="mt-1.5 text-sm">
+              Already have an account?{' '}
               <span>
-                Login{" "}
+                Login{' '}
                 <Link
-                  className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                  className="font-medium text-blue-600 hover:underline dark:text-blue-500"
                   href={`/login${
-                    searchParams.get("redirectedFrom")
-                      ? `?redirectedFrom=${encodeURIComponent(
-                          searchParams.get("redirectedFrom")!,
-                        )}`
-                      : ""
+                    searchParams.get('redirectedFrom')
+                      ? `?redirectedFrom=${encodeURIComponent(searchParams.get('redirectedFrom')!)}`
+                      : ''
                   }`}
                 >
                   here
@@ -177,18 +162,16 @@ export default function AuthForm({ type }: AuthFormProps) {
               </span>
             </p>
           ) : (
-            <p className="text-sm mt-1.5">
-              Don&apos;t have an account?{" "}
+            <p className="mt-1.5 text-sm">
+              Don&apos;t have an account?{' '}
               <span>
-                Sign up{" "}
+                Sign up{' '}
                 <Link
-                  className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                  className="font-medium text-blue-600 hover:underline dark:text-blue-500"
                   href={`/sign-up${
-                    searchParams.get("redirectedFrom")
-                      ? `?redirectedFrom=${encodeURIComponent(
-                          searchParams.get("redirectedFrom")!,
-                        )}`
-                      : ""
+                    searchParams.get('redirectedFrom')
+                      ? `?redirectedFrom=${encodeURIComponent(searchParams.get('redirectedFrom')!)}`
+                      : ''
                   }`}
                 >
                   here
@@ -200,7 +183,7 @@ export default function AuthForm({ type }: AuthFormProps) {
         <div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {type === "sign-up" && (
+              {type === 'sign-up' && (
                 <>
                   <div className="flex gap-4">
                     <CustomInput
@@ -238,7 +221,7 @@ export default function AuthForm({ type }: AuthFormProps) {
                 placeholder="Enter your password"
               />
 
-              {type === "sign-up" && (
+              {type === 'sign-up' && (
                 <CustomInput
                   control={form.control}
                   name="confirmPassword"
@@ -249,7 +232,7 @@ export default function AuthForm({ type }: AuthFormProps) {
 
               <Button
                 type="submit"
-                className="w-full bg-lavender-300 hover:bg-lavender-400 text-gray-700"
+                className="w-full bg-lavender-300 text-gray-700 hover:bg-lavender-400"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -266,15 +249,13 @@ export default function AuthForm({ type }: AuthFormProps) {
                     />
                   </div>
                 ) : (
-                  "Submit"
+                  'Submit'
                 )}
               </Button>
             </form>
           </Form>
-          {type === "sign-up" && (
-            <p className="text-gray-500 text-xs mt-1">
-              * All fields are required
-            </p>
+          {type === 'sign-up' && (
+            <p className="mt-1 text-xs text-gray-500">* All fields are required</p>
           )}
         </div>
       </div>

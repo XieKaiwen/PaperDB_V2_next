@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Pagination,
   PaginationContent,
@@ -8,8 +8,8 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "./ui/pagination";
-import { useRouter, useSearchParams } from "next/navigation";
+} from './ui/pagination';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface PaperTablePaginationProps {
   totalPages: number;
@@ -31,12 +31,12 @@ export default function PaperTablePagination({
   }, []);
 
   const constructURLWithPage = (page: number) => {
-    if (!isClient) return "#"; // Ensure consistency during SSR
-    if (page < 1 || page > totalPages) return "#"; // Prevent out-of-bounds navigation
+    if (!isClient) return '#'; // Ensure consistency during SSR
+    if (page < 1 || page > totalPages) return '#'; // Prevent out-of-bounds navigation
 
     // Create a new URLSearchParams object to modify the query parameters
     const params = new URLSearchParams(searchParams.toString());
-    params.set("page", page.toString()); // Update the "page" parameter
+    params.set('page', page.toString()); // Update the "page" parameter
 
     // Construct the full URL with the updated query parameters
     const newUrl = new URL(window.location.href); // Base URL
@@ -54,7 +54,7 @@ export default function PaperTablePagination({
         <PaginationItem>
           <PaginationPrevious
             href={constructURLWithPage(currentPage - 1)}
-            className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+            className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
           />
         </PaginationItem>
         {Array.from({ length: totalPages }).map((_, index) => (
@@ -71,9 +71,7 @@ export default function PaperTablePagination({
           <PaginationNext
             href={constructURLWithPage(currentPage + 1)}
             className={
-              isPlaceholder || currentPage === totalPages
-                ? "pointer-events-none opacity-50"
-                : ""
+              isPlaceholder || currentPage === totalPages ? 'pointer-events-none opacity-50' : ''
             }
           />
         </PaginationItem>

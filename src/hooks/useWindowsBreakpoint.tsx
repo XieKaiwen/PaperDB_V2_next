@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef } from "react";
-import {debounce} from "lodash";
+import { useState, useEffect, useRef } from 'react';
+import { debounce } from 'lodash';
 
 enum Breakpoint {
-  XS = "xs",
-  SM = "sm",
-  MD = "md",
-  LG = "lg",
-  XL = "xl",
-  XXL = "2xl",
+  XS = 'xs',
+  SM = 'sm',
+  MD = 'md',
+  LG = 'lg',
+  XL = 'xl',
+  XXL = '2xl',
 }
 
 // Define your breakpoints
@@ -21,9 +21,7 @@ const breakpoints = {
 };
 
 function useBreakpoint() {
-  const [currentBreakpoint, setCurrentBreakpoint] = useState<Breakpoint>(
-    getBreakpoint()
-  );
+  const [currentBreakpoint, setCurrentBreakpoint] = useState<Breakpoint>(getBreakpoint());
 
   // Function to determine the current breakpoint
   function getBreakpoint(): Breakpoint {
@@ -39,16 +37,16 @@ function useBreakpoint() {
   const debouncedResizeHandler = useRef(
     debounce(() => {
       setCurrentBreakpoint(getBreakpoint());
-    }, 300)
+    }, 300),
   ).current;
 
   useEffect(() => {
     // Initial check
     debouncedResizeHandler();
-    window.addEventListener("resize", debouncedResizeHandler);
+    window.addEventListener('resize', debouncedResizeHandler);
 
     return () => {
-      window.removeEventListener("resize", debouncedResizeHandler);
+      window.removeEventListener('resize', debouncedResizeHandler);
       debouncedResizeHandler.cancel();
     };
   }, []);

@@ -1,10 +1,15 @@
-import { contentTypeSchema, imageQuestionPartSchema, questionPartSchema, textQuestionPartSchema } from "@/utils/add-question/addQuestionUtils(client)";
-import { authFormSchema } from "@/utils/authFormUtils";
-import { UserMetadata } from "@supabase/supabase-js";
-import { FieldValues } from "react-hook-form";
-import { Label } from "@/components/ui/label";
-import { Prisma, Subject } from "@prisma/client";
-import { z } from "zod";
+import {
+  contentTypeSchema,
+  imageQuestionPartSchema,
+  questionPartSchema,
+  textQuestionPartSchema,
+} from '@/utils/add-question/addQuestionUtils(client)';
+import { authFormSchema } from '@/utils/authFormUtils';
+import { UserMetadata } from '@supabase/supabase-js';
+import { FieldValues } from 'react-hook-form';
+import { Label } from '@/components/ui/label';
+import { Prisma, Subject } from '@prisma/client';
+import { z } from 'zod';
 
 // Group type and interface together
 declare type GetLoggedInResponse = {
@@ -23,11 +28,9 @@ declare type User = {
 
 declare type AddQuestionFormData = z.infer<typeof questionPartSchema>;
 
-declare type AddQuestionFormDataSubscriber = (
-  updatedFormData: AddQuestionFormData
-) => void;
+declare type AddQuestionFormDataSubscriber = (updatedFormData: AddQuestionFormData) => void;
 declare type AddQuestionQuestionContentJSONSubscriber = (
-  updatedQuestionContentJSON: ProcessedQuestionContentCombinedJSON
+  updatedQuestionContentJSON: ProcessedQuestionContentCombinedJSON,
 ) => void;
 
 declare type FormQuestionPartWithText = {
@@ -64,35 +67,41 @@ declare type FormQuestionPartWithImageParsed = {
   image: File;
 };
 
-declare type FormQuestionPartParsed = FormQuestionPartWithTextParsed | FormQuestionPartWithImageParsed;
+declare type FormQuestionPartParsed =
+  | FormQuestionPartWithTextParsed
+  | FormQuestionPartWithImageParsed;
 
-declare type AddQuestionFormQuestionPart = {
-  questionIdx: string;
-  questionSubIdx: string;
-  order: string;
-  isText: true;
-  text: string;
-  id:string;
-}| {
-  questionIdx: string;
-  questionSubIdx: string;
-  order: string;
-  isText: false;
-  image: File;
-  id:string;
-}
+declare type AddQuestionFormQuestionPart =
+  | {
+      questionIdx: string;
+      questionSubIdx: string;
+      order: string;
+      isText: true;
+      text: string;
+      id: string;
+    }
+  | {
+      questionIdx: string;
+      questionSubIdx: string;
+      order: string;
+      isText: false;
+      image: File;
+      id: string;
+    };
 
-type ProcessedQuestionPart = {
-  isText: true;
-  content: string;
-  order?: number;
-  id: string;
-} | {
-  isText: false;
-  content: File;
-  order?: number;
-  id: string;
-};
+type ProcessedQuestionPart =
+  | {
+      isText: true;
+      content: string;
+      order?: number;
+      id: string;
+    }
+  | {
+      isText: false;
+      content: File;
+      order?: number;
+      id: string;
+    };
 
 type ProcessedQuestionContentCombinedJSON = {
   questionContent: {
@@ -106,45 +115,59 @@ type ProcessedQuestionContentCombinedJSON = {
   questionLeafs: { [key: string]: string[] } | null;
 };
 
-type ProcessedMCQQuestionAnswerJSON = {options: string[], answer: string[], mark: string}
+type ProcessedMCQQuestionAnswerJSON = { options: string[]; answer: string[]; mark: string };
 
 type ProcessedOEQQuestionAnswerJSON = {
-  [key:string]:{
-    [subkey:string]:{ 
-      answer: string|File,
-      isText: boolean
-      mark: string
-    }
-  }
-}
+  [key: string]: {
+    [subkey: string]: {
+      answer: string | File;
+      isText: boolean;
+      mark: string;
+    };
+  };
+};
 
-type AddQuestionAnswerItem = { questionIdx: string; questionSubIdx: string; answer: string; isText: true; id: string, mark: string } | { id: string; questionIdx: string; questionSubIdx: string; answer: File; isText: false, mark:string } 
+type AddQuestionAnswerItem =
+  | {
+      questionIdx: string;
+      questionSubIdx: string;
+      answer: string;
+      isText: true;
+      id: string;
+      mark: string;
+    }
+  | {
+      id: string;
+      questionIdx: string;
+      questionSubIdx: string;
+      answer: File;
+      isText: false;
+      mark: string;
+    };
 
 type PaperFilters = {
-  year: "all" | string[];
-  
-}
+  year: 'all' | string[];
+};
 
 //#####################################################################################
 // This are the types used for preprocessing and finalising the questionContent, questionLeafs and questionAnswer
-interface BaseQuestionIndex{
+interface BaseQuestionIndex {
   questionIdx: string;
   questionSubIdx: string;
 }
-interface BaseQuestionAttributes{
-  id: string
-  order: string
+interface BaseQuestionAttributes {
+  id: string;
+  order: string;
 }
 
-
-interface BaseQuestionPart extends BaseQuestionIndex, BaseQuestionAttributes{}
+interface BaseQuestionPart extends BaseQuestionIndex, BaseQuestionAttributes {}
 interface BaseTextAttributes {
   isText: true;
-  text: string
+  text: string;
 }
 interface BaseImageAttributes {
   isText: false;
-  image: string
+  image: string;
 }
 
 interface QuestionPartOrderInt extends Omit<BaseQuestionPart, 'order'> {
@@ -152,40 +175,39 @@ interface QuestionPartOrderInt extends Omit<BaseQuestionPart, 'order'> {
 }
 interface BaseQuestionPartWithoutOrder extends Omit<BaseQuestionPart, 'order'> {}
 
-interface BaseTextQuestionPart extends BaseQuestionPart, BaseTextAttributes {
-}
-interface BaseImageQuestionPart extends BaseQuestionPart, BaseImageAttributes {
-}
+interface BaseTextQuestionPart extends BaseQuestionPart, BaseTextAttributes {}
+interface BaseImageQuestionPart extends BaseQuestionPart, BaseImageAttributes {}
 
-type QuestionPart = BaseTextQuestionPart | BaseImageQuestionPart
+type QuestionPart = BaseTextQuestionPart | BaseImageQuestionPart;
 
 // These are all with questionIdx and subIdx
-interface TextQuestionPartOrderInt extends QuestionPartOrderInt, BaseTextAttributes {
-}
+interface TextQuestionPartOrderInt extends QuestionPartOrderInt, BaseTextAttributes {}
 
-interface ImageQuestionPartOrderInt extends QuestionPartOrderInt, BaseImageAttributes{
-}
+interface ImageQuestionPartOrderInt extends QuestionPartOrderInt, BaseImageAttributes {}
 
-type QuestionPartWithOrderInt = TextQuestionPartOrderInt | ImageQuestionPartOrderInt  
-type QuestionPartWithOrderIntArray = QuestionPartWithOrderInt[]
+type QuestionPartWithOrderInt = TextQuestionPartOrderInt | ImageQuestionPartOrderInt;
+type QuestionPartWithOrderIntArray = QuestionPartWithOrderInt[];
 
 // Create ones that does not have questionIdx and questionSubIdx
-interface TextQuestionPartOrderIntWithoutIdx extends Omit<QuestionPartOrderInt, 'questionIdx'|'questionSubIdx'>, BaseTextAttributes {
-}
+interface TextQuestionPartOrderIntWithoutIdx
+  extends Omit<QuestionPartOrderInt, 'questionIdx' | 'questionSubIdx'>,
+    BaseTextAttributes {}
 
-interface ImageQuestionPartOrderIntWithoutIdx extends Omit<QuestionPartOrderInt, 'questionIdx'|'questionSubIdx'>, BaseImageAttributes{
-}
+interface ImageQuestionPartOrderIntWithoutIdx
+  extends Omit<QuestionPartOrderInt, 'questionIdx' | 'questionSubIdx'>,
+    BaseImageAttributes {}
 
-type QuestionPartWithOrderIntWithoutIdx = TextQuestionPartOrderIntWithoutIdx | ImageQuestionPartOrderIntWithoutIdx  
-type QuestionPartWithOrderIntWithoutIdxArray = QuestionPartWithOrderIntWithoutIdx[]
+type QuestionPartWithOrderIntWithoutIdx =
+  | TextQuestionPartOrderIntWithoutIdx
+  | ImageQuestionPartOrderIntWithoutIdx;
+type QuestionPartWithOrderIntWithoutIdxArray = QuestionPartWithOrderIntWithoutIdx[];
 
+interface FinalisedTextQuestionPart extends Omit<TextQuestionPartOrderIntWithoutIdx, 'order'> {}
 
-interface FinalisedTextQuestionPart extends Omit<TextQuestionPartOrderIntWithoutIdx, 'order'>{}
+interface FinalisedImageQuestionPart extends Omit<ImageQuestionPartOrderIntWithoutIdx, 'order'> {}
 
-interface FinalisedImageQuestionPart extends Omit<ImageQuestionPartOrderIntWithoutIdx, 'order'>{}
-
-type FinalisedQuestionPart = FinalisedTextQuestionPart | FinalisedImageQuestionPart
-type FinalisedQuestionPartArray = FinalisedQuestionPart[]
+type FinalisedQuestionPart = FinalisedTextQuestionPart | FinalisedImageQuestionPart;
+type FinalisedQuestionPartArray = FinalisedQuestionPart[];
 
 type QuestionContentWithOrder = {
   root: QuestionPartWithOrderIntWithoutIdxArray;
@@ -193,12 +215,12 @@ type QuestionContentWithOrder = {
     [key: string]: {
       [subKey: string]: QuestionPartWithOrderIntWithoutIdxArray;
     };
-  }
-}
+  };
+};
 
 type FinalisedQuestionLeafs = {
-  [key: string]: string[]
-} | null
+  [key: string]: string[];
+} | null;
 
 type FinalisedQuestionContent = {
   root: FinalisedQuestionPartArray;
@@ -206,14 +228,14 @@ type FinalisedQuestionContent = {
     [key: string]: {
       [subKey: string]: FinalisedQuestionPartArray;
     };
-  }
-}
+  };
+};
 
 // Below are the types used for preprocessing and finalising the questionAnswer and markScheme
 interface BaseOEQAnswerAttributes {
   questionIdx: string;
   questionSubIdx: string;
-  mark: string
+  mark: string;
 }
 
 interface OEQImageAttributes {
@@ -228,57 +250,60 @@ interface OEQTextAttributes {
 interface OEQImageAnswerItem extends BaseOEQAnswerAttributes, OEQImageAttributes {}
 interface OEQTextAnswerItem extends BaseOEQAnswerAttributes, OEQTextAttributes {}
 
-type OEQAnswerItemCombined = OEQImageAnswerItem | OEQTextAnswerItem
+type OEQAnswerItemCombined = OEQImageAnswerItem | OEQTextAnswerItem;
 
 interface MCQAnswerItem {
-  options: string[],
-  answer: string[],
-  mark: string
+  options: string[];
+  answer: string[];
+  mark: string;
 }
-type MCQAnswerItemArray = MCQAnswerItem[]
+type MCQAnswerItemArray = MCQAnswerItem[];
 
-type OEQAnswerArray = OEQAnswerItemCombined[]
+type OEQAnswerArray = OEQAnswerItemCombined[];
 
-type QuestionAnswerArray = OEQAnswerArray | MCQAnswerItemArray
+type QuestionAnswerArray = OEQAnswerArray | MCQAnswerItemArray;
 
-interface FinalisedOEQImageAnswerItem extends Omit<OEQImageAnswerItem, 'questionIdx'|'questionSubIdx'> {
-  mark:number
+interface FinalisedOEQImageAnswerItem
+  extends Omit<OEQImageAnswerItem, 'questionIdx' | 'questionSubIdx'> {
+  mark: number;
 }
-interface FinalisedOEQTextAnswerItem extends Omit<OEQTextAnswerItem, 'questionIdx'|'questionSubIdx'> {
-  mark:number
+interface FinalisedOEQTextAnswerItem
+  extends Omit<OEQTextAnswerItem, 'questionIdx' | 'questionSubIdx'> {
+  mark: number;
 }
 
-type FinalisedOEQAnswerItem = FinalisedOEQImageAnswerItem | FinalisedOEQTextAnswerItem
+type FinalisedOEQAnswerItem = FinalisedOEQImageAnswerItem | FinalisedOEQTextAnswerItem;
 
 type FinalisedMultiMCQQuestionAnswer = {
-  options: string[],
-  answer: string[],
-} 
+  options: string[];
+  answer: string[];
+};
 type FinalisedNonMultiMCQQuestionAnswer = {
-  options: string[],
-  answer: string,
-}
+  options: string[];
+  answer: string;
+};
 
 type FinalisedOEQQuestionAnswer = {
-  [key:string]:{
-    [subkey:string]: FinalisedOEQAnswerItem
-  }
-}
+  [key: string]: {
+    [subkey: string]: FinalisedOEQAnswerItem;
+  };
+};
 
-type FinalisedQuestionAnswer = FinalisedMultiMCQQuestionAnswer | FinalisedNonMultiMCQQuestionAnswer | FinalisedOEQQuestionAnswer
+type FinalisedQuestionAnswer =
+  | FinalisedMultiMCQQuestionAnswer
+  | FinalisedNonMultiMCQQuestionAnswer
+  | FinalisedOEQQuestionAnswer;
 
 type FinalisedMarkScheme = {
-  [key:string]:{
-    [subkey:string]: number // mark
-  }
-} | null
+  [key: string]: {
+    [subkey: string]: number; // mark
+  };
+} | null;
 
 //#####################################################################################
 
-
-
 declare interface AuthFormProps {
-  type: "sign-up" | "login";
+  type: 'sign-up' | 'login';
 }
 
 declare interface LoginProps {
@@ -358,7 +383,6 @@ interface CustomAuthInputProps {
 //   name: FieldPath<z.infer<typeof questionPartSchema>>;
 //   placeholder: string;
 // }
-
 
 interface CustomInputProps<T extends FieldValues> {
   control: Control<T>; // Make control generic
@@ -440,15 +464,14 @@ interface CustomPopoverMultipleCheckBoxProps<T extends FieldValues> {
   className?: string;
 }
 
-interface QuestionInfoInputProps{
+interface QuestionInfoInputProps {
   optionsDict: { [key: string]: { value: string; label: string }[] };
   className?: string;
 }
 
-
 // #####################################################################################
 // BELOW ARE TYPES USED FOR DATA TABLE PAGINATION FOR VIEWING PAPERS, INCLUDING FILTERS
-interface UnparsedPaperFilterProps{
+interface UnparsedPaperFilterProps {
   year: string;
   school: string;
   subject: string;
@@ -463,7 +486,7 @@ interface ParsedPaperFilterProps {
   subject: string[];
   examType: exam_type[];
   educationLevel: edu_level[];
-  userId: string[]
-  fetchVisible: boolean
-  fetchNonVisible?: boolean
+  userId: string[];
+  fetchVisible: boolean;
+  fetchNonVisible?: boolean;
 }

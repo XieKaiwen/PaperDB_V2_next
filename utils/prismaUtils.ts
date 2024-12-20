@@ -1,5 +1,5 @@
-import { ParsedPaperFilterProps } from "@/src/types/types";
-import { Prisma } from "@prisma/client";
+import { ParsedPaperFilterProps } from '@/src/types/types';
+import { Prisma } from '@prisma/client';
 
 export function determineVisibility(fetchVisible: boolean, fetchNonVisible: boolean) {
   if (fetchVisible && fetchNonVisible) {
@@ -21,19 +21,18 @@ export function whereClauseConstructorForPapers({
   examType,
   userId,
   fetchVisible = false,
-  fetchNonVisible = false
+  fetchNonVisible = false,
 }: ParsedPaperFilterProps) {
-
   const visible = determineVisibility(fetchVisible, fetchNonVisible);
 
   const whereClause = {
-    year: year.length === 0 ? {} : {in: year},
-    educationLevel: educationLevel.length === 0 ? {} : {in: educationLevel},
-    schoolId: school ? {} : {in: school},
-    subjectId: subject.length === 0 ? {} : {in: subject},
-    examType: examType.length === 0 ? {} : {in: examType},
-    userId: userId.length === 0 ? {} : {in: userId},
-    ...(visible !== null && { visible })
+    year: year.length === 0 ? {} : { in: year },
+    educationLevel: educationLevel.length === 0 ? {} : { in: educationLevel },
+    schoolId: school ? {} : { in: school },
+    subjectId: subject.length === 0 ? {} : { in: subject },
+    examType: examType.length === 0 ? {} : { in: examType },
+    userId: userId.length === 0 ? {} : { in: userId },
+    ...(visible !== null && { visible }),
   };
   return whereClause;
 }

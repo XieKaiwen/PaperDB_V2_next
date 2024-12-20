@@ -1,12 +1,10 @@
-"use server";
-import { parseStringify } from "@/utils/utils";
-import { createClient } from "@/utils/supabase/server";
-import { headers } from "next/headers";
-import prisma from "@/utils/prisma-client/client";
-import { redirect, RedirectType } from "next/navigation";
-import { GetLoggedInResponse, LoginProps, SignUpProps } from "@/src/types/types";
-
-
+'use server';
+import { parseStringify } from '@/utils/utils';
+import { createClient } from '@/utils/supabase/server';
+import { headers } from 'next/headers';
+import prisma from '@/utils/prisma-client/client';
+import { redirect, RedirectType } from 'next/navigation';
+import { GetLoggedInResponse, LoginProps, SignUpProps } from '@/src/types/types';
 
 export async function login({ email, password }: LoginProps) {
   const supabase = createClient();
@@ -20,7 +18,7 @@ export async function login({ email, password }: LoginProps) {
       password,
     });
     const user = data?.user;
-    console.log("Retrieved user: ", user);
+    console.log('Retrieved user: ', user);
     return parseStringify(user);
   } catch (error) {
     console.error(error);
@@ -42,27 +40,23 @@ export async function signUp({
     },
   });
   if (existingUser) {
-    const encodedError = encodeURIComponent(
-      "Email already in use. Sign up with another email"
-    );
+    const encodedError = encodeURIComponent('Email already in use. Sign up with another email');
     return redirect(
       `/sign-up?error=${encodedError}${
-        redirectedFrom
-          ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}`
-          : ""
+        redirectedFrom ? `&redirectedFrom=${encodeURIComponent(redirectedFrom)}` : ''
       }`,
-      RedirectType.replace
+      RedirectType.replace,
     );
   }
 
   const headersList = headers();
-  const host = headersList.get("host");
-  const protocol = headersList.get("x-forwarded-proto") || "http";
+  const host = headersList.get('host');
+  const protocol = headersList.get('x-forwarded-proto') || 'http';
 
   const origin = `${protocol}://${host}`;
 
   // Use the origin as needed
-  console.log("Request origin:", origin);
+  console.log('Request origin:', origin);
   const supabase = createClient();
 
   // type-casting here for convenience
@@ -78,16 +72,17 @@ export async function signUp({
         educationLevel: educationLevel,
       },
       emailRedirectTo: `${origin}/auth/callback?${
-        redirectedFrom ? `redirectedFrom=${redirectedFrom}` : ""
+        redirectedFrom ? `redirectedFrom=${redirectedFrom}` : ''
       }`,
     },
   });
-  console.log("Email Redirect URL:", `${origin}/auth/callback?${
-    redirectedFrom ? `redirectedFrom=${redirectedFrom}` : ""
-  }`);
+  console.log(
+    'Email Redirect URL:',
+    `${origin}/auth/callback?${redirectedFrom ? `redirectedFrom=${redirectedFrom}` : ''}`,
+  );
 
   const user = data?.user;
-  console.log("Created user: ", user);
+  console.log('Created user: ', user);
   if (error) {
     console.error(error);
     throw new Error(error.message);
@@ -117,7 +112,7 @@ export async function getLoggedInUser(): Promise<GetLoggedInResponse> {
   try {
     const { data } = await supabase.auth.getUser();
     // console.log(data);
-    
+
     if (!data?.user) {
       return parseStringify(response);
     }

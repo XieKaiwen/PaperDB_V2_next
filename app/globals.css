@@ -174,13 +174,12 @@ body::-webkit-scrollbar {
 }
 
 @layer components {
-
   .question-content-container {
     @apply flex flex-col gap-6;
   }
 
   .question-section-content {
-    @apply flex flex-col flex-1 gap-1 items-center justify-center;
+    @apply flex flex-1 flex-col items-center justify-center gap-1;
   }
 
   .question-leafs {
@@ -191,8 +190,8 @@ body::-webkit-scrollbar {
     @apply flex flex-1 gap-4;
   }
 
-  .question-indexed-section-content{
-    @apply flex flex-col gap-2
+  .question-indexed-section-content {
+    @apply flex flex-col gap-2;
   }
 
   .question-index-label,

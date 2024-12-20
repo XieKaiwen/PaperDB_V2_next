@@ -1,29 +1,29 @@
-import { type EmailOtpType } from "@supabase/supabase-js";
-import { NextResponse, type NextRequest } from "next/server";
+import { type EmailOtpType } from '@supabase/supabase-js';
+import { NextResponse, type NextRequest } from 'next/server';
 
-import { createClient } from "@/utils/supabase/server";
-import { getBaseUrl } from "@/utils/utils";
-import prisma from "@/utils/prisma-client/client";
-import { supabaseAdmin } from "@/utils/supabase/serverAdmin";
+import { createClient } from '@/utils/supabase/server';
+import { getBaseUrl } from '@/utils/utils';
+import prisma from '@/utils/prisma-client/client';
+import { supabaseAdmin } from '@/utils/supabase/serverAdmin';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   console.log(request.url);
   console.log(searchParams);
 
-  const token_hash = searchParams.get("token_hash");
-  const type = searchParams.get("type") as EmailOtpType | null;
+  const token_hash = searchParams.get('token_hash');
+  const type = searchParams.get('type') as EmailOtpType | null;
 
-  const next = searchParams.get("redirectedFrom") ?? "/home";
+  const next = searchParams.get('redirectedFrom') ?? '/home';
   const decodedNext = decodeURIComponent(next);
 
-  const metadata = searchParams.get("metadata") || "";
+  const metadata = searchParams.get('metadata') || '';
 
-  console.log("metadata: ", metadata);
-  console.log("next: ", next);
+  console.log('metadata: ', metadata);
+  console.log('next: ', next);
 
-  console.log("token_hash: ", token_hash);
-  console.log("type: ", type);
+  console.log('token_hash: ', token_hash);
+  console.log('type: ', type);
 
   const baseURL = getBaseUrl(request);
   if (token_hash && type) {
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       console.log(response.data.user?.user_metadata); // This contains all the relevant information that I need to store in the database, dont need to parse the metadata string
       const userData = response.data.user?.user_metadata;
       if (!userData) {
-        throw new Error("user data not defined. Metadata missing");
+        throw new Error('user data not defined. Metadata missing');
       }
       /*
       {
@@ -69,84 +69,75 @@ export async function GET(request: NextRequest) {
               username: userData.username,
             },
           });
-          console.log("New user: ", newUser);
-          
+          console.log('New user: ', newUser);
+
           const newUserLog = await prisma.userLog.create({
             data: {
               userId: newUser.id,
               logInfo: `${newUser.username} just successfully registered and verified his email (${newUser.email})`,
             },
           });
-          console.log("new User Log: ", newUserLog);
+          console.log('new User Log: ', newUserLog);
         });
 
         return NextResponse.redirect(new URL(decodedNext, baseURL));
       } catch (err) {
-        // TODO roll back on supabase entry, and then prompt the user to re-signup for their account. 
+        // TODO roll back on supabase entry, and then prompt the user to re-signup for their account.
         console.error(err);
         const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
-          userData.sub, false
-        )  
-        if(deleteError){
+          userData.sub,
+          false,
+        );
+        if (deleteError) {
           const encodedError = encodeURIComponent(
-            "An error occurred during email verification. Please contact us at [official_email], sorry for the inconvenience"
+            'An error occurred during email verification. Please contact us at [official_email], sorry for the inconvenience',
           );
           return NextResponse.redirect(
             new URL(
               `/sign-up?error=${encodedError}${
-                decodedNext
-                  ? `&redirectedFrom=${encodeURIComponent(decodedNext)}`
-                  : ""
+                decodedNext ? `&redirectedFrom=${encodeURIComponent(decodedNext)}` : ''
               }`,
-              baseURL
-            )
+              baseURL,
+            ),
           );
-        }    
+        }
 
         const encodedError = encodeURIComponent(
-          "An error occurred during email verification. Account creation unsuccessful, please sign up again"
+          'An error occurred during email verification. Account creation unsuccessful, please sign up again',
         );
         return NextResponse.redirect(
           new URL(
             `/sign-up?error=${encodedError}${
-              decodedNext
-                ? `&redirectedFrom=${encodeURIComponent(decodedNext)}`
-                : ""
+              decodedNext ? `&redirectedFrom=${encodeURIComponent(decodedNext)}` : ''
             }`,
-            baseURL
-          )
+            baseURL,
+          ),
         );
       }
     } catch (err) {
       console.error(err);
       const encodedError = encodeURIComponent(
-        "An error occurred during email verification. Account not successfully created, link might have expired"
+        'An error occurred during email verification. Account not successfully created, link might have expired',
       );
       return NextResponse.redirect(
         new URL(
           `/sign-up?error=${encodedError}${
-            decodedNext
-              ? `&redirectedFrom=${encodeURIComponent(decodedNext)}`
-              : ""
+            decodedNext ? `&redirectedFrom=${encodeURIComponent(decodedNext)}` : ''
           }`,
-          baseURL
-        )
+          baseURL,
+        ),
       );
     }
   } else {
-    console.error("Token_hash or Type missing");
-    const encodedError = encodeURIComponent(
-      "An error occurred during email verification"
-    );
+    console.error('Token_hash or Type missing');
+    const encodedError = encodeURIComponent('An error occurred during email verification');
     return NextResponse.redirect(
       new URL(
         `/sign-up?error=${encodedError}${
-          decodedNext
-            ? `&redirectedFrom=${encodeURIComponent(decodedNext)}`
-            : ""
+          decodedNext ? `&redirectedFrom=${encodeURIComponent(decodedNext)}` : ''
         }`,
-        baseURL
-      )
+        baseURL,
+      ),
     );
   }
 }

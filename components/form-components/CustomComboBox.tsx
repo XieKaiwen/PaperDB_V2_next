@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   FormControl,
   FormDescription,
@@ -6,11 +6,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Button } from "../ui/button";
-import { cn } from "@/utils/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
+} from '../ui/form';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Button } from '../ui/button';
+import { cn } from '@/utils/utils';
+import { Check, ChevronsUpDown } from 'lucide-react';
 import {
   Command,
   CommandEmpty,
@@ -18,9 +18,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "../ui/command";
-import { CustomComboBoxProps } from "@/src/types/types";
-import { FieldValues } from "react-hook-form";
+} from '../ui/command';
+import { CustomComboBoxProps } from '@/src/types/types';
+import { FieldValues } from 'react-hook-form';
 
 // TODO Add types and props
 
@@ -65,35 +65,29 @@ export default function CustomComboBox<T extends FieldValues>({
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className={cn("flex flex-col", className)}>
-          {label && (
-            <FormLabel className="font-semibold text-sm">{label}</FormLabel>
-          )}
+        <FormItem className={cn('flex flex-col', className)}>
+          {label && <FormLabel className="text-sm font-semibold">{label}</FormLabel>}
           {description && <FormDescription>{description}</FormDescription>}
           <Popover onOpenChange={handleOpenChange}>
-            <PopoverTrigger
-              className="w-[200px] lg:w-[250px] xl:w-[300px]"
-              asChild
-            >
+            <PopoverTrigger className="w-[200px] lg:w-[250px] xl:w-[300px]" asChild>
               <FormControl>
                 <Button
                   variant="outline"
                   role="combobox"
                   className={cn(
-                    "w-[250px] xl:w-[300px] justify-between",
-                    !field.value && "text-muted-foreground"
+                    'w-[250px] justify-between xl:w-[300px]',
+                    !field.value && 'text-muted-foreground',
                   )}
                 >
                   {field.value
-                    ? options.find((option) => option.value === field.value)
-                        ?.label
+                    ? options.find((option) => option.value === field.value)?.label
                     : placeholder}
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
             {isOpen && (
-              <PopoverContent className="w-[200px] lg:w-[250px] xl:w-[300px] p-0">
+              <PopoverContent className="w-[200px] p-0 lg:w-[250px] xl:w-[300px]">
                 <Command>
                   <CommandInput placeholder={commandPlaceholder} />
                   <CommandList>
@@ -110,10 +104,8 @@ export default function CustomComboBox<T extends FieldValues>({
                         >
                           <Check
                             className={cn(
-                              "mr-2 h-4 w-4",
-                              option.value === field.value
-                                ? "opacity-100"
-                                : "opacity-0"
+                              'mr-2 h-4 w-4',
+                              option.value === field.value ? 'opacity-100' : 'opacity-0',
                             )}
                           />
                           {option.label}

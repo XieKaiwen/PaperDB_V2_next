@@ -1,16 +1,16 @@
-import { Loader2 } from "lucide-react";
-import React from "react";
+import { Loader2 } from 'lucide-react';
+import React from 'react';
 
-export default function LoadingSpinner({ size = "md" }: { size: string }) {
+export default function LoadingSpinner({ size = 'md' }: { size: string }) {
   const sizeClasses: Record<string, string> = {
-    sm: "w-6 h-6",
-    md: "w-12 h-12",
-    lg: "w-16 h-16",
+    sm: 'w-6 h-6',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16',
   };
 
   return (
-    <div className="flex justify-center items-center w-screen h-screen bg-white/90 fixed top-0 left-0 z-50">
-      <Loader2 className={`${sizeClasses[size]} text-blue-500 animate-spin`} />
+    <div className="fixed left-0 top-0 z-50 flex h-screen w-screen items-center justify-center bg-white/90">
+      <Loader2 className={`${sizeClasses[size]} animate-spin text-blue-500`} />
     </div>
   );
 }

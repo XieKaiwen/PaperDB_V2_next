@@ -1,23 +1,17 @@
-import React from "react";
+import React from 'react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
-import { Control, FieldPath } from "react-hook-form";
-import { authFormSchema } from "@/utils/authFormUtils";
-import { z } from "zod";
+} from '@/components/ui/select';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { Control, FieldPath } from 'react-hook-form';
+import { authFormSchema } from '@/utils/authFormUtils';
+import { z } from 'zod';
 
-const formSchema = authFormSchema("sign-up");
+const formSchema = authFormSchema('sign-up');
 
 interface CustomAuthSelectProps {
   control: Control<z.infer<typeof formSchema>>;

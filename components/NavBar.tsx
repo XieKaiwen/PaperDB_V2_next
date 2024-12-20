@@ -1,51 +1,43 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import Link from "next/link";
-import NavLink from "./NavLink";
-import { usePathname } from "next/navigation";
-import MobileNav from "./MobileNav";
-import { NavBarProps } from "@/src/types/types";
-import { navRoutes as routes } from "@/src/constants/constants";
+import * as React from 'react';
+import Link from 'next/link';
+import NavLink from './NavLink';
+import { usePathname } from 'next/navigation';
+import MobileNav from './MobileNav';
+import { NavBarProps } from '@/src/types/types';
+import { navRoutes as routes } from '@/src/constants/constants';
 
 export default function NavBar({ user }: NavBarProps) {
   const pathname = usePathname();
   return (
-    <nav className="bg-white fixed w-full z-20 top-0 start-0 border-b border-gray-200">
-      <div className=" flex flex-wrap items-center justify-between mx-auto p-4">
-        <Link
-          href="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
-          <span className="font-merriweather self-center tex#-2xl font-semibold whitespace-nowrap">
+    <nav className="fixed start-0 top-0 z-20 w-full border-b border-gray-200 bg-white">
+      <div className="mx-auto flex flex-wrap items-center justify-between p-4">
+        <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+          <span className="tex#-2xl self-center whitespace-nowrap font-merriweather font-semibold">
             PaperDB
           </span>
         </Link>
-        <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+        <div className="flex space-x-3 md:order-2 md:space-x-0 rtl:space-x-reverse">
           <button
             type="button"
-            className="text-white bg-lavender-500 hover:bg-lavender-700 focus:ring-4 focus:outline-none focus:ring-lavender-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center"
+            className="rounded-lg bg-lavender-500 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-lavender-700 focus:outline-none focus:ring-4 focus:ring-lavender-300"
           >
             Placeholder
           </button>
           <MobileNav user={user} />
         </div>
         <div
-          className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
+          className="hidden w-full items-center justify-between md:order-1 md:flex md:w-auto"
           id="navbar-sticky"
         >
-          <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-white">
+          <ul className="mt-4 flex flex-col rounded-lg border border-gray-100 bg-gray-50 p-4 font-medium md:mt-0 md:flex-row md:space-x-8 md:border-0 md:bg-white md:p-0 rtl:space-x-reverse">
             {routes.map((route) => {
               const { title, link } = route;
               const isActive = pathname.startsWith(link);
               return (
                 <li key={link}>
-                  <NavLink
-                    key={link}
-                    title={title}
-                    link={link}
-                    isActive={isActive}
-                  />
+                  <NavLink key={link} title={title} link={link} isActive={isActive} />
                 </li>
               );
             })}

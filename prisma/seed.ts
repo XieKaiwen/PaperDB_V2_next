@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import prisma from "../utils/prisma-client/client";
+import prisma from '../utils/prisma-client/client';
 import fs from 'fs';
 import { parse } from 'csv-parse/sync';
 import path from 'path';
 
-const DATA_FOLDER_ROUTE = path.join(__dirname, "../src/data/"); // Use __dirname to get the absolute path
+const DATA_FOLDER_ROUTE = path.join(__dirname, '../src/data/'); // Use __dirname to get the absolute path
 
 interface CsvData {
   [key: string]: string;
@@ -45,7 +45,7 @@ const tableConfigs: TableConfig[] = [
       subjectId: data.subjectId,
       educationLevel: data.educationLevel,
     }),
-  }
+  },
 ];
 
 function readCsvFile(filePath: string): CsvData[] {

@@ -1,22 +1,15 @@
-import React from "react";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
-import { CustomFileInputProps } from "@/src/types/types";
-import { Input } from "../ui/input";
-import { FieldValues } from "react-hook-form";
-
+import React from 'react';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { CustomFileInputProps } from '@/src/types/types';
+import { Input } from '../ui/input';
+import { FieldValues } from 'react-hook-form';
 
 export default function CustomFileInput<T extends FieldValues>({
   control,
   name,
   label,
   className,
-  inputClassName
+  inputClassName,
 }: CustomFileInputProps<T>) {
   return (
     <FormField
@@ -32,7 +25,7 @@ export default function CustomFileInput<T extends FieldValues>({
               onChange={(e) => field.onChange(e.target.files?.[0])}
             />
           </FormControl>
-          <FormMessage/>
+          <FormMessage />
         </FormItem>
       )}
     />

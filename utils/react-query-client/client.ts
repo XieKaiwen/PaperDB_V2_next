@@ -1,7 +1,4 @@
-import {
-  defaultShouldDehydrateQuery,
-  QueryClient,
-} from "@tanstack/react-query";
+import { defaultShouldDehydrateQuery, QueryClient } from '@tanstack/react-query';
 
 function makeQueryClient() {
   return new QueryClient({
@@ -14,8 +11,7 @@ function makeQueryClient() {
       dehydrate: {
         // include pending queries in dehydration
         shouldDehydrateQuery: (query) =>
-          defaultShouldDehydrateQuery(query) ||
-          query.state.status === "pending",
+          defaultShouldDehydrateQuery(query) || query.state.status === 'pending',
       },
     },
   });
@@ -24,7 +20,7 @@ function makeQueryClient() {
 let browserQueryClient: QueryClient | undefined = undefined;
 
 export function getQueryClient() {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     // Checking if we are on the server
     // Server: always make a new query client
     return makeQueryClient();

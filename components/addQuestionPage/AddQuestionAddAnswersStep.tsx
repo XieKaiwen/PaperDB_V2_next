@@ -1,25 +1,22 @@
-import { useAddQuestionContext } from "@/src/hooks/useAddQuestionContext";
-import {
-  AddQuestionFormData,
-  ProcessedQuestionContentCombinedJSON,
-} from "@/src/types/types";
+import { useAddQuestionContext } from '@/src/hooks/useAddQuestionContext';
+import { AddQuestionFormData, ProcessedQuestionContentCombinedJSON } from '@/src/types/types';
 import {
   createQuestionAnswerValueAfterReset,
   createQuestionAnswerValueWithoutReset,
   MCQAnswerSchema,
   OEQAnswerSchema,
   questionAnswerRequiresReset,
-} from "@/utils/add-question/addQuestionUtils(client)";
-import React, { forwardRef, ReactElement, useEffect, useState } from "react";
-import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
-import { z } from "zod";
-import { answerCombinedSchema } from "../../utils/add-question/addQuestionUtils(client)";
-import CustomTextArea from "../form-components/CustomTextArea";
-import CustomFileInput from "../form-components/CustomFileInput";
-import { Switch } from "@/components/ui/switch";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { CSS } from "@dnd-kit/utilities";
+} from '@/utils/add-question/addQuestionUtils(client)';
+import React, { forwardRef, ReactElement, useEffect, useState } from 'react';
+import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
+import { z } from 'zod';
+import { answerCombinedSchema } from '../../utils/add-question/addQuestionUtils(client)';
+import CustomTextArea from '../form-components/CustomTextArea';
+import CustomFileInput from '../form-components/CustomFileInput';
+import { Switch } from '@/components/ui/switch';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { CSS } from '@dnd-kit/utilities';
 
 import {
   DndContext,
@@ -29,25 +26,24 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from "@dnd-kit/core";
-import crossDeleteIcon from "@/src/assets/cross-delete-icon.svg";
-import dragHandleIcon from "@/src/assets/drag-handle.svg";
+} from '@dnd-kit/core';
+import crossDeleteIcon from '@/src/assets/cross-delete-icon.svg';
+import dragHandleIcon from '@/src/assets/drag-handle.svg';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import Image from "next/image";
-import { FormField, FormMessage } from "../ui/form";
-import { Checkbox } from "../ui/checkbox";
-import { CheckedState } from "@radix-ui/react-checkbox";
-import CustomInput from "../form-components/CustomInput";
+} from '@dnd-kit/sortable';
+import Image from 'next/image';
+import { FormField, FormMessage } from '../ui/form';
+import { Checkbox } from '../ui/checkbox';
+import { CheckedState } from '@radix-ui/react-checkbox';
+import CustomInput from '../form-components/CustomInput';
 
 export default function AddQuestionAddAnswersStep() {
-  const { control, setValue, resetField, getValues } =
-    useFormContext<AddQuestionFormData>();
+  const { control, setValue, resetField, getValues } = useFormContext<AddQuestionFormData>();
   const {
     questionContentJSON: {
       subscribe: subscribeToQuestionContentJSON,
@@ -61,7 +57,7 @@ export default function AddQuestionAddAnswersStep() {
 
   const [watchedQuestionAnswer, watchedQuestionType] = useWatch({
     control,
-    name: ["questionAnswer", "questionType"],
+    name: ['questionAnswer', 'questionType'],
   }) as [z.infer<typeof answerCombinedSchema>, string];
 
   // RETRIEVE THE FORM DATA AND QUESTION CONTENT FROM CONTEXT WHEN MOUNT
@@ -81,7 +77,7 @@ export default function AddQuestionAddAnswersStep() {
       (updatedQuestionContentJSON) => {
         setQuestionContent(updatedQuestionContentJSON);
         // console.log("Receive updatedQuestionContentJSON in AddQuestionAddAnswersStep");
-      }
+      },
     );
 
     return () => {
@@ -98,27 +94,24 @@ export default function AddQuestionAddAnswersStep() {
     }
     // console.log("watchedQuestionAnswer:", watchedQuestionAnswer);
 
-    const requireReset = questionAnswerRequiresReset(
-      watchedQuestionType,
-      watchedQuestionAnswer
-    );
+    const requireReset = questionAnswerRequiresReset(watchedQuestionType, watchedQuestionAnswer);
     if (requireReset) {
       // console.log("update questionAnswer with reset");
 
-      resetField("questionAnswer", { defaultValue: [] });
+      resetField('questionAnswer', { defaultValue: [] });
       const newQuestionAnswerValue = createQuestionAnswerValueAfterReset(
         watchedQuestionType,
-        questionLeafs!
+        questionLeafs!,
       );
-      setValue("questionAnswer", newQuestionAnswerValue);
+      setValue('questionAnswer', newQuestionAnswerValue);
     } else {
       // console.log("update questionAnswer without reset");
       const newQuestionAnswerValue = createQuestionAnswerValueWithoutReset(
         watchedQuestionType,
         questionLeafs!,
-        watchedQuestionAnswer
+        watchedQuestionAnswer,
       );
-      setValue("questionAnswer", newQuestionAnswerValue);
+      setValue('questionAnswer', newQuestionAnswerValue);
     }
     // console.log("Call useEffect for updating questionAnswer");
   }, [watchedQuestionType, questionLeafs]);
@@ -128,17 +121,24 @@ export default function AddQuestionAddAnswersStep() {
   // NO NEED FOR append and remove, BECAUSE USER DOES NOT NEED TO ADD OR REMOVE ANSWERS
   const { fields, update } = useFieldArray({
     control,
-    name: "questionAnswer",
+    name: 'questionAnswer',
   });
 
   function toggleFileClick(index: number) {
-    const answerItem = getValues(`questionAnswer.${index}`) as { questionIdx: string; questionSubIdx: string; answer: string | File; id: string; isText: boolean; mark: string } //Since this is only for OEQ
+    const answerItem = getValues(`questionAnswer.${index}`) as {
+      questionIdx: string;
+      questionSubIdx: string;
+      answer: string | File;
+      id: string;
+      isText: boolean;
+      mark: string;
+    }; //Since this is only for OEQ
 
     // Create a new object to avoid mutating the existing answerItem
     const updatedAnswerItem = {
       ...answerItem,
       isText: !answerItem.isText,
-      answer: answerItem.isText ? new File([], "") : "", // Toggle between File and string
+      answer: answerItem.isText ? new File([], '') : '', // Toggle between File and string
     };
 
     // Use the update function from useFieldArray to ensure sync
@@ -153,15 +153,20 @@ export default function AddQuestionAddAnswersStep() {
       {/* {watchedQuestionType === "MCQ" && (
         <div>{JSON.stringify(watchedQuestionAnswer, null, 2)}</div>
       )} */}
-      {watchedQuestionType === "MCQ" && <AddMCQAnswerInput />}
+      {watchedQuestionType === 'MCQ' && <AddMCQAnswerInput />}
 
-      {watchedQuestionType === "OEQ" && (
+      {watchedQuestionType === 'OEQ' && (
         <div className="w-full space-y-4">
           {(fields as z.infer<typeof OEQAnswerSchema>).map((answerPart, index) => {
             const { questionIdx, questionSubIdx, isText, answer } = answerPart;
             return (
               <div key={answerPart.id}>
-                <CustomInput<AddQuestionFormData> label={`Marks for (${questionIdx})(${questionSubIdx})`} control={control} name={`questionAnswer.${index}.mark`} placeholder="Enter marks..."/>
+                <CustomInput<AddQuestionFormData>
+                  label={`Marks for (${questionIdx})(${questionSubIdx})`}
+                  control={control}
+                  name={`questionAnswer.${index}.mark`}
+                  placeholder="Enter marks..."
+                />
                 <div>
                   {isText ? (
                     <CustomTextArea<AddQuestionFormData>
@@ -178,12 +183,9 @@ export default function AddQuestionAddAnswersStep() {
                       key={answerPart.id}
                     />
                   )}
-                  <div className="flex gap-2 mt-3 text-sm">
+                  <div className="mt-3 flex gap-2 text-sm">
                     Toggle File:
-                    <Switch
-                      checked={!isText}
-                      onCheckedChange={() => toggleFileClick(index)}
-                    />
+                    <Switch checked={!isText} onCheckedChange={() => toggleFileClick(index)} />
                   </div>
                 </div>
               </div>
@@ -196,19 +198,18 @@ export default function AddQuestionAddAnswersStep() {
 }
 
 function AddMCQAnswerInput() {
-  const { control, setValue, resetField, getValues } =
-    useFormContext<AddQuestionFormData>();
+  const { control, setValue, resetField, getValues } = useFormContext<AddQuestionFormData>();
 
   // THIS COMPONENT IS ONLY MOUNTED WHEN questionType === MCQ, hence
   const [options, setOptions] = useState<string[]>(() => {
-    const formMCQAnswer = (getValues("questionAnswer") as z.infer<typeof MCQAnswerSchema>)[0];
+    const formMCQAnswer = (getValues('questionAnswer') as z.infer<typeof MCQAnswerSchema>)[0];
     if (formMCQAnswer && formMCQAnswer.options !== undefined) {
       return formMCQAnswer.options;
     }
-    return ["1", "2", "3", "4"];
+    return ['1', '2', '3', '4'];
   });
   const [correctAnswers, setCorrectAnswers] = useState<string[]>(() => {
-    const formMCQAnswer = getValues("questionAnswer")[0];
+    const formMCQAnswer = getValues('questionAnswer')[0];
     if (
       formMCQAnswer &&
       formMCQAnswer.answer !== undefined &&
@@ -218,14 +219,14 @@ function AddMCQAnswerInput() {
     }
     return [];
   }); // This will be a list of options that are correct answers, will be converted into indexes that will be sorted, to keep them in order
-  const [curInput, setCurInput] = useState<string>("");
+  const [curInput, setCurInput] = useState<string>('');
 
   // Set up dndKit
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   function handleDragEnd(event: DragEndEvent) {
@@ -255,8 +256,8 @@ function AddMCQAnswerInput() {
 
     // Step 3: Map the sorted indexes back to the corresponding values in options
     const sortedCorrectAnswers = sortedIndexes.map((index) => options[index]);
-    setValue("questionAnswer.0.answer", sortedCorrectAnswers);
-    setValue("questionAnswer.0.options", options);
+    setValue('questionAnswer.0.answer', sortedCorrectAnswers);
+    setValue('questionAnswer.0.options', options);
   }
 
   // HANDLING DELETION OF OPTIONS
@@ -273,9 +274,7 @@ function AddMCQAnswerInput() {
 
     if (correctAnswers.includes(optionDeleted)) {
       setCorrectAnswers((prev) => {
-        const updatedCorrectAnswers = prev.filter(
-          (answer) => answer !== optionDeleted
-        );
+        const updatedCorrectAnswers = prev.filter((answer) => answer !== optionDeleted);
         // console.log("Updated correctAnswers:", updatedCorrectAnswers);
         return updatedCorrectAnswers;
       });
@@ -298,30 +297,26 @@ function AddMCQAnswerInput() {
           placeholder="Enter an option"
         />
         <Button
-          className="bg-lavender-300 hover:bg-lavender-400 text-gray-700"
+          className="bg-lavender-300 text-gray-700 hover:bg-lavender-400"
           onClick={() => {
-            if (curInput.trim() === "") {
-              alert("Option cannot be empty"); // Optional: Prevent adding empty strings
+            if (curInput.trim() === '') {
+              alert('Option cannot be empty'); // Optional: Prevent adding empty strings
               return;
             }
             setOptions((prev) => {
               if (prev.includes(curInput)) {
-                alert("This option already exists"); // Optional: Provide feedback
+                alert('This option already exists'); // Optional: Provide feedback
                 return prev; // Return the existing array without changes
               }
               return [...prev, curInput];
             });
-            setCurInput(""); // Clear the input field after adding
+            setCurInput(''); // Clear the input field after adding
           }}
         >
           Add
         </Button>
       </div>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={options} strategy={verticalListSortingStrategy}>
           {options.map((option, index) => (
             <SortableMCQAddAnswerOptionItem
@@ -333,9 +328,7 @@ function AddMCQAnswerInput() {
               onCheckedChange={(checked) => {
                 return checked
                   ? setCorrectAnswers((prev) => [...prev, option])
-                  : setCorrectAnswers((prev) =>
-                      prev.filter((a) => a !== option)
-                    );
+                  : setCorrectAnswers((prev) => prev.filter((a) => a !== option));
               }}
             />
           ))}
@@ -370,7 +363,7 @@ function AddMCQAnswerInput() {
 
       <Button
         type="button"
-        className="bg-lavender-300 hover:bg-lavender-400 text-gray-700"
+        className="bg-lavender-300 text-gray-700 hover:bg-lavender-400"
         onClick={handleSaveClick}
       >
         Save
@@ -388,53 +381,52 @@ interface MCQAddAnswerOptionItemProps {
   onCheckedChange: (checked: CheckedState) => void;
   onDelete: (index: number) => void;
 }
-const MCQAddAnswerOptionItem = forwardRef<
-  HTMLDivElement,
-  MCQAddAnswerOptionItemProps
->(function MCQAddAnswerOptionItem(
-  { option, index, style, checked, onCheckedChange, onDelete, ...props },
-  ref
-) {
-  return (
-    <div
-      ref={ref}
-      style={style}
-      className="p-2 bg-white rounded-lg shadow-md border-gray-300 border-2 w-full md:w-1/2 flex gap-2"
-    >
-      <div>
-        <Checkbox
+const MCQAddAnswerOptionItem = forwardRef<HTMLDivElement, MCQAddAnswerOptionItemProps>(
+  function MCQAddAnswerOptionItem(
+    { option, index, style, checked, onCheckedChange, onDelete, ...props },
+    ref,
+  ) {
+    return (
+      <div
+        ref={ref}
+        style={style}
+        className="flex w-full gap-2 rounded-lg border-2 border-gray-300 bg-white p-2 shadow-md md:w-1/2"
+      >
+        <div>
+          <Checkbox
+            className=""
+            checked={checked}
+            onCheckedChange={(checked: CheckedState) => onCheckedChange(checked)}
+          />
+        </div>
+
+        <p className="mr-auto" {...props}>
+          {option}
+        </p>
+        <Button
           className=""
-          checked={checked}
-          onCheckedChange={(checked: CheckedState) => onCheckedChange(checked)}
+          type="button"
+          variant="destructive"
+          size="sm"
+          onClick={() => {
+            // console.log("Button clicked, index:", index);
+            onDelete(index);
+          }}
+        >
+          <Image src={crossDeleteIcon} alt="delete icon" width={10} height={10} />
+        </Button>
+        <Image
+          src={dragHandleIcon}
+          alt="drag handle icon"
+          width={30}
+          height={30}
+          className=""
+          {...props}
         />
       </div>
-
-      <p className="mr-auto" {...props}>
-        {option}
-      </p>
-      <Button
-        className=""
-        type="button"
-        variant="destructive"
-        size="sm"
-        onClick={() => {
-          // console.log("Button clicked, index:", index);
-          onDelete(index);
-        }}
-      >
-        <Image src={crossDeleteIcon} alt="delete icon" width={10} height={10} />
-      </Button>
-      <Image
-        src={dragHandleIcon}
-        alt="drag handle icon"
-        width={30}
-        height={30}
-        className=""
-        {...props}
-      />
-    </div>
-  );
-});
+    );
+  },
+);
 
 interface SortableMCQAddAnswerOptionItemProps {
   onDelete: (index: number) => void;
@@ -450,8 +442,7 @@ function SortableMCQAddAnswerOptionItem({
   checked,
   onCheckedChange,
 }: SortableMCQAddAnswerOptionItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: id });
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: id });
 
   const style = {
     transform: CSS.Transform.toString(transform),

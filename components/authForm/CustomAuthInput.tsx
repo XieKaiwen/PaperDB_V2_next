@@ -1,14 +1,12 @@
-import React from "react";
-import { FormControl, FormField, FormLabel, FormMessage } from "../ui/form";
-import { Input } from "../ui/input";
-import { authFormSchema } from "@/utils/authFormUtils";
-import { CustomAuthInputProps } from "@/src/types/types";
+import React from 'react';
+import { FormControl, FormField, FormLabel, FormMessage } from '../ui/form';
+import { Input } from '../ui/input';
+import { authFormSchema } from '@/utils/authFormUtils';
+import { CustomAuthInputProps } from '@/src/types/types';
 
-const formSchema = authFormSchema('sign-up')
+const formSchema = authFormSchema('sign-up');
 
-
-
-export default function CustomInput({control, name, label, placeholder}:CustomAuthInputProps) {
+export default function CustomInput({ control, name, label, placeholder }: CustomAuthInputProps) {
   return (
     <FormField
       control={control}
@@ -20,7 +18,7 @@ export default function CustomInput({control, name, label, placeholder}:CustomAu
             <FormControl>
               <Input
                 placeholder={placeholder}
-                type={(name === "password" || name ==="confirmPassword") ? 'password' : 'text'}
+                type={name === 'password' || name === 'confirmPassword' ? 'password' : 'text'}
                 {...field}
               />
             </FormControl>

@@ -1,18 +1,14 @@
-import {
-  getAllSchools,
-  getAllSubjects,
-  getAllTopics,
-} from "@/src/actions/dataFetching.actions";
+import { getAllSchools, getAllSubjects, getAllTopics } from '@/src/actions/dataFetching.actions';
 import {
   AddQuestionFormData,
   AddQuestionFormDataSubscriber,
   AddQuestionQuestionContentJSONSubscriber,
   ProcessedQuestionContentCombinedJSON,
-} from "@/src/types/types";
-import { School, Subject, Topic } from "@prisma/client";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { debounce } from "lodash";
-import React, { createContext, ReactNode, useMemo, useRef } from "react";
+} from '@/src/types/types';
+import { School, Subject, Topic } from '@prisma/client';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { debounce } from 'lodash';
+import React, { createContext, ReactNode, useMemo, useRef } from 'react';
 import { parseStringify } from '../../utils/utils';
 
 interface FormDataContext {
@@ -44,37 +40,35 @@ const AddQuestionContext = createContext<AddQuestionContextProps | null>(null);
 function AddQuestionContextProvider({ children }: { children: ReactNode }) {
   // Fetch all the data once in the context so that its children, "AddQuestionForm" and "QuestionPreview" can access this data.
   const { data: allSubjects } = useSuspenseQuery({
-    queryKey: ["subjects"],
+    queryKey: ['subjects'],
     queryFn: getAllSubjects,
-    staleTime: 600 * 1000 
+    staleTime: 600 * 1000,
   });
 
   const { data: allTopics } = useSuspenseQuery({
-    queryKey: ["topics"],
+    queryKey: ['topics'],
     queryFn: getAllTopics,
     staleTime: 600 * 1000,
   });
   const { data: allSchools } = useSuspenseQuery({
-    queryKey: ["schools"],
+    queryKey: ['schools'],
     queryFn: getAllSchools,
-    staleTime: 600 * 1000 
+    staleTime: 600 * 1000,
   });
 
   const addQuestionFormData = useRef<AddQuestionFormData>({
-    subject: "",
-    educationLevel: "",
-    school: "",
-    questionType: "",
+    subject: '',
+    educationLevel: '',
+    school: '',
+    questionType: '',
     topics: [],
-    questionNumber: "",
+    questionNumber: '',
     questionAnswer: [],
-    examType: "OTHER", // Provide a default valid examType
-    year: "",
+    examType: 'OTHER', // Provide a default valid examType
+    year: '',
     questionPart: [],
   });
-  const formDataSubscribers = useRef<Set<AddQuestionFormDataSubscriber>>(
-    new Set()
-  );
+  const formDataSubscribers = useRef<Set<AddQuestionFormDataSubscriber>>(new Set());
 
   // Create the debouncedUpdateFormData function in context instead of in the AddQuestionForm component, useRef to prevent unnecessary re-renders
   const debouncedUpdateFormData = useRef(
@@ -84,20 +78,17 @@ function AddQuestionContextProvider({ children }: { children: ReactNode }) {
       formDataSubscribers.current.forEach((subscriber) => {
         subscriber(updatedFormData);
       });
-    }, 300) // Adjust the debounce delay (300ms in this case) as needed
+    }, 300), // Adjust the debounce delay (300ms in this case) as needed
   ).current;
 
   // Let the subscribeToFormData be a Ref as well to increase stability
-  const subscribeToFormData = useRef(
-    (subscriber: AddQuestionFormDataSubscriber) => {
-      formDataSubscribers.current.add(subscriber);
-      //  Return a cleanup function that will be called when the component unmounts to unsubcribe the subscriber
-      return () => formDataSubscribers.current.delete(subscriber);
-    }
-  ).current;
+  const subscribeToFormData = useRef((subscriber: AddQuestionFormDataSubscriber) => {
+    formDataSubscribers.current.add(subscriber);
+    //  Return a cleanup function that will be called when the component unmounts to unsubcribe the subscriber
+    return () => formDataSubscribers.current.delete(subscriber);
+  }).current;
 
   const retrieveFormData = () => addQuestionFormData.current;
-
 
   // Track QuestionContentJSON for questionLeafs that is required in the 3rd step of the form
   const questionContentJSON = useRef<ProcessedQuestionContentCombinedJSON>({
@@ -107,9 +98,9 @@ function AddQuestionContextProvider({ children }: { children: ReactNode }) {
     },
     questionLeafs: {},
   });
-  const questionContentJSONSubscribers = useRef<
-    Set<AddQuestionQuestionContentJSONSubscriber>
-  >(new Set());
+  const questionContentJSONSubscribers = useRef<Set<AddQuestionQuestionContentJSONSubscriber>>(
+    new Set(),
+  );
   // FUNCTION FOR TRACKING QuestionContentJSON, no need for debounce because it does not happen often
   const updateQuestionContentJSON = useRef(
     (updatedQuestionContentJSON: ProcessedQuestionContentCombinedJSON) => {
@@ -118,7 +109,7 @@ function AddQuestionContextProvider({ children }: { children: ReactNode }) {
       questionContentJSONSubscribers.current.forEach((subscriber) => {
         subscriber(updatedQuestionContentJSON);
       });
-    }
+    },
   ).current;
   // Let the subscribeToQuestionContentJSON be a Ref as well to increase stability
   const subscribeToQuestionContentJSON = useRef(
@@ -126,7 +117,7 @@ function AddQuestionContextProvider({ children }: { children: ReactNode }) {
       questionContentJSONSubscribers.current.add(subscriber);
       //  Return a cleanup function that will be called when the component unmounts to unsubcribe the subscriber
       return () => questionContentJSONSubscribers.current.delete(subscriber);
-    }
+    },
   ).current;
   const retrieveQuestionContentJSON = () => questionContentJSON.current;
 
@@ -135,12 +126,12 @@ function AddQuestionContextProvider({ children }: { children: ReactNode }) {
       formData: {
         update: debouncedUpdateFormData,
         subscribe: subscribeToFormData,
-        retrieve: retrieveFormData
+        retrieve: retrieveFormData,
       },
-      questionContentJSON:{
+      questionContentJSON: {
         update: updateQuestionContentJSON,
         subscribe: subscribeToQuestionContentJSON,
-        retrieve: retrieveQuestionContentJSON
+        retrieve: retrieveQuestionContentJSON,
       },
       data: {
         subjects: allSubjects,

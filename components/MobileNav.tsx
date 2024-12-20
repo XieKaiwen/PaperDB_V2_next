@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Sheet,
   SheetClose,
@@ -7,22 +7,21 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { usePathname } from "next/navigation";
-import NavLink from "./NavLink";
-import { Separator } from "./ui/separator";
-import { navRoutes } from "@/src/constants/constants";
-import { MobileNavProps } from "@/src/types/types";
+} from '@/components/ui/sheet';
+import { usePathname } from 'next/navigation';
+import NavLink from './NavLink';
+import { Separator } from './ui/separator';
+import { navRoutes } from '@/src/constants/constants';
+import { MobileNavProps } from '@/src/types/types';
 
-
-export default function MobileNav({user} : MobileNavProps) {
+export default function MobileNav({ user }: MobileNavProps) {
   const pathname = usePathname();
   return (
-    <div className="inline-flex items-center  p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
+    <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg p-2 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 md:hidden">
       <Sheet>
         <SheetTrigger>
           <svg
-            className="w-5 h-5"
+            className="h-5 w-5"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -38,19 +37,18 @@ export default function MobileNav({user} : MobileNavProps) {
           </svg>
         </SheetTrigger>
         <SheetContent className="border-none bg-white font-open-sans">
-          <SheetHeader className=" mb-2">
+          <SheetHeader className="mb-2">
             <SheetTitle>Hello {user.username}!</SheetTitle>
             <SheetDescription>
-            Sed et malesuada ante. Suspendisse ut est in nisi porta volutpat. Donec euismod mi at ex eleifend, eget faucibus orci vulputate.
+              Sed et malesuada ante. Suspendisse ut est in nisi porta volutpat. Donec euismod mi at
+              ex eleifend, eget faucibus orci vulputate.
             </SheetDescription>
           </SheetHeader>
           <Separator />
           <SheetClose asChild>
-            <nav className="flex h-full flex-col gap-6 pt-6 text-black font-open-sans">
+            <nav className="flex h-full flex-col gap-6 pt-6 font-open-sans text-black">
               {navRoutes.map((route) => {
-                const isActive =
-                  pathname === route.link ||
-                  pathname.startsWith(`${route.link}`);
+                const isActive = pathname === route.link || pathname.startsWith(`${route.link}`);
                 return (
                   <SheetClose asChild key={route.link}>
                     {/* <Link
@@ -60,7 +58,7 @@ export default function MobileNav({user} : MobileNavProps) {
                     >
                       <p>{route.title}</p>
                     </Link> */}
-                    <NavLink title={route.title} link={route.link} isActive = {isActive} />
+                    <NavLink title={route.title} link={route.link} isActive={isActive} />
                   </SheetClose>
                 );
               })}

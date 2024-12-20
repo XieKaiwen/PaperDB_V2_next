@@ -1,16 +1,13 @@
-import React from "react";
-import CustomSelect from "../form-components/CustomSelect";
-import { AddQuestionFormData, QuestionInfoInputProps } from "@/src/types/types";
-import CustomComboBox from "@/components/form-components/CustomComboBox";
-import CustomPopoverMultipleCheckBox from "@/components/form-components/CustomPopoverMultipleCheckbox";
-import CustomInput from "@/components/form-components/CustomInput";
-import CustomRadio from "@/components/form-components/CustomRadio";
-import { useFormContext } from "react-hook-form";
+import React from 'react';
+import CustomSelect from '../form-components/CustomSelect';
+import { AddQuestionFormData, QuestionInfoInputProps } from '@/src/types/types';
+import CustomComboBox from '@/components/form-components/CustomComboBox';
+import CustomPopoverMultipleCheckBox from '@/components/form-components/CustomPopoverMultipleCheckbox';
+import CustomInput from '@/components/form-components/CustomInput';
+import CustomRadio from '@/components/form-components/CustomRadio';
+import { useFormContext } from 'react-hook-form';
 
-export default function QuestionInfoInput({
-  optionsDict,
-  className,
-}: QuestionInfoInputProps) {
+export default function QuestionInfoInput({ optionsDict, className }: QuestionInfoInputProps) {
   const {
     educationLevelOptions,
     schoolOptions,
@@ -21,8 +18,8 @@ export default function QuestionInfoInput({
     examTypeOptions,
   } = optionsDict;
 
-  const {control, setValue} = useFormContext<AddQuestionFormData>()
-  
+  const { control, setValue } = useFormContext<AddQuestionFormData>();
+
   return (
     <div className={className}>
       <CustomSelect<AddQuestionFormData>
@@ -34,7 +31,7 @@ export default function QuestionInfoInput({
         className="flex-1 font-medium"
       />
 
-      <div className="flex flex-1 flex-wrap gap-3 justify-between ">
+      <div className="flex flex-1 flex-wrap justify-between gap-3">
         <CustomComboBox<AddQuestionFormData>
           control={control}
           name="school"
@@ -58,7 +55,7 @@ export default function QuestionInfoInput({
           className=""
         />
       </div>
-      <div className="flex flex-1 flex-wrap gap-2 justify-between ">
+      <div className="flex flex-1 flex-wrap justify-between gap-2">
         <CustomPopoverMultipleCheckBox<AddQuestionFormData>
           control={control}
           name="topics"
@@ -75,7 +72,7 @@ export default function QuestionInfoInput({
           className="flex-1"
         />
       </div>
-      <div className="flex flex-1 flex-wrap gap-2 justify-center align-middle">
+      <div className="flex flex-1 flex-wrap justify-center gap-2 align-middle">
         <CustomSelect<AddQuestionFormData>
           control={control}
           name="year"

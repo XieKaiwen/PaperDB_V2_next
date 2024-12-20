@@ -1,21 +1,21 @@
-"use client";
-import { ParsedPaperFilterProps } from "@/src/types/types";
-import React from "react";
-import PaperTableFilter from "./PaperTableFilter";
-import PaperTableContent from "./PaperTableContent";
-import PaperTablePagination from "./PaperTablePagination";
-import { useQuery } from "@tanstack/react-query";
+'use client';
+import { ParsedPaperFilterProps } from '@/src/types/types';
+import React from 'react';
+import PaperTableFilter from './PaperTableFilter';
+import PaperTableContent from './PaperTableContent';
+import PaperTablePagination from './PaperTablePagination';
+import { useQuery } from '@tanstack/react-query';
 import {
   paperTableCountWithFiltersQueryOptions,
   paperTableWithFiltersQueryOptions,
-} from "@/utils/react-query-client/query-options/paper";
-import { parsePaperSearchTablesParamsIntoFilters } from "@/utils/view-paper/utils";
-import { useRouter, useSearchParams } from "next/navigation";
-import { paperTableFilterDistinctValuesQueryOptions } from "../utils/react-query-client/query-options/paper";
-import { Paper, School, Subject, User } from "@prisma/client";
+} from '@/utils/react-query-client/query-options/paper';
+import { parsePaperSearchTablesParamsIntoFilters } from '@/utils/view-paper/utils';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { paperTableFilterDistinctValuesQueryOptions } from '../utils/react-query-client/query-options/paper';
+import { Paper, School, Subject, User } from '@prisma/client';
 
 interface PaperTableProps {
-  type: "default";
+  type: 'default';
   page: number;
   filters: ParsedPaperFilterProps;
 }
@@ -28,7 +28,7 @@ export default function PaperTable({ type }: PaperTableProps) {
   // Define a helper function to get values with defaults
   const getParam = (key: string, defaultValue: string) => {
     const value = searchParams.get(key);
-    return value !== null && value !== "" ? value : defaultValue;
+    return value !== null && value !== '' ? value : defaultValue;
   };
 
   const updateSearchParams = (key: string, value: string) => {
@@ -46,16 +46,16 @@ export default function PaperTable({ type }: PaperTableProps) {
   };
 
   // Retrieve search parameters with default values
-  const year = getParam("year", "[]");
-  const school = getParam("school", "[]");
-  const subject = getParam("subject", "[]");
-  const examType = getParam("examType", "[]");
-  const edul = getParam("edul", "[]");
-  const users = getParam("users", "[]");
-  const page = getParam("page", "1");
-  const pageSize = getParam("pageSize", "10");
-  const visible = getParam("visible", "true");
-  const nonVisible = getParam("nonVisible", "true");
+  const year = getParam('year', '[]');
+  const school = getParam('school', '[]');
+  const subject = getParam('subject', '[]');
+  const examType = getParam('examType', '[]');
+  const edul = getParam('edul', '[]');
+  const users = getParam('users', '[]');
+  const page = getParam('page', '1');
+  const pageSize = getParam('pageSize', '10');
+  const visible = getParam('visible', 'true');
+  const nonVisible = getParam('nonVisible', 'true');
 
   // Parse the search parameters into the correct forms
   const {
@@ -81,7 +81,7 @@ export default function PaperTable({ type }: PaperTableProps) {
     page,
     pageSize,
     visible,
-    nonVisible
+    nonVisible,
   );
 
   const {
@@ -101,8 +101,8 @@ export default function PaperTable({ type }: PaperTableProps) {
         fetchVisible: parsedFetchVisible,
         fetchNonVisible: parsedFetchNonVisible,
       },
-      parsedPageSize
-    )
+      parsedPageSize,
+    ),
   );
 
   const {
@@ -129,8 +129,8 @@ export default function PaperTable({ type }: PaperTableProps) {
         School: true,
         Subject: true,
         User: true,
-      }
-    )
+      },
+    ),
   );
 
   const {
@@ -142,7 +142,7 @@ export default function PaperTable({ type }: PaperTableProps) {
     paperTableFilterDistinctValuesQueryOptions({
       includeNonVisible: parsedFetchNonVisible,
       includeVisible: parsedFetchVisible,
-    })
+    }),
   );
 
   if (isPaperCountPending || isPaperDataPending || isPaperFilterValuesPending) {
@@ -152,18 +152,14 @@ export default function PaperTable({ type }: PaperTableProps) {
   if (isPaperCountError || isPaperDataError || isFilterValuesError) {
     return (
       <span>
-        Error:{" "}
-        {paperCountError?.message ||
-          paperDataError?.message ||
-          filterValuesError?.message}
+        Error: {paperCountError?.message || paperDataError?.message || filterValuesError?.message}
       </span>
     );
   }
 
-  const { totalCount: paperCount, totalPages: paperTotalPages } =
-    paperCountData;
+  const { totalCount: paperCount, totalPages: paperTotalPages } = paperCountData;
   if (parsedPage > paperTotalPages || parsedPage < 1) {
-    updateSearchParams("page", "1"); // Default to the first page
+    updateSearchParams('page', '1'); // Default to the first page
   }
 
   return (
@@ -178,7 +174,11 @@ export default function PaperTable({ type }: PaperTableProps) {
           })[]
         }
       />
-      <PaperTablePagination totalPages={paperTotalPages} currentPage={parsedPage} isPlaceholder={isPlaceholderPaperData} />
+      <PaperTablePagination
+        totalPages={paperTotalPages}
+        currentPage={parsedPage}
+        isPlaceholder={isPlaceholderPaperData}
+      />
     </main>
   );
 }

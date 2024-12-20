@@ -1,8 +1,8 @@
-import React from "react";
-import ImageReader from "./addQuestionPage/ImageReader";
-import { marked } from "marked";
-import DOMPurify from "dompurify";
-import { removeImagesFromHtml } from "@/utils/utils";
+import React from 'react';
+import ImageReader from './addQuestionPage/ImageReader';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
+import { removeImagesFromHtml } from '@/utils/utils';
 
 interface QuestionLeafAnswerDisplayProps {
   questionType: string;
@@ -21,7 +21,7 @@ const QuestionLeafAnswerDisplay = React.memo(function QuestionSectionDisplay({
   width = 400,
   height = 400,
 }: QuestionLeafAnswerDisplayProps) {
-  if (questionType === "OEQ") {
+  if (questionType === 'OEQ') {
     if (isText) {
       const rawHTML = marked.parse(content as string, {
         async: false,
@@ -40,7 +40,7 @@ const QuestionLeafAnswerDisplay = React.memo(function QuestionSectionDisplay({
 
       return (
         <div
-          className="w-full p-2 text-sm text-start break-words markdown-question-text text-red-700 border-2 border-red-500"
+          className="markdown-question-text w-full break-words border-2 border-red-500 p-2 text-start text-sm text-red-700"
           dangerouslySetInnerHTML={{ __html: processedHTML }}
         ></div>
       );
@@ -54,22 +54,20 @@ const QuestionLeafAnswerDisplay = React.memo(function QuestionSectionDisplay({
         />
       );
     }
-  } else if (questionType === "MCQ") {
+  } else if (questionType === 'MCQ') {
     // Only display the correct answer here
-    const correctAnswersList = (
-      content as { options: string[]; answer: string[] }
-    ).answer as string[];
-    const correctAnswerString = correctAnswersList.join(", ");
+    const correctAnswersList = (content as { options: string[]; answer: string[] })
+      .answer as string[];
+    const correctAnswerString = correctAnswersList.join(', ');
 
-    const optionsList = (content as { options: string[]; answer: string[] })
-      .options as string[];
-    const optionsString = optionsList.join(", ");
+    const optionsList = (content as { options: string[]; answer: string[] }).options as string[];
+    const optionsString = optionsList.join(', ');
     return (
       <>
-        <p className="w-full text-sm text-start break-words markdown-question-text text-red-700 border-2 border-red-500 p-2">
+        <p className="markdown-question-text w-full break-words border-2 border-red-500 p-2 text-start text-sm text-red-700">
           Options: {optionsString}
         </p>
-        <p className="w-full text-sm text-start break-words markdown-question-text text-red-700 border-2 border-red-500 p-2">
+        <p className="markdown-question-text w-full break-words border-2 border-red-500 p-2 text-start text-sm text-red-700">
           Answer: {correctAnswerString}
         </p>
       </>

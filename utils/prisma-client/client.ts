@@ -4,7 +4,7 @@ import {
   FinalisedQuestionContent,
   FinalisedQuestionLeafs,
   ParsedPaperFilterProps,
-} from "@/src/types/types";
+} from '@/src/types/types';
 import {
   Difficulty,
   edu_level,
@@ -12,9 +12,9 @@ import {
   Prisma,
   PrismaClient,
   QuestionType,
-} from "@prisma/client";
-import { determineVisibility, whereClauseConstructorForPapers } from "../prismaUtils";
-import { examTypeOrder } from "@/src/constants/constants";
+} from '@prisma/client';
+import { determineVisibility, whereClauseConstructorForPapers } from '../prismaUtils';
+import { examTypeOrder } from '@/src/constants/constants';
 
 const prisma = new PrismaClient().$extends({
   // Extending the client with custom methods
@@ -54,7 +54,7 @@ const prisma = new PrismaClient().$extends({
       }) {
         // Validate input here if needed
         if (!paperId || !questionType || !questionContent || !questionAnswer) {
-          throw new Error("Required fields are missing to create question.");
+          throw new Error('Required fields are missing to create question.');
         }
 
         // Create the question
@@ -106,7 +106,7 @@ const prisma = new PrismaClient().$extends({
         questionAnswer: FinalisedQuestionAnswer; // Adjust type based on your `Json` schema
       }) {
         if (!paperId || !questionType || !questionContent || !questionAnswer) {
-          throw new Error("Required fields are missing to upsert question.");
+          throw new Error('Required fields are missing to upsert question.');
         }
 
         const question = await prisma.question.upsert({
@@ -222,7 +222,7 @@ const prisma = new PrismaClient().$extends({
         page: number,
         pageSize: number,
         includeFields: Prisma.PaperInclude = {},
-        selectFields: Prisma.PaperSelect = {}
+        selectFields: Prisma.PaperSelect = {},
       ) {
         const whereClause = whereClauseConstructorForPapers({
           year,
@@ -244,20 +244,20 @@ const prisma = new PrismaClient().$extends({
           take: pageSize,
           orderBy: [
             {
-              dateAdded: "desc",
+              dateAdded: 'desc',
             },
             {
-              year: "desc",
+              year: 'desc',
             },
             {
-              educationLevel: "desc",
+              educationLevel: 'desc',
             },
             {
               School: {
-                schoolFullName: "asc",
+                schoolFullName: 'asc',
               },
             },
-            { examType: "asc" },
+            { examType: 'asc' },
           ],
           ...(Object.keys(selectFields).length > 0
             ? { select: selectFields }
@@ -294,12 +294,12 @@ const prisma = new PrismaClient().$extends({
 
         return totalCount;
       },
-      
+
       async getDistinctPaperColumnValues(includeVisible: boolean, includeNonVisible: boolean) {
         // Conditions based on the visibility (if provided)
         const visible = determineVisibility(includeVisible, includeNonVisible);
         const whereClause = visible !== null ? { visible } : {};
-      
+
         // First, run all distinct queries in parallel for scalar fields.
         const [
           distinctEducationLevels,
@@ -307,7 +307,7 @@ const prisma = new PrismaClient().$extends({
           distinctYears,
           distinctSchoolIds,
           distinctSubjectIds,
-          distinctUserIds
+          distinctUserIds,
         ] = await Promise.all([
           prisma.paper.findMany({
             distinct: ['educationLevel'],
@@ -323,66 +323,66 @@ const prisma = new PrismaClient().$extends({
             distinct: ['year'],
             where: whereClause,
             select: { year: true },
-            orderBy: { year: 'desc' }
+            orderBy: { year: 'desc' },
           }),
           prisma.paper.findMany({
             distinct: ['schoolId'],
             where: whereClause,
-            select: { schoolId: true }
+            select: { schoolId: true },
             // We'll sort after we get the actual School objects
           }),
           prisma.paper.findMany({
             distinct: ['subjectId'],
             where: whereClause,
-            select: { subjectId: true }
+            select: { subjectId: true },
             // We'll sort after we get the actual Subject objects
           }),
           prisma.paper.findMany({
             distinct: ['userId'],
             where: whereClause,
-            select: { userId: true }
+            select: { userId: true },
             // We'll sort after we get the actual User objects
           }),
         ]);
-      
+
         // Convert the Prisma results into arrays of distinct values
-        const educationLevels = distinctEducationLevels.map((p) => p.educationLevel).sort(
-          (a, b) => {
+        const educationLevels = distinctEducationLevels
+          .map((p) => p.educationLevel)
+          .sort((a, b) => {
             const firstA = a[0]; // 'P', 'S', or 'J'
             const firstB = b[0]; // 'P', 'S', or 'J'
-        
+
             // Define the order of first letters
             const orderMap: Record<string, number> = { P: 1, S: 2, J: 3 };
-        
+
             // Compare based on the order of first letters
             if (orderMap[firstA] !== orderMap[firstB]) {
               return orderMap[firstA] - orderMap[firstB];
             }
-        
+
             // If first letters are the same, compare by numeric level
             const levelA = parseInt(a.slice(1), 10);
             const levelB = parseInt(b.slice(1), 10);
-        
+
             return levelA - levelB;
-          }
-        );
-        const examTypes = distinctExamTypes.map((p) => p.examType).sort(
-          (a, b) => {
+          });
+        const examTypes = distinctExamTypes
+          .map((p) => p.examType)
+          .sort((a, b) => {
             // Sort by enum value
             return examTypeOrder[a] - examTypeOrder[b];
-          }
-        );
-        const years = distinctYears.map((p) => p.year).sort(
-          (a, b) => {
+          });
+        const years = distinctYears
+          .map((p) => p.year)
+          .sort((a, b) => {
             // Sort by enum value
-            return parseInt(b, 10) -parseInt(a, 10) ; // sort in descending order
-          }
-        );
-      
+            return parseInt(b, 10) - parseInt(a, 10); // sort in descending order
+          });
+
         const schoolIds = distinctSchoolIds.map((p) => p.schoolId);
         const subjectIds = distinctSubjectIds.map((p) => p.subjectId);
         const userIds = distinctUserIds.map((p) => p.userId);
-      
+
         // Fetch related objects in parallel
         const [schools, subjects, users] = await Promise.all([
           prisma.school.findMany({
@@ -398,7 +398,7 @@ const prisma = new PrismaClient().$extends({
             orderBy: { username: 'asc' }, // sorting by username (customize as needed)
           }),
         ]);
-      
+
         return {
           educationLevels,
           examTypes,
