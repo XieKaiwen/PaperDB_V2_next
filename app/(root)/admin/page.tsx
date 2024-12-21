@@ -3,7 +3,7 @@ import Link from 'next/link';
 import React from 'react';
 
 // Admin actions
-export const adminActions = [
+const adminActions = [
   {
     title: 'Add question',
     link: '/admin/add-question',
