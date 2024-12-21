@@ -1,19 +1,19 @@
-import { ColumnDef } from "@tanstack/react-table";
-import { PaperDataForTable } from "./types";
+import { ColumnDef } from '@tanstack/react-table';
+import { PaperDataForTable } from './types';
 
-export function columnConstructor(type: "admin" | "default") {
+export function columnConstructor(type: 'admin' | 'default') {
   const columns: ColumnDef<PaperDataForTable>[] = [
     {
-      accessorKey: "year",
-      header: "Year",
+      accessorKey: 'year',
+      header: 'Year',
     },
     {
-      accessorKey: "educationLevel",
-      header: "Level",
+      accessorKey: 'educationLevel',
+      header: 'Level',
     },
     {
-      accessorKey: "School.schoolFullName",
-      header: "School",
+      accessorKey: 'School.schoolFullName',
+      header: 'School',
       cell: ({ row }) => {
         const schoolName = row.original.School.schoolFullName;
         const schoolShortName = row.original.School.schoolShortName;
@@ -26,26 +26,26 @@ export function columnConstructor(type: "admin" | "default") {
       },
     },
     {
-      accessorKey: "Subject.subjectName",
-      header: "Subject",
+      accessorKey: 'Subject.subjectName',
+      header: 'Subject',
     },
     {
-      accessorKey: "examType",
-      header: "Exam type",
+      accessorKey: 'examType',
+      header: 'Exam type',
     },
     {
-      accessorKey: "totalMark",
-      header: "Total mark",
+      accessorKey: 'totalMark',
+      header: 'Total mark',
     },
   ];
 
-  if (type === "default") {
+  if (type === 'default') {
     return columns;
-  } else if (type === "admin") {
+  } else if (type === 'admin') {
     const extraColumns: ColumnDef<PaperDataForTable>[] = [
       {
-        accessorKey: "User.username",
-        header: "Created by",
+        accessorKey: 'User.username',
+        header: 'Created by',
         cell: ({ row }) => {
           const username = row.original.User.username;
           const email = row.original.User.email;
@@ -59,24 +59,22 @@ export function columnConstructor(type: "admin" | "default") {
         },
       },
       {
-        accessorKey: "dateAdded",
-        header: "Date added",
+        accessorKey: 'dateAdded',
+        header: 'Date added',
         cell: ({ row }) => {
           const date = row.original.dateAdded;
-          return date.toLocaleDateString("en-GB");
+          return date.toLocaleDateString('en-GB');
         },
       },
       {
-        accessorKey: "visible",
-        header: () => <div className="w-full flex justify-center items-center">Visible</div>,
+        accessorKey: 'visible',
+        header: () => <div className="flex w-full items-center justify-center">Visible</div>,
         cell: ({ row }) => {
           const visible = row.original.visible;
           return (
-            <div className="w-full flex justify-center items-center">
+            <div className="flex w-full items-center justify-center">
               <div
-                className={`w-6 h-6 rounded-full ${
-                  visible ? "bg-green-500" : "bg-red-500"
-                }`}
+                className={`h-6 w-6 rounded-full ${visible ? 'bg-green-500' : 'bg-red-500'}`}
               ></div>
             </div>
           );

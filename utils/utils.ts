@@ -34,11 +34,11 @@ export function generateYearList() {
 export function generateOptionsFromJsonList<
   T extends Record<string, unknown>,
   VKey extends keyof T,
-  LKey extends keyof T
+  LKey extends keyof T,
 >(
   JSONList: T[],
   valueKey: VKey & (T[VKey] extends string ? VKey : never),
-  labelKey: LKey & (T[LKey] extends string ? LKey : never)
+  labelKey: LKey & (T[LKey] extends string ? LKey : never),
 ): { value: string; label: string }[] {
   return JSONList.map((item) => ({
     value: item[valueKey] as string,
@@ -74,4 +74,28 @@ export function removeImagesFromHtml(htmlString: string) {
 
   // Return the modified HTML as a string
   return tempElement.innerHTML;
+}
+
+export function setSearchParams({
+  searchParams,
+  paramsToSet,
+}: {
+  searchParams: URLSearchParams;
+  paramsToSet: Record<string, unknown>;
+}) {
+  // console.log("Params to set: ", paramsToSet);
+
+  for (const [key, value] of Object.entries(paramsToSet)) {
+    if (typeof value === 'string') {
+      searchParams.set(key, value);
+      continue;
+    } else if (typeof value === 'boolean') {
+      const treatedValue = value ? 'true' : 'false';
+      searchParams.set(key, treatedValue);
+      continue;
+    }
+    const treatedValue = JSON.stringify(value);
+    searchParams.set(key, treatedValue);
+  }
+  return searchParams;
 }

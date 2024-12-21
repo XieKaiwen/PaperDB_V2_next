@@ -1,8 +1,12 @@
-import { generateOptionsFromJsonList } from "@/utils/utils";
-import { edu_level, exam_type, School, Subject, User } from "@prisma/client";
-import React, { useMemo, useState } from "react";
-import PopoverMultipleCheckbox from "../PopoverMultipleCheckbox";
-import { Button } from "../ui/button";
+'use client';
+import { generateOptionsFromJsonList, setSearchParams } from '@/utils/utils';
+import { edu_level, exam_type, School, Subject, User } from '@prisma/client';
+import React, { useMemo, useState } from 'react';
+import { MemoizedPopoverMultipleCheckbox } from '../PopoverMultipleCheckbox';
+import { Button } from '../ui/button';
+import { Checkbox } from '../ui/checkbox';
+import { Check, Loader2 } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface PaperTableFilterProps {
   filterValues: {
@@ -23,7 +27,7 @@ interface PaperTableFilterProps {
     fetchVisible: boolean;
     fetchNonVisible: boolean;
   };
-  type: "admin" | "default";
+  type: 'admin' | 'default';
 }
 export default function PaperTableFilter({
   filterValues: {
@@ -42,11 +46,14 @@ export default function PaperTableFilter({
     subject: activeSubjects,
     userId: activeUserIds,
     fetchVisible = true,
-    fetchNonVisible = false
+    fetchNonVisible = false,
   },
-  type = "default"
+  type = 'default',
 }: PaperTableFilterProps) {
-  console.log("Filter values: ", {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  console.log('Filter values: ', {
     educationLevelsFilterValues,
     yearsFilterValues,
     examTypesFilterValues,
@@ -54,83 +61,75 @@ export default function PaperTableFilter({
     subjectsFilterValues,
     usersFilterValues,
   });
-  console.log("Filters from search params: ", {
+  console.log('Filters from search params: ', {
     activeEducationLevels,
     activeYears,
     activeExamTypes,
     activeSchools,
     activeSubjects,
     activeUserIds,
+    fetchVisible,
+    fetchNonVisible,
   });
   // Generate the options from the filter values
   const educationLevelOptions = useMemo(() => {
     const optionsList = educationLevelsFilterValues.map((level) => {
       return { value: level, label: level };
-    })
-    return optionsList
-  }, [educationLevelsFilterValues])
+    });
+    return optionsList;
+  }, [educationLevelsFilterValues]);
   const yearOptions = useMemo(() => {
     const optionsList = yearsFilterValues.map((year) => {
       return { value: year, label: year };
-    })
-    return optionsList
-  }, [yearsFilterValues])
+    });
+    return optionsList;
+  }, [yearsFilterValues]);
   const examTypeOptions = useMemo(() => {
     const optionsList = examTypesFilterValues.map((type) => {
       return { value: type, label: type };
-    })
-    return optionsList
+    });
+    return optionsList;
   }, [examTypesFilterValues]);
   const schoolOptions = useMemo(() => {
-    const optionsList = generateOptionsFromJsonList(schoolsFilterValues, "id", "schoolFullName")
-    return optionsList
-  }, [schoolsFilterValues])
+    const optionsList = generateOptionsFromJsonList(schoolsFilterValues, 'id', 'schoolFullName');
+    return optionsList;
+  }, [schoolsFilterValues]);
   const subjectOptions = useMemo(() => {
-    const optionsList = generateOptionsFromJsonList(subjectsFilterValues, "id", "subjectName")
-    return optionsList
-  }, [subjectsFilterValues])
+    const optionsList = generateOptionsFromJsonList(subjectsFilterValues, 'id', 'subjectName');
+    return optionsList;
+  }, [subjectsFilterValues]);
   const userOptions = useMemo(() => {
-    const optionsList = generateOptionsFromJsonList(usersFilterValues, "id", "email")
-    return optionsList
+    const optionsList = generateOptionsFromJsonList(usersFilterValues, 'id', 'email');
+    return optionsList;
   }, [usersFilterValues]);
-  
+
   const [educationLevels, setEducationLevels] = useState<string[]>(
     activeEducationLevels.filter((level) =>
-      educationLevelsFilterValues.includes(level as edu_level)
-    )
+      educationLevelsFilterValues.includes(level as edu_level),
+    ),
   );
   const [years, setYears] = useState<string[]>(
-    activeYears.filter((year) => yearsFilterValues.includes(year))
+    activeYears.filter((year) => yearsFilterValues.includes(year)),
   );
   const [examTypes, setExamTypes] = useState<string[]>(
-    activeExamTypes.filter((type) =>
-      examTypesFilterValues.includes(type as exam_type)
-    )
+    activeExamTypes.filter((type) => examTypesFilterValues.includes(type as exam_type)),
   );
   const [schools, setSchools] = useState<string[]>(
-    activeSchools.filter((school) =>
-      schoolsFilterValues.some((s) => s.id === school)
-    )
+    activeSchools.filter((school) => schoolsFilterValues.some((s) => s.id === school)),
   );
   const [subjects, setSubjects] = useState<string[]>(
-    activeSubjects.filter((subject) =>
-      subjectsFilterValues.some((s) => s.id === subject)
-    )
+    activeSubjects.filter((subject) => subjectsFilterValues.some((s) => s.id === subject)),
   );
   const [users, setUsers] = useState<string[]>(
-    activeUserIds.filter((userId) =>
-      usersFilterValues.some((u) => u.id === userId)
-    )
+    activeUserIds.filter((userId) => usersFilterValues.some((u) => u.id === userId)),
   );
   const [includeVisible, setIncludeVisible] = useState(fetchVisible);
   const [includeNonVisible, setIncludeNonVisible] = useState(fetchNonVisible);
 
-
-
   const handleApplyFilters = () => {
     // Implement the logic you want to perform when filters are applied.
     // You can access all selected arrays here.
-    console.log("Filters applied with:", {
+    console.log('Filters applied with:', {
       educationLevels,
       years,
       examTypes,
@@ -138,53 +137,101 @@ export default function PaperTableFilter({
       subjects,
       users,
       includeVisible,
-      includeNonVisible
+      includeNonVisible,
     });
+    const params = new URLSearchParams(searchParams.toString());
+    setSearchParams({
+      searchParams: params,
+      paramsToSet: {
+        year: years,
+        school: schools,
+        subject: subjects,
+        examType: examTypes,
+        edul: educationLevels,
+        users: users,
+        visible: includeVisible,
+        nonVisible: includeNonVisible,
+      },
+    });
+    const updatedURL = `/admin/paper?${params.toString()}`;
+    router.push(updatedURL);
   };
 
-
   return (
-    <div className="p-4 space-y-4 border border-slate-400">
+    <div className="space-y-4 border border-slate-400 p-4">
       <h2 className="text-2xl font-semibold underline underline-offset-2">Filter papers</h2>
       <div className="flex flex-wrap gap-12">
-        <PopoverMultipleCheckbox
+        <MemoizedPopoverMultipleCheckbox
           label="Education Level"
           options={educationLevelOptions}
           checkedOptions={educationLevels}
           onCheckChange={setEducationLevels}
         />
-        <PopoverMultipleCheckbox
+        <MemoizedPopoverMultipleCheckbox
           label="Year"
           options={yearOptions}
           checkedOptions={years}
           onCheckChange={setYears}
         />
-        <PopoverMultipleCheckbox
+        <MemoizedPopoverMultipleCheckbox
           label="Exam Type"
           options={examTypeOptions}
           checkedOptions={examTypes}
           onCheckChange={setExamTypes}
         />
-        <PopoverMultipleCheckbox
+        <MemoizedPopoverMultipleCheckbox
           label="School"
           options={schoolOptions}
           checkedOptions={schools}
           onCheckChange={setSchools}
         />
-        <PopoverMultipleCheckbox
+        <MemoizedPopoverMultipleCheckbox
           label="Subject"
           options={subjectOptions}
           checkedOptions={subjects}
           onCheckChange={setSubjects}
         />
-        <PopoverMultipleCheckbox
+        <MemoizedPopoverMultipleCheckbox
           label="User"
           options={userOptions}
           checkedOptions={users}
           onCheckChange={setUsers}
         />
       </div>
-      <Button onClick={handleApplyFilters} size={"lg"}>Apply</Button>
+      <div className="flex gap-6">
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            checked={includeVisible}
+            onCheckedChange={(checked) => {
+              setIncludeVisible(checked === true);
+            }}
+          />
+
+          <label
+            htmlFor="visible"
+            className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Visible
+          </label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            checked={includeNonVisible}
+            onCheckedChange={(checked) => {
+              setIncludeNonVisible(checked === true);
+            }}
+          />
+          <label
+            htmlFor="non-visible"
+            className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Non-visible
+          </label>
+        </div>
+      </div>
+      <Button onClick={handleApplyFilters} size={'lg'}>
+        Apply
+      </Button>
     </div>
   );
 }

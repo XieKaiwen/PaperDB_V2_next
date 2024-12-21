@@ -1,18 +1,6 @@
-import React from "react";
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
+import React from 'react';
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 
 interface PaperTableContentProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -22,7 +10,7 @@ export default function PaperTableContent<TData, TValue>({
   data,
   columns,
 }: PaperTableContentProps<TData, TValue>) {
-  console.log("Table data: ", data);
+  console.log('Table data: ', data);
 
   const table = useReactTable({
     data,
@@ -41,10 +29,7 @@ export default function PaperTableContent<TData, TValue>({
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 );
               })}
@@ -54,10 +39,7 @@ export default function PaperTableContent<TData, TValue>({
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
+              <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

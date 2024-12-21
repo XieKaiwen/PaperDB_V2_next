@@ -1,5 +1,4 @@
 import { ParsedPaperFilterProps } from '@/src/types/types';
-import { Prisma } from '@prisma/client';
 
 export function determineVisibility(fetchVisible: boolean, fetchNonVisible: boolean) {
   if (fetchVisible && fetchNonVisible) {

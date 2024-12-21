@@ -82,7 +82,7 @@ export default function AddQuestionPaperMetadataStep() {
     const optionList = generateOptionsFromJsonList(filteredTopics, 'topicName', 'topicName');
     optionList.sort((a, b) => a.label.localeCompare(b.label));
     return optionList;
-  }, [allTopics, subjectOptions, subject]);
+  }, [allTopics, subjectOptions, subject, educationLevel]);
 
   const yearOptions = useMemo(() => {
     return generateYearList();
@@ -99,10 +99,10 @@ export default function AddQuestionPaperMetadataStep() {
   useEffect(() => {
     if (!subjectOptions.find((subjectOption) => subject === subjectOption.value))
       resetField('subject');
-  }, [subjectOptions]);
+  }, [subjectOptions, resetField, subject]);
   useEffect(() => {
     if (!schoolOptions.find((schoolOption) => school === schoolOption.value)) resetField('school');
-  }, [schoolOptions]);
+  }, [schoolOptions, resetField, school]);
   useEffect(() => {
     topics.every((topic) => {
       if (!topicsOptions.find((topicOption) => topicOption.value === topic)) {
@@ -111,10 +111,10 @@ export default function AddQuestionPaperMetadataStep() {
       }
       return true;
     });
-  }, [topicsOptions]);
+  }, [topicsOptions, resetField, topics]);
   useEffect(() => {
     if (!examTypeOptions.find((type) => examType === type.value)) resetField('examType');
-  }, [examTypeOptions]);
+  }, [examTypeOptions, resetField, examType]);
 
   const optionsDict = useMemo(() => {
     return {

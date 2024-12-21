@@ -1,22 +1,22 @@
-"use client";
-import React from "react";
-import PaperTableFilter from "./PaperTableFilter";
-import PaperTableContent from "./PaperTableContent";
-import PaperTablePagination from "./PaperTablePagination";
-import { useQuery } from "@tanstack/react-query";
+'use client';
+import React from 'react';
+import PaperTableFilter from './PaperTableFilter';
+import PaperTableContent from './PaperTableContent';
+import PaperTablePagination from './PaperTablePagination';
+import { useQuery } from '@tanstack/react-query';
 import {
   paperTableCountWithFiltersQueryOptions,
   paperTableWithFiltersQueryOptions,
-} from "@/utils/react-query-client/query-options/paper";
-import { parsePaperSearchTablesParamsIntoFilters } from "@/utils/view-paper/utils";
-import { useRouter, useSearchParams } from "next/navigation";
-import { paperTableFilterDistinctValuesQueryOptions } from "../../utils/react-query-client/query-options/paper";
-import { PaperDataForTable } from "./types";
-import { columnConstructor } from "./columns";
-import { ParsedPaperFilterProps } from "@/src/types/types";
+} from '@/utils/react-query-client/query-options/paper';
+import { parsePaperSearchTablesParamsIntoFilters } from '@/utils/view-paper/utils';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { paperTableFilterDistinctValuesQueryOptions } from '../../utils/react-query-client/query-options/paper';
+import { PaperDataForTable } from './types';
+import { columnConstructor } from './columns';
+import { ParsedPaperFilterProps } from '@/src/types/types';
 
 interface PaperTableProps {
-  type: "default" | "admin";
+  type: 'default' | 'admin';
 }
 
 // To contain a pagination bar, the actual table and filtering bar
@@ -27,7 +27,7 @@ export default function PaperTable({ type }: PaperTableProps) {
   // Define a helper function to get values with defaults
   const getParam = (key: string, defaultValue: string) => {
     const value = searchParams.get(key);
-    return value !== null && value !== "" ? value : defaultValue;
+    return value !== null && value !== '' ? value : defaultValue;
   };
 
   const updateSearchParams = (key: string, value: string) => {
@@ -45,16 +45,16 @@ export default function PaperTable({ type }: PaperTableProps) {
   };
 
   // Retrieve search parameters with default values
-  const year = getParam("year", "[]");
-  const school = getParam("school", "[]");
-  const subject = getParam("subject", "[]");
-  const examType = getParam("examType", "[]");
-  const edul = getParam("edul", "[]");
-  const users = getParam("users", "[]");
-  const page = getParam("page", "1");
-  const pageSize = getParam("pageSize", "10");
-  const visible = getParam("visible", "true");
-  const nonVisible = getParam("nonVisible", "true");
+  const year = getParam('year', '[]');
+  const school = getParam('school', '[]');
+  const subject = getParam('subject', '[]');
+  const examType = getParam('examType', '[]');
+  const edul = getParam('edul', '[]');
+  const users = getParam('users', '[]');
+  const page = getParam('page', '1');
+  const pageSize = getParam('pageSize', '10');
+  const visible = getParam('visible', 'true');
+  const nonVisible = getParam('nonVisible', 'true');
 
   // Parse the search parameters into the correct forms
   const {
@@ -151,18 +151,14 @@ export default function PaperTable({ type }: PaperTableProps) {
   if (isPaperCountError || isPaperDataError || isFilterValuesError) {
     return (
       <span>
-        Error:{" "}
-        {paperCountError?.message ||
-          paperDataError?.message ||
-          filterValuesError?.message}
+        Error: {paperCountError?.message || paperDataError?.message || filterValuesError?.message}
       </span>
     );
   }
 
-  const { totalCount: paperCount, totalPages: paperTotalPages } =
-    paperCountData;
+  const { totalCount: paperCount, totalPages: paperTotalPages } = paperCountData;
   if (parsedPage > paperTotalPages || parsedPage < 1) {
-    updateSearchParams("page", "1"); // Default to the first page
+    updateSearchParams('page', '1'); // Default to the first page
   }
 
   const fullFilter: ParsedPaperFilterProps = {
@@ -178,7 +174,7 @@ export default function PaperTable({ type }: PaperTableProps) {
 
   return (
     <main className="paper-table space-y-4 px-4">
-      <PaperTableFilter filterValues={filterValuesData} activeFilters={fullFilter} type="admin"/>
+      <PaperTableFilter filterValues={filterValuesData} activeFilters={fullFilter} type="admin" />
       <PaperTableContent
         columns={columnConstructor(type)}
         data={paperData as PaperDataForTable[]}

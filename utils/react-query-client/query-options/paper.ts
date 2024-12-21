@@ -6,7 +6,6 @@ import {
   getPapersWithFilters,
 } from '@/src/actions/data-actions/paper.actions';
 import { ParsedPaperFilterProps } from '@/src/types/types';
-import prisma from '@/utils/prisma-client/client';
 import { Prisma } from '@prisma/client';
 import { keepPreviousData, queryOptions } from '@tanstack/react-query';
 
