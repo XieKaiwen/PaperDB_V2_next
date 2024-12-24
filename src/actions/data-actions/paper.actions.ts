@@ -64,7 +64,7 @@ export async function getPaperIdByMetadata({
 }
 
 // ### READ ###
-export async function getPapersWithFilters(
+export async function getPapersWithFiltersAdmin(
   {
     year = [],
     educationLevel = [],
@@ -101,7 +101,7 @@ export async function getPapersWithFilters(
   return papers;
 }
 
-export async function countPapersWithFilters(
+export async function countPapersWithFiltersAdmin(
   {
     year = [],
     educationLevel = [],
@@ -131,7 +131,7 @@ export async function countPapersWithFilters(
   };
 }
 
-export async function getPaperDistinctValuesInColumns({
+export async function getPaperDistinctValuesInColumnsAdmin({
   includeVisible,
   includeNonVisible,
 }: {

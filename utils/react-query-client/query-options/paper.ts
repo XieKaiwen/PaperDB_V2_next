@@ -1,15 +1,15 @@
 // For query related to fetching papers for PaperTable with filters
 
 import {
-  countPapersWithFilters,
-  getPaperDistinctValuesInColumns,
-  getPapersWithFilters,
+  countPapersWithFiltersAdmin,
+  getPaperDistinctValuesInColumnsAdmin,
+  getPapersWithFiltersAdmin,
 } from '@/src/actions/data-actions/paper.actions';
 import { ParsedPaperFilterProps } from '@/src/types/types';
 import { Prisma } from '@prisma/client';
 import { keepPreviousData, queryOptions } from '@tanstack/react-query';
 
-export function paperTableWithFiltersQueryOptions(
+export function adminPaperTableWithFiltersQueryOptions(
   {
     year,
     school,
@@ -53,13 +53,13 @@ export function paperTableWithFiltersQueryOptions(
       const filters: ParsedPaperFilterProps = JSON.parse(filterString);
       console.log('Current paper filters: ', filters);
 
-      return getPapersWithFilters({ ...filters }, page, pageSize, includeFields, selectFields);
+      return getPapersWithFiltersAdmin({ ...filters }, page, pageSize, includeFields, selectFields);
     },
     placeholderData: keepPreviousData,
   });
 }
 
-export function paperTableCountWithFiltersQueryOptions(
+export function adminPaperTableCountWithFiltersQueryOptions(
   {
     year,
     school,
@@ -94,12 +94,12 @@ export function paperTableCountWithFiltersQueryOptions(
       const filters: ParsedPaperFilterProps = JSON.parse(filterString);
       console.log('Current filters: ', filters);
 
-      return countPapersWithFilters({ ...filters }, pageSize);
+      return countPapersWithFiltersAdmin({ ...filters }, pageSize);
     },
   });
 }
 
-export function paperTableFilterDistinctValuesQueryOptions({
+export function adminPaperTableFilterDistinctValuesQueryOptions({
   includeVisible,
   includeNonVisible,
 }: {
@@ -115,7 +115,7 @@ export function paperTableFilterDistinctValuesQueryOptions({
         boolean,
         boolean,
       ];
-      return getPaperDistinctValuesInColumns({ includeVisible, includeNonVisible });
+      return getPaperDistinctValuesInColumnsAdmin({ includeVisible, includeNonVisible });
     },
   });
 }

@@ -9,7 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 interface PaperTablePaginationProps {
   totalPages: number;
@@ -22,7 +22,7 @@ export default function PaperTablePagination({
   currentPage,
   isPlaceholder,
 }: PaperTablePaginationProps) {
-  const router = useRouter();
+  // const router = useRouter();
   const searchParams = useSearchParams();
   const [isClient, setIsClient] = useState(false);
 
@@ -49,33 +49,35 @@ export default function PaperTablePagination({
   if (!isClient) return null;
 
   return (
-    <Pagination>
-      <PaginationContent>
-        <PaginationItem>
-          <PaginationPrevious
-            href={constructURLWithPage(currentPage - 1)}
-            className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
-          />
-        </PaginationItem>
-        {Array.from({ length: totalPages }).map((_, index) => (
-          <PaginationItem key={index + 1}>
-            <PaginationLink
-              href={constructURLWithPage(index + 1)}
-              isActive={index + 1 === currentPage}
-            >
-              {index + 1}
-            </PaginationLink>
+    totalPages > 0 && (
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              href={constructURLWithPage(currentPage - 1)}
+              className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+            />
           </PaginationItem>
-        ))}
-        <PaginationItem>
-          <PaginationNext
-            href={constructURLWithPage(currentPage + 1)}
-            className={
-              isPlaceholder || currentPage === totalPages ? 'pointer-events-none opacity-50' : ''
-            }
-          />
-        </PaginationItem>
-      </PaginationContent>
-    </Pagination>
+          {Array.from({ length: totalPages }, (_, index) => (
+            <PaginationItem key={index + 1}>
+              <PaginationLink
+                href={constructURLWithPage(index + 1)}
+                isActive={index + 1 === currentPage}
+              >
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationItem>
+            <PaginationNext
+              href={constructURLWithPage(currentPage + 1)}
+              className={
+                isPlaceholder || currentPage === totalPages ? 'pointer-events-none opacity-50' : ''
+              }
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    )
   );
 }

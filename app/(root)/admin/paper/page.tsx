@@ -1,10 +1,10 @@
 import AdminPaperTable from '@/components/PaperTable/admin/AdminPaperTable';
-import { ParsedPaperFilterProps } from '@/src/types/types';
+// import { ParsedPaperFilterProps } from '@/src/types/types';
 import { getQueryClient } from '@/utils/react-query-client/client';
 import {
-  paperTableCountWithFiltersQueryOptions,
-  paperTableFilterDistinctValuesQueryOptions,
-  paperTableWithFiltersQueryOptions,
+  adminPaperTableWithFiltersQueryOptions,
+  adminPaperTableCountWithFiltersQueryOptions,
+  adminPaperTableFilterDistinctValuesQueryOptions,
 } from '@/utils/react-query-client/query-options/paper';
 import { createClient } from '@/utils/supabase/server';
 import { parsePaperSearchTablesParamsIntoFilters } from '@/utils/view-paper/utils';
@@ -77,7 +77,7 @@ export default async function AdminViewPaperPage({
   const queryClient = getQueryClient();
   // Prefetching the paginated paper data
   await queryClient.prefetchQuery(
-    paperTableWithFiltersQueryOptions(
+    adminPaperTableWithFiltersQueryOptions(
       {
         year: parsedYear,
         school: parsedSchool,
@@ -100,7 +100,7 @@ export default async function AdminViewPaperPage({
 
   // Prefetch the number of papers for pagination (for total number of pages)
   await queryClient.prefetchQuery(
-    paperTableCountWithFiltersQueryOptions(
+    adminPaperTableCountWithFiltersQueryOptions(
       {
         year: parsedYear,
         school: parsedSchool,
@@ -118,7 +118,7 @@ export default async function AdminViewPaperPage({
   // Prefetch data required for the filtering: year, school, subject, examType, edul, users
   // Only fetch distinct data that exists in the database
   await queryClient.prefetchQuery(
-    paperTableFilterDistinctValuesQueryOptions({
+    adminPaperTableFilterDistinctValuesQueryOptions({
       includeNonVisible: parsedFetchNonVisible,
       includeVisible: parsedFetchVisible,
     }),

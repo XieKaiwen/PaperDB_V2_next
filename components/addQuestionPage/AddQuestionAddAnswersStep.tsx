@@ -158,7 +158,7 @@ export default function AddQuestionAddAnswersStep() {
       {watchedQuestionType === 'OEQ' && (
         <div className="w-full space-y-4">
           {(fields as z.infer<typeof OEQAnswerSchema>).map((answerPart, index) => {
-            const { questionIdx, questionSubIdx, isText, answer } = answerPart;
+            const { questionIdx, questionSubIdx, isText } = answerPart;
             return (
               <div key={answerPart.id}>
                 <CustomInput<AddQuestionFormData>
@@ -198,7 +198,7 @@ export default function AddQuestionAddAnswersStep() {
 }
 
 function AddMCQAnswerInput() {
-  const { control, setValue, resetField, getValues } = useFormContext<AddQuestionFormData>();
+  const { control, setValue, getValues } = useFormContext<AddQuestionFormData>();
 
   // THIS COMPONENT IS ONLY MOUNTED WHEN questionType === MCQ, hence
   const [options, setOptions] = useState<string[]>(() => {

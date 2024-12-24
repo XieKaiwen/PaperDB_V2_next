@@ -1,21 +1,21 @@
 'use client';
 import React from 'react';
-import PaperTableFilter from '@/components/PaperTable/PaperTableFilter';
 import PaperTableContent from '@/components/PaperTable/PaperTableContent';
 import PaperTablePagination from '@/components/PaperTable/PaperTablePagination';
 import { useQuery } from '@tanstack/react-query';
 import {
-  paperTableCountWithFiltersQueryOptions,
-  paperTableWithFiltersQueryOptions,
+  adminPaperTableWithFiltersQueryOptions,
+  adminPaperTableCountWithFiltersQueryOptions,
+  adminPaperTableFilterDistinctValuesQueryOptions,
 } from '@/utils/react-query-client/query-options/paper';
 import { parsePaperSearchTablesParamsIntoFilters } from '@/utils/view-paper/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { paperTableFilterDistinctValuesQueryOptions } from '@/utils/react-query-client/query-options/paper';
 import { AdminPaperDataForTable } from './types';
 import { ParsedPaperFilterProps } from '@/src/types/types';
 import { adminColumns } from './columns';
+import AdminPaperTableFilter from '@/components/PaperTable/admin/AdminPaperTableFilter';
 
-interface PaperTableProps {}
+// interface PaperTableProps {}
 
 // To contain a pagination bar, the actual table and filtering bar
 
@@ -87,7 +87,7 @@ export default function AdminPaperTable() {
     data: paperCountData,
     error: paperCountError,
   } = useQuery(
-    paperTableCountWithFiltersQueryOptions(
+    adminPaperTableCountWithFiltersQueryOptions(
       {
         year: parsedYear,
         school: parsedSchool,
@@ -109,7 +109,7 @@ export default function AdminPaperTable() {
     error: paperDataError,
     isPlaceholderData: isPlaceholderPaperData,
   } = useQuery(
-    paperTableWithFiltersQueryOptions(
+    adminPaperTableWithFiltersQueryOptions(
       {
         year: parsedYear,
         school: parsedSchool,
@@ -136,7 +136,7 @@ export default function AdminPaperTable() {
     data: filterValuesData,
     error: filterValuesError,
   } = useQuery(
-    paperTableFilterDistinctValuesQueryOptions({
+    adminPaperTableFilterDistinctValuesQueryOptions({
       includeNonVisible: parsedFetchNonVisible,
       includeVisible: parsedFetchVisible,
     }),
@@ -154,7 +154,7 @@ export default function AdminPaperTable() {
     );
   }
 
-  const { totalCount: paperCount, totalPages: paperTotalPages } = paperCountData;
+  const { totalPages: paperTotalPages } = paperCountData;
   if (parsedPage > paperTotalPages || parsedPage < 1) {
     updateSearchParams('page', '1'); // Default to the first page
   }
@@ -172,7 +172,7 @@ export default function AdminPaperTable() {
 
   return (
     <main className="paper-table space-y-4 px-4">
-      <PaperTableFilter filterValues={filterValuesData} activeFilters={fullFilter} type="admin" />
+      <AdminPaperTableFilter filterValues={filterValuesData} activeFilters={fullFilter} />
       <PaperTableContent columns={adminColumns} data={paperData as AdminPaperDataForTable[]} />
       <PaperTablePagination
         totalPages={paperTotalPages}

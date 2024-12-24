@@ -127,7 +127,7 @@ export default function AddQuestionForm() {
   });
 
   // // default value for images should be new File([], "")
-  const { control, clearErrors, getValues, setError, resetField, handleSubmit } = form;
+  const { control, clearErrors, getValues, setError, resetField } = form;
   // const { isSubmitting } = useFormState({ control });
 
   // Changing to using useWatch because watch() causes a rerender of the form whenever there is a change in formValues, i do not want that

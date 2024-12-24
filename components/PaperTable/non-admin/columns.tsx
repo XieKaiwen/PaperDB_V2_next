@@ -67,7 +67,7 @@ export const defaultColumns: ColumnDef<AdminPaperDataForTable>[] = [
             href={`/paper/${id}`}
             className="focus:text-blue-500-bold font-bold hover:text-blue-500 hover:underline focus:underline md:hidden"
           >
-            {year}/{educationLevel}/{schoolFullName}/{subjectName}/{examType}
+            {year}/{educationLevel}/{schoolShortName}/{subjectName}/{examType}
           </Link>
         </div>
       );

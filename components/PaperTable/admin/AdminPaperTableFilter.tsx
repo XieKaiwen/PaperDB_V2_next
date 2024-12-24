@@ -2,13 +2,13 @@
 import { generateOptionsFromJsonList, setSearchParams } from '@/utils/utils';
 import { edu_level, exam_type, School, Subject, User } from '@prisma/client';
 import React, { useMemo, useState } from 'react';
-import { MemoizedPopoverMultipleCheckbox } from '../PopoverMultipleCheckbox';
-import { Button } from '../ui/button';
-import { Checkbox } from '../ui/checkbox';
+import { MemoizedPopoverMultipleCheckbox } from '../../PopoverMultipleCheckbox';
+import { Button } from '../../ui/button';
+import { Checkbox } from '../../ui/checkbox';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ParsedPaperFilterLooseProps } from '@/src/types/types';
 
-interface PaperTableFilterProps {
+interface AdminPaperTableFilterProps {
   filterValues: {
     educationLevels: edu_level[];
     years: string[];
@@ -18,9 +18,8 @@ interface PaperTableFilterProps {
     users: User[];
   };
   activeFilters: ParsedPaperFilterLooseProps;
-  type: 'admin' | 'default';
 }
-export default function PaperTableFilter({
+export default function AdminPaperTableFilter({
   filterValues: {
     educationLevels: educationLevelsFilterValues,
     years: yearsFilterValues,
@@ -39,8 +38,7 @@ export default function PaperTableFilter({
     fetchVisible = true,
     fetchNonVisible = false,
   },
-  type = 'default',
-}: PaperTableFilterProps) {
+}: AdminPaperTableFilterProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
