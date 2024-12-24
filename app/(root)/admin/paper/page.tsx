@@ -1,4 +1,4 @@
-import PaperTable from '@/components/PaperTable/PaperTable';
+import AdminPaperTable from '@/components/PaperTable/admin/AdminPaperTable';
 import { ParsedPaperFilterProps } from '@/src/types/types';
 import { getQueryClient } from '@/utils/react-query-client/client';
 import {
@@ -124,20 +124,20 @@ export default async function AdminViewPaperPage({
     }),
   );
 
-  const fullFilter: ParsedPaperFilterProps = {
-    year: parsedYear,
-    school: parsedSchool,
-    subject: parsedSubject,
-    examType: parsedExamType,
-    educationLevel: parsedEdul,
-    userId: parsedUsers,
-    fetchVisible: parsedFetchVisible,
-    fetchNonVisible: parsedFetchNonVisible,
-  };
+  // const fullFilter: ParsedPaperFilterProps = {
+  //   year: parsedYear,
+  //   school: parsedSchool,
+  //   subject: parsedSubject,
+  //   examType: parsedExamType,
+  //   educationLevel: parsedEdul,
+  //   userId: parsedUsers,
+  //   fetchVisible: parsedFetchVisible,
+  //   fetchNonVisible: parsedFetchNonVisible,
+  // };
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <PaperTable type="admin" />
+      <AdminPaperTable />
     </HydrationBoundary>
   );
 }

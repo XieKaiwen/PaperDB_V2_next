@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
-import PaperTableFilter from './PaperTableFilter';
-import PaperTableContent from './PaperTableContent';
-import PaperTablePagination from './PaperTablePagination';
+import PaperTableFilter from '@/components/PaperTable/PaperTableFilter';
+import PaperTableContent from '@/components/PaperTable/PaperTableContent';
+import PaperTablePagination from '@/components/PaperTable/PaperTablePagination';
 import { useQuery } from '@tanstack/react-query';
 import {
   paperTableCountWithFiltersQueryOptions,
@@ -10,18 +10,16 @@ import {
 } from '@/utils/react-query-client/query-options/paper';
 import { parsePaperSearchTablesParamsIntoFilters } from '@/utils/view-paper/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { paperTableFilterDistinctValuesQueryOptions } from '../../utils/react-query-client/query-options/paper';
-import { PaperDataForTable } from './types';
-import { columnConstructor } from './columns';
+import { paperTableFilterDistinctValuesQueryOptions } from '@/utils/react-query-client/query-options/paper';
+import { AdminPaperDataForTable } from './types';
 import { ParsedPaperFilterProps } from '@/src/types/types';
+import { adminColumns } from './columns';
 
-interface PaperTableProps {
-  type: 'default' | 'admin';
-}
+interface PaperTableProps {}
 
 // To contain a pagination bar, the actual table and filtering bar
 
-export default function PaperTable({ type }: PaperTableProps) {
+export default function AdminPaperTable() {
   const searchParams = useSearchParams();
   const router = useRouter();
   // Define a helper function to get values with defaults
@@ -41,7 +39,7 @@ export default function PaperTable({ type }: PaperTableProps) {
     const newUrl = `${window.location.pathname}?${params.toString()}`;
 
     // Use router.push to navigate to the updated URL
-    router.push(newUrl);
+    router.replace(newUrl);
   };
 
   // Retrieve search parameters with default values
@@ -175,10 +173,7 @@ export default function PaperTable({ type }: PaperTableProps) {
   return (
     <main className="paper-table space-y-4 px-4">
       <PaperTableFilter filterValues={filterValuesData} activeFilters={fullFilter} type="admin" />
-      <PaperTableContent
-        columns={columnConstructor(type)}
-        data={paperData as PaperDataForTable[]}
-      />
+      <PaperTableContent columns={adminColumns} data={paperData as AdminPaperDataForTable[]} />
       <PaperTablePagination
         totalPages={paperTotalPages}
         currentPage={parsedPage}

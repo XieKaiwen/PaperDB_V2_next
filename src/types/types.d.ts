@@ -487,6 +487,17 @@ interface ParsedPaperFilterProps {
   examType: exam_type[];
   educationLevel: edu_level[];
   userId: string[];
-  fetchVisible: boolean;
-  fetchNonVisible: boolean;
+  fetchVisible?: boolean;
+  fetchNonVisible?: boolean;
+}
+
+interface ParsedPaperFilterLooseProps {
+  educationLevel: string[];
+  year: string[];
+  examType: string[];
+  school: string[];
+  subject: string[];
+  userId: string[];
+  fetchVisible?: boolean;
+  fetchNonVisible?: boolean;
 }

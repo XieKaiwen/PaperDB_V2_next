@@ -1,12 +1,12 @@
-"use client"
+'use client';
 import { generateOptionsFromJsonList, setSearchParams } from '@/utils/utils';
 import { edu_level, exam_type, School, Subject, User } from '@prisma/client';
 import React, { useMemo, useState } from 'react';
 import { MemoizedPopoverMultipleCheckbox } from '../PopoverMultipleCheckbox';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
-import { Check, Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { ParsedPaperFilterLooseProps } from '@/src/types/types';
 
 interface PaperTableFilterProps {
   filterValues: {
@@ -17,16 +17,7 @@ interface PaperTableFilterProps {
     subjects: Subject[];
     users: User[];
   };
-  activeFilters: {
-    educationLevel: string[];
-    year: string[];
-    examType: string[];
-    school: string[];
-    subject: string[];
-    userId: string[];
-    fetchVisible: boolean;
-    fetchNonVisible: boolean;
-  };
+  activeFilters: ParsedPaperFilterLooseProps;
   type: 'admin' | 'default';
 }
 export default function PaperTableFilter({
@@ -126,7 +117,6 @@ export default function PaperTableFilter({
   const [includeVisible, setIncludeVisible] = useState(fetchVisible);
   const [includeNonVisible, setIncludeNonVisible] = useState(fetchNonVisible);
 
-
   const handleApplyFilters = () => {
     // Implement the logic you want to perform when filters are applied.
     // You can access all selected arrays here.
@@ -140,7 +130,7 @@ export default function PaperTableFilter({
       includeVisible,
       includeNonVisible,
     });
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams.toString());
     setSearchParams({
       searchParams: params,
       paramsToSet: {
@@ -151,11 +141,11 @@ export default function PaperTableFilter({
         edul: educationLevels,
         users: users,
         visible: includeVisible,
-        nonVisible: includeNonVisible
-      }
-    })
-    const updatedURL = `/admin/paper?${params.toString()}`
-    router.push(updatedURL)
+        nonVisible: includeNonVisible,
+      },
+    });
+    const updatedURL = `/admin/paper?${params.toString()}`;
+    router.push(updatedURL);
   };
 
   return (
@@ -202,7 +192,7 @@ export default function PaperTableFilter({
       <div className="flex gap-6">
         <div className="flex items-center space-x-2">
           <Checkbox
-            checked = {includeVisible}
+            checked={includeVisible}
             onCheckedChange={(checked) => {
               setIncludeVisible(checked === true);
             }}
@@ -217,7 +207,7 @@ export default function PaperTableFilter({
         </div>
         <div className="flex items-center space-x-2">
           <Checkbox
-            checked = {includeNonVisible}
+            checked={includeNonVisible}
             onCheckedChange={(checked) => {
               setIncludeNonVisible(checked === true);
             }}
@@ -230,7 +220,7 @@ export default function PaperTableFilter({
           </label>
         </div>
       </div>
-      <Button onClick={handleApplyFilters} size={'lg'} >
+      <Button onClick={handleApplyFilters} size={'lg'}>
         Apply
       </Button>
     </div>

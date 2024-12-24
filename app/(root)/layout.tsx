@@ -1,4 +1,5 @@
 import NavBar from '@/components/NavBar';
+import Scroll from '@/components/Scroll';
 import { Toaster } from '@/components/ui/toaster';
 import { createClient } from '@/utils/supabase/server';
 import { headers } from 'next/headers';
@@ -24,6 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <main className="font-open-sans">
+      <Scroll />
       <NavBar user={user} />
       <div className="mt-16 p-6 pb-0">{children}</div>
       <Toaster />
