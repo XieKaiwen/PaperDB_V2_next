@@ -8,7 +8,6 @@ import { authFormSchema } from '@/utils/authFormUtils';
 import { UserMetadata } from '@supabase/supabase-js';
 import { FieldValues } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
-import { Prisma, Subject } from '@prisma/client';
 import { z } from 'zod';
 
 // Group type and interface together
