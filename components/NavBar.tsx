@@ -6,7 +6,12 @@ import NavLink from './NavLink';
 import { usePathname } from 'next/navigation';
 import MobileNav from './MobileNav';
 import { NavBarProps } from '@/src/types/types';
-import { navRoutes as routes } from '@/src/constants/constants';
+
+export const navRoutes = [
+  { title: 'Home', link: '/home' },
+  { title: 'Contact Us', link: '/contact-us' },
+  { title: 'Papers', link: '/papers' },
+];
 
 export default function NavBar({ user }: NavBarProps) {
   const pathname = usePathname();
@@ -32,7 +37,7 @@ export default function NavBar({ user }: NavBarProps) {
           id="navbar-sticky"
         >
           <ul className="mt-4 flex flex-col rounded-lg border border-gray-100 bg-gray-50 p-4 font-medium md:mt-0 md:flex-row md:space-x-8 md:border-0 md:bg-white md:p-0 rtl:space-x-reverse">
-            {routes.map((route) => {
+            {navRoutes.map((route) => {
               const { title, link } = route;
               const isActive = pathname.startsWith(link);
               return (

@@ -245,7 +245,7 @@ export default function AddQuestionForm() {
         variant: 'destructive',
       });
     }
-  }, [submissionError]);
+  }, [submissionError, toast]);
 
   // FUNCTIONS TO BE CALLED AFTER SUBMISSION
   // Initial submission: Client-side validation -> Check if question number in the paper exists -> Open dialog to move to next step
